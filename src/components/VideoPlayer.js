@@ -20,7 +20,9 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, onClose })
       
       // Use Electron's protocol to serve the file
       if (videoRef.current) {
-        videoRef.current.src = `file://${videoPath}`;
+        // Encode each path segment to handle #, ?, +, % in filenames
+        const safePath = videoPath.split('/').map(encodeURIComponent).join('/');
+        videoRef.current.src = `file://${safePath}`;
         videoRef.current.load();
       }
     }

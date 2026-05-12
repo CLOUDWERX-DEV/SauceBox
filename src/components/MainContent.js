@@ -1,7 +1,7 @@
 import React from 'react';
 import DownloadTab from './tabs/DownloadTab';
 import QueueTab from './tabs/QueueTab';
-import HistoryTab from './tabs/HistoryTab';
+import GalleryTab from './tabs/GalleryTab';
 import SettingsTab from './tabs/SettingsTab';
 
 export default function MainContent({ activeTab }) {
@@ -12,7 +12,7 @@ export default function MainContent({ activeTab }) {
       case 'queue':
         return <QueueTab />;
       case 'history':
-        return <HistoryTab />;
+        return <GalleryTab />;
       case 'settings':
         return <SettingsTab />;
       default:

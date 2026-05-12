@@ -3,10 +3,13 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput 
 import { useStore } from '../../store';
 import { theme } from '../../theme';
 import VideoPlayer from '../VideoPlayer';
+import ConfirmModal from '../ConfirmModal';
+import EditVideoModal from '../EditVideoModal';
+import ImportModal from '../ImportModal';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
-export default function HistoryTab() {
+export default function GalleryTab() {
   const history = useStore(state => state.history);
   const clearHistory = useStore(state => state.clearHistory);
   const removeFromHistory = useStore(state => state.removeFromHistory);
@@ -21,6 +24,9 @@ export default function HistoryTab() {
   const [filterTag, setFilterTag] = useState(null);
   const [editingTagId, setEditingTagId] = useState(null);
   const [newTagText, setNewTagText] = useState('');
+  const [editingVideo, setEditingVideo] = useState(null);
+  const [importVisible, setImportVisible] = useState(false);
+  const [clearConfirmVisible, setClearConfirmVisible] = useState(false);
 
   const allTags = Array.from(new Set(history.flatMap(h => h.tags || []))).sort();
 
@@ -47,16 +53,21 @@ export default function HistoryTab() {
   };
 
   const formatFileSize = (bytes) => {
-    if (!bytes) return null;
-    const mb = bytes / (1024 * 1024);
-    const gb = bytes / (1024 * 1024 * 1024);
+    const num = Number(bytes);
+    if (!num || isNaN(num)) return null;
+    const mb = num / (1024 * 1024);
+    const gb = num / (1024 * 1024 * 1024);
     if (gb >= 1) return `${gb.toFixed(2)} GB`;
     return `${mb.toFixed(2)} MB`;
   };
 
   const handlePlayVideo = async (item) => {
     try {
-      const videoPath = await ipcRenderer?.invoke('get-video-path', `${item.title}.mp4`);
+      let videoPath = item.path;
+      if (!videoPath) {
+        // Fallback for older downloads without absolute path
+        videoPath = await ipcRenderer?.invoke('get-video-path', `${item.title}.mp4`);
+      }
       setSelectedVideo({ path: videoPath, title: item.title });
     } catch (error) {
       console.error('Failed to find video:', error);
@@ -66,7 +77,10 @@ export default function HistoryTab() {
 
   const handleOpenFolder = async (item) => {
     try {
-      const videoPath = await ipcRenderer?.invoke('get-video-path', `${item.title}.mp4`);
+      let videoPath = item.path;
+      if (!videoPath) {
+        videoPath = await ipcRenderer?.invoke('get-video-path', `${item.title}.mp4`);
+      }
       await ipcRenderer?.invoke('open-folder', videoPath);
     } catch (error) {
       console.error('Failed to open folder:', error);
@@ -112,11 +126,16 @@ export default function HistoryTab() {
                   : `${filteredHistory.length} of ${history.length} shown`}
             </Text>
           </View>
-          {history.length > 0 && (
-            <TouchableOpacity style={styles.clearButton} onPress={clearHistory}>
-              <Text style={styles.clearButtonText}>🗑️ Clear All</Text>
+          <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+            <TouchableOpacity style={styles.importButton} onPress={() => setImportVisible(true)}>
+              <Text style={styles.importButtonText}>📥 IMPORT VIDEOS</Text>
             </TouchableOpacity>
-          )}
+            {history.length > 0 && (
+              <TouchableOpacity style={styles.clearButton} onPress={() => setClearConfirmVisible(true)}>
+                <Text style={styles.clearButtonText}>🗑️ Clear All</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         <View style={styles.filterBar}>
@@ -394,6 +413,13 @@ export default function HistoryTab() {
                         </Text>
                       </TouchableOpacity>
                     ))}
+                    
+                    <TouchableOpacity 
+                      style={styles.editMetadataButton} 
+                      onPress={(e) => { e.stopPropagation(); setEditingVideo(item); }}
+                    >
+                      <Text style={styles.editMetadataButtonText}>✏️ Edit</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
@@ -407,6 +433,33 @@ export default function HistoryTab() {
         videoPath={selectedVideo?.path}
         videoTitle={selectedVideo?.title}
         onClose={() => setSelectedVideo(null)}
+      />
+
+      <ConfirmModal
+        visible={clearConfirmVisible}
+        title="Clear Gallery?"
+        message="Are you sure you want to clear your entire video gallery? This will not delete the actual files from your hard drive, but it will remove all metadata, tags, and history from LocalFap."
+        confirmText="Clear Gallery"
+        onConfirm={() => {
+          clearHistory();
+          setClearConfirmVisible(false);
+        }}
+        onCancel={() => setClearConfirmVisible(false)}
+      />
+
+      <EditVideoModal
+        visible={!!editingVideo}
+        video={editingVideo}
+        onSave={(updatedVideo) => {
+          useStore.getState().updateHistoryItem(updatedVideo.id, updatedVideo);
+          setEditingVideo(null);
+        }}
+        onClose={() => setEditingVideo(null)}
+      />
+
+      <ImportModal
+        visible={importVisible}
+        onClose={() => setImportVisible(false)}
       />
     </>
   );
@@ -438,6 +491,28 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontStyle: 'italic',
   },
+  importButton: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    cursor: 'pointer',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  importButtonText: {
+    color: '#000',
+    fontSize: 15,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
   clearButton: {
     backgroundColor: `${theme.colors.primary}20`,
     paddingHorizontal: 20,
@@ -455,8 +530,8 @@ const styles = StyleSheet.create({
   filterBar: {
     backgroundColor: theme.colors.surface,
     borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
+    padding: 16,
+    marginBottom: 20,
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
@@ -466,8 +541,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surfaceLight,
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginBottom: 20,
+    paddingVertical: 10,
+    marginBottom: 16,
     borderWidth: 2,
     borderColor: `${theme.colors.primary}30`,
   },
@@ -496,13 +571,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   filterControls: {
-    gap: 16,
-  },
-  filterGroup: {
     gap: 12,
   },
+  filterGroup: {
+    gap: 8,
+  },
   filterLabel: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: theme.colors.primary,
     textTransform: 'uppercase',
@@ -514,13 +589,14 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   filterButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 8,
     backgroundColor: theme.colors.surfaceLight,
     borderWidth: 1,
     borderColor: theme.colors.border,
     cursor: 'pointer',
+    maxWidth: 160,
   },
   filterButtonActive: {
     backgroundColor: `${theme.colors.primary}20`,
@@ -530,6 +606,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: theme.colors.textSecondary,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   filterButtonTextActive: {
     color: theme.colors.primary,
@@ -569,9 +648,11 @@ const styles = StyleSheet.create({
   },
   historyCard: {
     width: 'calc(33.333% - 14px)',
+    height: 420,
+    flexDirection: 'column',
     backgroundColor: theme.colors.surface,
     borderRadius: 16,
-    overflow: 'visible',
+    overflow: 'hidden',
     borderWidth: 1,
     borderColor: theme.colors.border,
     cursor: 'pointer',
@@ -619,10 +700,9 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: '100%',
     height: 200,
+    minHeight: 200,
     backgroundColor: theme.colors.surfaceLight,
     resizeMode: 'cover',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
   },
   overlay: {
     position: 'absolute',
@@ -649,40 +729,49 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   cardInfo: {
+    flex: 1,
     padding: 16,
+    justifyContent: 'space-between',
   },
   historyTitle: {
     fontSize: 15,
     fontWeight: '600',
     color: theme.colors.text,
     marginBottom: 4,
+    lineHeight: 20,
+    height: 40,
   },
   uploaderName: {
     fontSize: 13,
     fontWeight: '700',
     color: theme.colors.primary,
     marginBottom: 8,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
   historyMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 8,
   },
   historyMetaText: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textTertiary,
+    whiteSpace: 'nowrap',
   },
   historyMetaDot: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#444',
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
-    marginTop: 10,
-    paddingTop: 10,
+    marginTop: 8,
+    paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
   },
@@ -699,34 +788,40 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   starFilled: {
-    fontSize: 18,
+    fontSize: 16,
     color: theme.colors.primary,
   },
   starEmpty: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#444444',
   },
   tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
-    marginTop: 4,
+    overflow: 'hidden',
+    maxHeight: 50,
   },
   tagBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: `${theme.colors.primary}20`,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
     borderRadius: 6,
     borderWidth: 1,
     borderColor: theme.colors.primary,
+    maxWidth: 120,
   },
   tagBadgeText: {
     color: theme.colors.primary,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
     marginRight: 4,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    flexShrink: 1,
   },
   tagRemoveText: {
     color: theme.colors.primary,
@@ -735,8 +830,8 @@ const styles = StyleSheet.create({
   },
   addTagButton: {
     backgroundColor: theme.colors.surfaceLight,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
     borderRadius: 6,
     borderWidth: 1,
     borderColor: theme.colors.border,
@@ -744,7 +839,7 @@ const styles = StyleSheet.create({
   },
   addTagButtonText: {
     color: theme.colors.textSecondary,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
   },
   tagInput: {
@@ -752,11 +847,25 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     fontSize: 11,
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 2,
     borderRadius: 6,
     borderWidth: 1,
     borderColor: theme.colors.primary,
     outlineStyle: 'none',
     width: 80,
+  },
+  editMetadataButton: {
+    marginLeft: 'auto',
+    backgroundColor: theme.colors.surfaceLight,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  editMetadataButtonText: {
+    color: theme.colors.textSecondary,
+    fontSize: 11,
+    fontWeight: '600',
   }
 });

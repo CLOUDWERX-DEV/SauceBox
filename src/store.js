@@ -45,9 +45,26 @@ export const useStore = create(
       clearQueue: () => set({ downloads: [] }),
       
       addToHistory: (item) => set((state) => ({
-        history: [{ ...item, id: Date.now(), timestamp: Date.now(), rating: 0, tags: [] }, ...state.history]
+        history: [{ ...item, id: Date.now(), timestamp: Date.now(), rating: item.rating || 0, tags: item.tags || [] }, ...state.history]
       })),
       
+      importVideos: (videos) => set((state) => {
+        const timestamp = Date.now();
+        const items = videos.map((v, i) => ({
+          ...v,
+          id: timestamp + i,
+          timestamp: timestamp + i,
+          rating: v.rating || 0,
+          tags: v.tags || [],
+          status: 'completed'
+        }));
+        return { history: [...items, ...state.history] };
+      }),
+      
+      updateHistoryItem: (id, updates) => set((state) => ({
+        history: state.history.map(h => h.id === id ? { ...h, ...updates } : h)
+      })),
+
       updateHistoryRating: (id, rating) => set((state) => ({
         history: state.history.map(h => h.id === id ? { ...h, rating } : h)
       })),

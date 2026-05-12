@@ -43,7 +43,7 @@ export default function App() {
         }
       };
 
-      const progressHandler = (event, data) => {
+      const progressHandler = async (event, data) => {
         const store = useStore.getState();
         const download = store.downloads.find(d => d.id === data.id);
         if (download) {
@@ -62,6 +62,14 @@ export default function App() {
 
           if (data.status === 'completed') {
             const currentSettings = store.settings;
+            try {
+              const videoPath = await ipcRenderer?.invoke('get-video-path', `${download.title}.mp4`);
+              if (videoPath) {
+                const meta = await ipcRenderer?.invoke('get-local-metadata', videoPath);
+                if (meta?.filesize) download.filesize = meta.filesize;
+                download.path = videoPath;
+              }
+            } catch (e) {}
             if (currentSettings.autoTagDomainUploader) {
               const generatedTags = [];
               try {
@@ -69,11 +77,11 @@ export default function App() {
                 let domain = urlObj.hostname.replace('www.', '');
                 // Try to get just the main name (e.g. pornhub.com -> pornhub)
                 domain = domain.substring(0, domain.lastIndexOf('.'));
-                if (domain) generatedTags.push(domain);
+                if (domain) {
+                  const formattedDomain = domain.charAt(0).toUpperCase() + domain.slice(1);
+                  generatedTags.push(formattedDomain);
+                }
               } catch (e) {}
-              if (download.uploader && download.uploader !== 'Unknown') {
-                generatedTags.push(download.uploader);
-              }
               download.tags = [...new Set([...(download.tags || []), ...generatedTags])];
             }
             store.addToHistory(download);
@@ -162,7 +170,7 @@ export default function App() {
                 uploader: info.uploader || d.uploader,
                 resolution: info.resolution || d.resolution,
                 format: info.format || d.format,
-                filesize: info.filesize || d.filesize,
+                filesize: info.filesize || info.filesize_approx || d.filesize,
                 duration: info.duration || d.duration,
                 thumbnail: info.thumbnail || d.thumbnail
               });

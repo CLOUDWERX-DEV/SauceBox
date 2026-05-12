@@ -541,6 +541,111 @@ ipcMain.handle('select-folder', async () => {
   return null;
 });
 
+ipcMain.handle('select-import-files', async () => {
+  const { dialog } = require('electron');
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile', 'multiSelections'],
+    filters: [{ name: 'Videos', extensions: ['mp4', 'mkv', 'webm', 'avi', 'mov'] }]
+  });
+  return result.canceled ? [] : result.filePaths;
+});
+
+ipcMain.handle('select-import-folder', async () => {
+  const { dialog } = require('electron');
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory']
+  });
+  if (result.canceled || result.filePaths.length === 0) return [];
+  
+  const dir = result.filePaths[0];
+  try {
+    const files = fs.readdirSync(dir);
+    const exts = ['.mp4', '.mkv', '.webm', '.avi', '.mov'];
+    return files
+      .filter(f => exts.includes(path.extname(f).toLowerCase()))
+      .map(f => path.join(dir, f));
+  } catch (e) {
+    console.error('Failed to read directory:', e);
+    return [];
+  }
+});
+
+ipcMain.handle('get-local-metadata', async (event, filePath) => {
+  return new Promise((resolve) => {
+    // Note: using ffmpeg -i to dump metadata to stderr and exit
+    const ffmpeg = spawn(currentFfmpegPath, ['-i', filePath]);
+    let output = '';
+    
+    ffmpeg.stderr.on('data', d => { output += d.toString(); });
+    
+    ffmpeg.on('close', () => {
+      let duration = null;
+      let resolution = null;
+      
+      const durMatch = output.match(/Duration: (\d{2}):(\d{2}):(\d{2})\.\d{2}/);
+      if (durMatch) {
+        duration = parseInt(durMatch[1], 10) * 3600 + parseInt(durMatch[2], 10) * 60 + parseInt(durMatch[3], 10);
+      }
+      
+      const resMatch = output.match(/Video: .*, (\d{3,4}x\d{3,4})/);
+      if (resMatch) {
+        resolution = resMatch[1];
+      }
+      
+      let filesize = null;
+      try {
+        filesize = fs.statSync(filePath).size;
+      } catch (e) {}
+      
+      resolve({ duration, resolution, filesize });
+    });
+    
+    ffmpeg.on('error', () => resolve({ duration: null, resolution: null, filesize: null }));
+  });
+});
+
+ipcMain.handle('get-local-thumbnail', async (event, filePath) => {
+  return new Promise((resolve) => {
+    const thumbDir = path.join(app.getPath('userData'), 'thumbnails');
+    if (!fs.existsSync(thumbDir)) {
+      fs.mkdirSync(thumbDir, { recursive: true });
+    }
+    const filename = `thumb_${Date.now()}_${Math.floor(Math.random() * 10000)}.jpg`;
+    const outputPath = path.join(thumbDir, filename);
+
+    const ffmpeg = spawn(currentFfmpegPath, [
+      '-ss', '00:00:05',
+      '-i', filePath,
+      '-vframes', '1',
+      '-q:v', '2',
+      '-y',
+      outputPath
+    ]);
+
+    ffmpeg.on('close', (code) => {
+      if (code === 0 && fs.existsSync(outputPath)) {
+        resolve(`file://${outputPath}`);
+      } else {
+        const ffmpegFallback = spawn(currentFfmpegPath, [
+          '-ss', '00:00:01',
+          '-i', filePath,
+          '-vframes', '1',
+          '-q:v', '2',
+          '-y',
+          outputPath
+        ]);
+        ffmpegFallback.on('close', (codeFallback) => {
+          if (codeFallback === 0 && fs.existsSync(outputPath)) {
+             resolve(`file://${outputPath}`);
+          } else {
+             resolve(null);
+          }
+        });
+      }
+    });
+  });
+});
+
 ipcMain.handle('minimize-window', () => mainWindow.minimize());
 ipcMain.handle('maximize-window', () => mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize());
 ipcMain.handle('close-window', () => mainWindow.close());

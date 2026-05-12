@@ -365,8 +365,8 @@ export default function SettingsTab() {
         <View style={styles.card}>
           <View style={styles.switchRow}>
             <View style={styles.switchInfo}>
-              <Text style={styles.switchLabel}>Auto-Tagging (Domain & Uploader)</Text>
-              <Text style={styles.switchDesc}>Automatically tag videos based on source site and creator</Text>
+              <Text style={styles.switchLabel}>Auto-Tagging (Domain/Provider)</Text>
+              <Text style={styles.switchDesc}>Automatically tag videos based on their source site (e.g. Pornhub, Spankbang)</Text>
             </View>
             <Switch
               value={settings.autoTagDomainUploader}

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'rea
 import { useStore } from '../../store';
 import { theme } from '../../theme';
 import VideoPlayer from '../VideoPlayer';
+import ConfirmModal from '../ConfirmModal';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
@@ -13,6 +14,7 @@ export default function QueueTab() {
   const clearQueue = useStore(state => state.clearQueue);
   const addToHistory = useStore(state => state.addToHistory);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [clearConfirmVisible, setClearConfirmVisible] = useState(false);
 
   const formatDuration = (seconds) => {
     if (!seconds) return 'Unknown';
@@ -22,9 +24,10 @@ export default function QueueTab() {
   };
 
   const formatFileSize = (bytes) => {
-    if (!bytes) return 'Unknown';
-    const mb = bytes / (1024 * 1024);
-    const gb = bytes / (1024 * 1024 * 1024);
+    const num = Number(bytes);
+    if (!num || isNaN(num)) return null;
+    const mb = num / (1024 * 1024);
+    const gb = num / (1024 * 1024 * 1024);
     if (gb >= 1) return `${gb.toFixed(2)} GB`;
     return `${mb.toFixed(2)} MB`;
   };
@@ -99,11 +102,13 @@ export default function QueueTab() {
         <View>
           <Text style={styles.title}>Download Queue</Text>
           <Text style={styles.subtitle}>
-            {downloads.length === 0 ? 'No downloads yet' : `${downloads.length} item(s) in the oven 🔥`}
+            {downloads.filter(d => d.status !== 'completed').length === 0 
+              ? 'No downloads in queue' 
+              : `${downloads.filter(d => d.status !== 'completed').length} item(s) in queue 🔥`}
           </Text>
         </View>
         {downloads.length > 0 && (
-          <TouchableOpacity style={styles.clearButton} onPress={clearQueue}>
+          <TouchableOpacity style={styles.clearButton} onPress={() => setClearConfirmVisible(true)}>
             <Text style={styles.clearButtonText}>🗑️ Clear Queue</Text>
           </TouchableOpacity>
         )}
@@ -250,6 +255,18 @@ export default function QueueTab() {
       videoPath={selectedVideo?.path}
       videoTitle={selectedVideo?.title}
       onClose={() => setSelectedVideo(null)}
+    />
+
+    <ConfirmModal
+      visible={clearConfirmVisible}
+      title="Clear Queue?"
+      message="Are you sure you want to clear all downloads from the queue? Active downloads will be stopped and removed."
+      confirmText="Clear Queue"
+      onConfirm={() => {
+        clearQueue();
+        setClearConfirmVisible(false);
+      }}
+      onCancel={() => setClearConfirmVisible(false)}
     />
   </>
 );
