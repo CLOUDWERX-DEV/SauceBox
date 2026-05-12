@@ -11,11 +11,18 @@ export default function HistoryTab() {
   const clearHistory = useStore(state => state.clearHistory);
   const removeFromHistory = useStore(state => state.removeFromHistory);
   const updateHistoryRating = useStore(state => state.updateHistoryRating);
+  const addTagToHistory = useStore(state => state.addTagToHistory);
+  const removeTagFromHistory = useStore(state => state.removeTagFromHistory);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('date'); // date, title, duration, rating
+  const [sortBy, setSortBy] = useState('date');
   const [filterResolution, setFilterResolution] = useState('all');
-  const [filterRating, setFilterRating] = useState(0); // 0 = all, 1-5 = min stars
+  const [filterRating, setFilterRating] = useState(0);
+  const [filterTag, setFilterTag] = useState(null);
+  const [editingTagId, setEditingTagId] = useState(null);
+  const [newTagText, setNewTagText] = useState('');
+
+  const allTags = Array.from(new Set(history.flatMap(h => h.tags || []))).sort();
 
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
@@ -74,7 +81,8 @@ export default function HistoryTab() {
       const matchesResolution = filterResolution === 'all' ||
         (item.resolution && item.resolution.includes(filterResolution));
       const matchesRating = filterRating === 0 || (item.rating || 0) >= filterRating;
-      return matchesSearch && matchesResolution && matchesRating;
+      const matchesTag = !filterTag || (item.tags && item.tags.includes(filterTag));
+      return matchesSearch && matchesResolution && matchesRating && matchesTag;
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -229,6 +237,33 @@ export default function HistoryTab() {
                 ))}
               </View>
             </View>
+
+            {allTags.length > 0 && (
+              <View style={styles.filterGroup}>
+                <Text style={styles.filterLabel}>Tag:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterButtons}>
+                  <TouchableOpacity
+                    style={[styles.filterButton, !filterTag && styles.filterButtonActive]}
+                    onPress={() => setFilterTag(null)}
+                  >
+                    <Text style={[styles.filterButtonText, !filterTag && styles.filterButtonTextActive]}>
+                      All
+                    </Text>
+                  </TouchableOpacity>
+                  {allTags.map(tag => (
+                    <TouchableOpacity
+                      key={tag}
+                      style={[styles.filterButton, filterTag === tag && styles.filterButtonActive]}
+                      onPress={() => setFilterTag(tag)}
+                    >
+                      <Text style={[styles.filterButtonText, filterTag === tag && styles.filterButtonTextActive]}>
+                        🏷️ {tag}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
           </View>
         </View>
 
@@ -314,6 +349,35 @@ export default function HistoryTab() {
                     </Text>
                   </View>
                   
+                  <View style={styles.tagsContainer}>
+                    {(item.tags || []).map(tag => (
+                      <View key={tag} style={styles.tagBadge}>
+                        <Text style={styles.tagBadgeText}>{tag}</Text>
+                        <TouchableOpacity onPress={(e) => { e.stopPropagation(); removeTagFromHistory(item.id, tag); }}>
+                          <Text style={styles.tagRemoveText}>✕</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                    {editingTagId === item.id ? (
+                      <TextInput 
+                        style={styles.tagInput}
+                        autoFocus
+                        value={newTagText}
+                        onChangeText={setNewTagText}
+                        onBlur={() => { setEditingTagId(null); setNewTagText(''); }}
+                        onSubmitEditing={() => {
+                          if (newTagText.trim()) addTagToHistory(item.id, newTagText.trim());
+                          setEditingTagId(null);
+                          setNewTagText('');
+                        }}
+                      />
+                    ) : (
+                      <TouchableOpacity style={styles.addTagButton} onPress={(e) => { e.stopPropagation(); setEditingTagId(item.id); }}>
+                        <Text style={styles.addTagButtonText}>+ Tag</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+
                   <View style={styles.ratingContainer}>
                     <Text style={styles.ratingLabel}>Rate:</Text>
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -641,5 +705,58 @@ const styles = StyleSheet.create({
   starEmpty: {
     fontSize: 18,
     color: '#444444',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 4,
+  },
+  tagBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: `${theme.colors.primary}20`,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+  },
+  tagBadgeText: {
+    color: theme.colors.primary,
+    fontSize: 11,
+    fontWeight: '600',
+    marginRight: 4,
+  },
+  tagRemoveText: {
+    color: theme.colors.primary,
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  addTagButton: {
+    backgroundColor: theme.colors.surfaceLight,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    justifyContent: 'center',
+  },
+  addTagButtonText: {
+    color: theme.colors.textSecondary,
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  tagInput: {
+    backgroundColor: theme.colors.surfaceLight,
+    color: theme.colors.text,
+    fontSize: 11,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+    outlineStyle: 'none',
+    width: 80,
   }
 });

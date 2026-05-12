@@ -15,7 +15,9 @@ export const useStore = create(
         autoClearCompleted: false,
         systemNotifications: true,
         preferredContainer: 'mp4',
-        proxyString: ''
+        proxyString: '',
+        vaultEnabled: false,
+        vaultPin: '0000'
       },
       
       addDownload: (download) => set((state) => {
@@ -36,11 +38,19 @@ export const useStore = create(
       clearQueue: () => set({ downloads: [] }),
       
       addToHistory: (item) => set((state) => ({
-        history: [{ ...item, id: Date.now(), timestamp: Date.now(), rating: 0 }, ...state.history]
+        history: [{ ...item, id: Date.now(), timestamp: Date.now(), rating: 0, tags: [] }, ...state.history]
       })),
       
       updateHistoryRating: (id, rating) => set((state) => ({
         history: state.history.map(h => h.id === id ? { ...h, rating } : h)
+      })),
+      
+      addTagToHistory: (id, tag) => set((state) => ({
+        history: state.history.map(h => h.id === id ? { ...h, tags: [...(h.tags || []), tag] } : h)
+      })),
+      
+      removeTagFromHistory: (id, tag) => set((state) => ({
+        history: state.history.map(h => h.id === id ? { ...h, tags: (h.tags || []).filter(t => t !== tag) } : h)
       })),
       
       removeFromHistory: (id) => set((state) => ({

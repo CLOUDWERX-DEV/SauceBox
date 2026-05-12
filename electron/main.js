@@ -1,8 +1,9 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const fs = require('fs');
 const os = require('os');
+const http = require('http');
 
 function decodeHTMLEntities(text) {
   if (!text) return text;
@@ -40,6 +41,51 @@ function createWindow() {
 if (app) {
   app.whenReady().then(() => {
     createWindow();
+
+    // Start local HTTP Server for Chrome Extension
+    const server = http.createServer((req, res) => {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+      if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+      }
+
+      if (req.method === 'POST' && req.url === '/add-download') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+          try {
+            const { url } = JSON.parse(body);
+            if (url && mainWindow) {
+              mainWindow.webContents.send('external-add-url', url);
+            }
+            res.writeHead(200);
+            res.end(JSON.stringify({ success: true }));
+          } catch (e) {
+            res.writeHead(400);
+            res.end(JSON.stringify({ error: e.message }));
+          }
+        });
+      } else {
+        res.writeHead(404);
+        res.end();
+      }
+    });
+    server.listen(13337, '127.0.0.1');
+
+    // Stealth Mode Global Shortcut
+    globalShortcut.register('CommandOrControl+Shift+H', () => {
+      if (mainWindow.isVisible()) {
+        mainWindow.webContents.send('panic-stealth');
+        mainWindow.hide();
+      } else {
+        mainWindow.show();
+      }
+    });
 
     // Inject Referer headers for adult video CDNs to bypass hotlink protection.
     // Without this, thumbnail images return 403 because the CDN checks Referer.
@@ -472,5 +518,27 @@ ipcMain.handle('get-entry-thumbnails', async (event, entries) => {
   }
 
   return allResults;
+});
+
+ipcMain.handle('trim-video', async (event, { inputPath, outputPath, startTime, duration }) => {
+  return new Promise((resolve, reject) => {
+    const args = [
+      '-ss', startTime.toString(),
+      '-i', inputPath,
+      '-t', duration.toString(),
+      '-c', 'copy',
+      outputPath
+    ];
+    const ffmpeg = spawn('ffmpeg', args);
+    let errOutput = '';
+    ffmpeg.stderr.on('data', d => { errOutput += d.toString(); });
+    ffmpeg.on('close', (code) => {
+      if (code === 0) resolve({ success: true, path: outputPath });
+      else reject(new Error('ffmpeg failed: ' + errOutput));
+    });
+    ffmpeg.on('error', (err) => {
+      reject(new Error('Failed to spawn ffmpeg. Make sure it is installed in PATH. ' + err.message));
+    });
+  });
 });
 

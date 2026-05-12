@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import TitleBar from './components/TitleBar';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
+import AppLock from './components/AppLock';
 
 import { useStore } from './store';
 
@@ -13,9 +14,26 @@ export default function App() {
   const downloads = useStore(state => state.downloads);
   const maxConcurrentDownloads = useStore(state => state.settings.maxConcurrentDownloads);
   const updateDownload = useStore(state => state.updateDownload);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const vaultEnabled = useStore(state => state.settings.vaultEnabled);
 
   useEffect(() => {
     if (ipcRenderer) {
+      const externalAddHandler = (event, url) => {
+        useStore.getState().addDownload({ url, title: 'Fetching metadata...' });
+      };
+      
+      const panicStealthHandler = () => {
+        setIsUnlocked(false);
+        const store = useStore.getState();
+        store.downloads.forEach(d => {
+          if (d.status === 'downloading') {
+            ipcRenderer.invoke('pause-download', d.id);
+            store.updateDownload(d.id, { status: 'paused', speed: null, eta: null });
+          }
+        });
+      };
+
       const progressHandler = (event, data) => {
         const download = useStore.getState().downloads.find(d => d.id === data.id);
         if (download) {
@@ -62,11 +80,15 @@ export default function App() {
         }
       };
       
+      ipcRenderer.on('external-add-url', externalAddHandler);
+      ipcRenderer.on('panic-stealth', panicStealthHandler);
       ipcRenderer.on('download-progress', progressHandler);
       ipcRenderer.on('download-speed', speedHandler);
       ipcRenderer.on('download-eta', etaHandler);
       
       return () => {
+        ipcRenderer.removeListener('external-add-url', externalAddHandler);
+        ipcRenderer.removeListener('panic-stealth', panicStealthHandler);
         ipcRenderer.removeListener('download-progress', progressHandler);
         ipcRenderer.removeListener('download-speed', speedHandler);
         ipcRenderer.removeListener('download-eta', etaHandler);
@@ -132,6 +154,15 @@ export default function App() {
       });
     }
   }, [downloads, maxConcurrentDownloads, updateDownload]);
+
+  if (vaultEnabled && !isUnlocked) {
+    return (
+      <View style={styles.container}>
+        <TitleBar />
+        <AppLock onUnlock={() => setIsUnlocked(true)} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

@@ -8,6 +8,10 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, onClose })
   const videoRef = useRef(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [trimMode, setTrimMode] = useState(false);
+  const [startTime, setStartTime] = useState('00:00:00');
+  const [duration, setDuration] = useState('00:00:30');
+  const [trimming, setTrimming] = useState(false);
 
   useEffect(() => {
     if (visible && videoPath) {
@@ -46,6 +50,27 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, onClose })
     }
   };
 
+  const handleSaveClip = async () => {
+    if (!startTime || !duration) return alert("Enter valid start time and duration");
+    try {
+      setTrimming(true);
+      const ext = videoPath.split('.').pop();
+      const newPath = videoPath.replace(`.${ext}`, `_clip_${Date.now()}.${ext}`);
+      await ipcRenderer?.invoke('trim-video', {
+        inputPath: videoPath,
+        outputPath: newPath,
+        startTime,
+        duration
+      });
+      alert('Clip saved successfully at:\n' + newPath);
+      setTrimMode(false);
+    } catch (err) {
+      alert('Failed to trim video:\n' + err.message);
+    } finally {
+      setTrimming(false);
+    }
+  };
+
   if (!visible) return null;
 
   return (
@@ -57,10 +82,43 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, onClose })
               <Text style={styles.title}>Video Player</Text>
               {videoTitle && <Text style={styles.subtitle}>{videoTitle}</Text>}
             </View>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <Text style={styles.closeButtonText}>✕</Text>
-            </TouchableOpacity>
+            <View style={styles.headerActions}>
+              <TouchableOpacity style={styles.trimToggleButton} onPress={() => setTrimMode(!trimMode)}>
+                <Text style={styles.trimToggleButtonText}>✂️ Clip Mode</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+          
+          {trimMode && (
+            <View style={styles.trimBar}>
+              <View style={styles.trimInputGroup}>
+                <Text style={styles.trimLabel}>Start Time (HH:MM:SS)</Text>
+                <input 
+                  style={styles.trimInput} 
+                  value={startTime} 
+                  onChange={(e) => setStartTime(e.target.value)} 
+                />
+              </View>
+              <View style={styles.trimInputGroup}>
+                <Text style={styles.trimLabel}>Duration (HH:MM:SS or Seconds)</Text>
+                <input 
+                  style={styles.trimInput} 
+                  value={duration} 
+                  onChange={(e) => setDuration(e.target.value)} 
+                />
+              </View>
+              <TouchableOpacity 
+                style={[styles.saveClipButton, trimming && { opacity: 0.5 }]} 
+                onPress={handleSaveClip}
+                disabled={trimming}
+              >
+                <Text style={styles.saveClipButtonText}>{trimming ? '✂️ Trimming...' : '💾 Save Clip'}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
           
           <View style={styles.videoContainer}>
             {loading && (
@@ -206,5 +264,65 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  trimToggleButton: {
+    backgroundColor: `${theme.colors.primary}20`,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+    cursor: 'pointer',
+  },
+  trimToggleButtonText: {
+    color: theme.colors.primary,
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  trimBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surfaceLight,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    gap: 20,
+  },
+  trimInputGroup: {
+    flexDirection: 'column',
+    gap: 4,
+  },
+  trimLabel: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+  },
+  trimInput: {
+    backgroundColor: theme.colors.surface,
+    border: `1px solid ${theme.colors.border}`,
+    borderRadius: 6,
+    color: theme.colors.text,
+    padding: '8px 12px',
+    fontSize: 14,
+    width: 140,
+    outline: 'none',
+  },
+  saveClipButton: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    cursor: 'pointer',
+    marginTop: 18, // Align with inputs
+  },
+  saveClipButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
   }
 });

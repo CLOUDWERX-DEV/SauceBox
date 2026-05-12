@@ -119,6 +119,44 @@ export default function SettingsTab() {
       </View>
 
       <View style={styles.section}>
+        <Text style={styles.sectionTitle}>🔒 Security & Vault</Text>
+        <View style={styles.card}>
+          <View style={styles.switchRow}>
+            <View style={styles.switchInfo}>
+              <Text style={styles.switchLabel}>App Lock (Vault Mode)</Text>
+              <Text style={styles.switchDesc}>Require a PIN code to open LocalFap</Text>
+            </View>
+            <Switch
+              value={settings.vaultEnabled}
+              onValueChange={(value) => updateSettings({ vaultEnabled: value })}
+              trackColor={{ false: theme.colors.surfaceLight, true: `${theme.colors.primary}40` }}
+              thumbColor={settings.vaultEnabled ? theme.colors.primary : theme.colors.textTertiary}
+            />
+          </View>
+          
+          {settings.vaultEnabled && (
+            <View style={[styles.switchRow, { marginTop: 24 }]}>
+              <View style={styles.switchInfo}>
+                <Text style={styles.switchLabel}>Vault PIN Code</Text>
+                <Text style={styles.switchDesc}>4-digit PIN required to unlock</Text>
+              </View>
+              <TextInput
+                style={[styles.pathInput, { flex: 0, width: 100, textAlign: 'center', letterSpacing: 8 }]}
+                value={settings.vaultPin}
+                secureTextEntry={true}
+                maxLength={4}
+                keyboardType="numeric"
+                onChangeText={(text) => {
+                  const num = text.replace(/[^0-9]/g, '');
+                  updateSettings({ vaultPin: num });
+                }}
+              />
+            </View>
+          )}
+        </View>
+      </View>
+
+      <View style={styles.section}>
         <Text style={styles.sectionTitle}>⚡ Advanced</Text>
         <View style={styles.card}>
           <View style={styles.switchRow}>
