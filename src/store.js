@@ -10,7 +10,12 @@ export const useStore = create(
         downloadPath: '',
         quality: 'best',
         autoDownload: true,
-        maxConcurrentDownloads: 0
+        maxConcurrentDownloads: 0,
+        downloadSpeedLimit: 0,
+        autoClearCompleted: false,
+        systemNotifications: true,
+        preferredContainer: 'mp4',
+        proxyString: ''
       },
       
       addDownload: (download) => set((state) => {

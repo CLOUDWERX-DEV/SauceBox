@@ -87,7 +87,7 @@ if (app) {
 
 const activeDownloads = new Map();
 
-ipcMain.handle('download-video', async (event, { id, url, outputPath, resume = false }) => {
+ipcMain.handle('download-video', async (event, { id, url, outputPath, resume = false, speedLimit, container = 'mp4', proxy }) => {
   console.log('Starting download for:', url, 'Resume:', resume, 'ID:', id);
   return new Promise((resolve, reject) => {
     const downloadsDir = outputPath || path.join(os.homedir(), 'Downloads', 'LocalFap');
@@ -98,10 +98,22 @@ ipcMain.handle('download-video', async (event, { id, url, outputPath, resume = f
       console.log('Created download directory');
     }
 
+    let formatArgs = [];
+    if (container === 'mkv') {
+      formatArgs = ['-f', 'bestvideo+bestaudio/best', '--merge-output-format', 'mkv'];
+    } else if (container === 'webm') {
+      formatArgs = ['-f', 'bestvideo[ext=webm]+bestaudio[ext=webm]/best', '--merge-output-format', 'webm'];
+    } else if (container === 'any') {
+      formatArgs = ['-f', 'bestvideo+bestaudio/best'];
+    } else {
+      formatArgs = ['-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--merge-output-format', 'mp4'];
+    }
+
+    const extTemplate = container === 'any' ? '%(ext)s' : container;
+
     const args = [
-      '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-      '--merge-output-format', 'mp4',
-      '-o', path.join(downloadsDir, '%(title)s.%(ext)s'),
+      ...formatArgs,
+      '-o', path.join(downloadsDir, `%(title)s.${extTemplate}`),
       '--newline',
       '--no-playlist',
       '--concurrent-fragments', '3',
@@ -117,7 +129,14 @@ ipcMain.handle('download-video', async (event, { id, url, outputPath, resume = f
     args.push('--retries', '10');
     args.push('--fragment-retries', '10');
     args.push('--retry-sleep', '5');
-    args.push('--throttled-rate', '100K');
+    
+    if (speedLimit && speedLimit > 0) {
+      args.push('--limit-rate', `${speedLimit}K`);
+    }
+
+    if (proxy && proxy.trim() !== '') {
+      args.push('--proxy', proxy.trim());
+    }
     
     args.push(url);
 

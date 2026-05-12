@@ -26,6 +26,24 @@ export default function App() {
           
           if (data.status === 'completed') {
             useStore.getState().addToHistory(download);
+            
+            if (useStore.getState().settings.systemNotifications && window.Notification) {
+              new Notification('Download Complete', {
+                body: `${download.title} has finished downloading.`,
+                icon: 'logo.png'
+              });
+            }
+
+            if (useStore.getState().settings.autoClearCompleted) {
+              useStore.getState().removeDownload(download.id);
+            }
+          } else if (data.status === 'failed') {
+            if (useStore.getState().settings.systemNotifications && window.Notification) {
+              new Notification('Download Failed', {
+                body: `${download.title} failed to download.`,
+                icon: 'logo.png'
+              });
+            }
           }
         }
       };
@@ -98,7 +116,15 @@ export default function App() {
             }
           }
           
-          await ipcRenderer?.invoke('download-video', { id: d.id, url: d.url, resume: d.isRetry });
+          const currentSettings = useStore.getState().settings;
+          await ipcRenderer?.invoke('download-video', { 
+            id: d.id, 
+            url: d.url, 
+            resume: d.isRetry,
+            speedLimit: currentSettings.downloadSpeedLimit,
+            container: currentSettings.preferredContainer,
+            proxy: currentSettings.proxyString
+          });
         } catch (err) {
           console.error(err);
           updateDownload(d.id, { status: 'failed' });
