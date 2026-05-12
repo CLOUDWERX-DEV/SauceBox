@@ -1,0 +1,457 @@
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
+const { spawn } = require('child_process');
+const fs = require('fs');
+const os = require('os');
+
+function decodeHTMLEntities(text) {
+  if (!text) return text;
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&#39;/g, "'");
+}
+
+let mainWindow;
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1400,
+    height: 900,
+    minWidth: 1200,
+    minHeight: 700,
+    backgroundColor: '#0a0a0a',
+    titleBarStyle: 'hidden',
+    frame: false,
+    icon: path.join(__dirname, '../public/icon.png'),
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      webSecurity: false
+    }
+  });
+
+  mainWindow.loadURL('http://localhost:8081');
+}
+
+if (app) {
+  app.whenReady().then(() => {
+    createWindow();
+
+    // Inject Referer headers for adult video CDNs to bypass hotlink protection.
+    // Without this, thumbnail images return 403 because the CDN checks Referer.
+    const { session } = require('electron');
+    const cdnRefererMap = [
+      { pattern: '*://*.phncdn.com/*',        referer: 'https://www.pornhub.com/' },
+      { pattern: '*://*.pornhub.com/*',        referer: 'https://www.pornhub.com/' },
+      { pattern: '*://*.xvideos-cdn.com/*',    referer: 'https://www.xvideos.com/' },
+      { pattern: '*://*.xvideos.com/*',        referer: 'https://www.xvideos.com/' },
+      { pattern: '*://*.xhamster*.com/*',      referer: 'https://xhamster.com/' },
+      { pattern: '*://*.redtubefiles.com/*',   referer: 'https://www.redtube.com/' },
+      { pattern: '*://*.redtube.com/*',        referer: 'https://www.redtube.com/' },
+      { pattern: '*://*.youporn.com/*',        referer: 'https://www.youporn.com/' },
+      { pattern: '*://*.ypncdn.com/*',         referer: 'https://www.youporn.com/' },
+      { pattern: '*://*.thumbs.redditmedia.com/*', referer: 'https://www.reddit.com/' },
+    ];
+
+    session.defaultSession.webRequest.onBeforeSendHeaders(
+      { urls: cdnRefererMap.map(e => e.pattern) },
+      (details, callback) => {
+        try {
+          const reqUrl = new URL(details.url);
+          for (const { pattern, referer } of cdnRefererMap) {
+            // Convert glob pattern to a simple hostname suffix check
+            const domain = pattern.replace('*://*.', '').replace('/*', '').split('/')[0];
+            if (reqUrl.hostname === domain || reqUrl.hostname.endsWith('.' + domain)) {
+              details.requestHeaders['Referer'] = referer;
+              break;
+            }
+          }
+        } catch (_) { /* malformed URL — skip */ }
+        callback({ requestHeaders: details.requestHeaders });
+      }
+    );
+  });
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit();
+  });
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+}
+
+const activeDownloads = new Map();
+
+ipcMain.handle('download-video', async (event, { id, url, outputPath, resume = false }) => {
+  console.log('Starting download for:', url, 'Resume:', resume, 'ID:', id);
+  return new Promise((resolve, reject) => {
+    const downloadsDir = outputPath || path.join(os.homedir(), 'Downloads', 'LocalFap');
+    console.log('Download directory:', downloadsDir);
+    
+    if (!fs.existsSync(downloadsDir)) {
+      fs.mkdirSync(downloadsDir, { recursive: true });
+      console.log('Created download directory');
+    }
+
+    const args = [
+      '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+      '--merge-output-format', 'mp4',
+      '-o', path.join(downloadsDir, '%(title)s.%(ext)s'),
+      '--newline',
+      '--no-playlist',
+      '--concurrent-fragments', '3',
+    ];
+    
+    // Add resume/continue flags
+    if (resume) {
+      args.push('--continue');
+      args.push('--no-overwrites');
+    }
+    
+    // Add retry and timeout options for network resilience
+    args.push('--retries', '10');
+    args.push('--fragment-retries', '10');
+    args.push('--retry-sleep', '5');
+    args.push('--throttled-rate', '100K');
+    
+    args.push(url);
+
+    const ytDlp = spawn('yt-dlp', args);
+    activeDownloads.set(id, { process: ytDlp, killedByUser: false });
+
+    let progress = '';
+    
+    ytDlp.stdout.on('data', (data) => {
+      progress = data.toString();
+      console.log('yt-dlp output:', progress);
+      
+      // Parse progress percentage
+      const match = progress.match(/(\d+\.?\d*)%/);
+      if (match) {
+        mainWindow.webContents.send('download-progress', {
+          id,
+          progress: parseFloat(match[1]),
+          status: 'downloading'
+        });
+      }
+      
+      // Parse download speed
+      const speedMatch = progress.match(/([\d.]+)(K|M|G)iB\/s/);
+      if (speedMatch) {
+        mainWindow.webContents.send('download-speed', {
+          id,
+          speed: `${speedMatch[1]}${speedMatch[2]}iB/s`
+        });
+      }
+      
+      // Parse ETA
+      const etaMatch = progress.match(/ETA\s+([\d:]+)/);
+      if (etaMatch) {
+        mainWindow.webContents.send('download-eta', {
+          id,
+          eta: etaMatch[1]
+        });
+      }
+    });
+
+    ytDlp.stderr.on('data', (data) => {
+      console.error('yt-dlp stderr:', data.toString());
+    });
+
+    ytDlp.on('close', (code) => {
+      console.log('Download finished with code:', code, 'ID:', id);
+      const downloadInfo = activeDownloads.get(id);
+      
+      if (downloadInfo && downloadInfo.killedByUser) {
+        mainWindow.webContents.send('download-progress', {
+          id,
+          status: 'paused'
+        });
+        activeDownloads.delete(id);
+        return resolve({ success: false, paused: true });
+      }
+      
+      activeDownloads.delete(id);
+
+      if (code === 0) {
+        mainWindow.webContents.send('download-progress', {
+          id,
+          progress: 100,
+          status: 'completed'
+        });
+        resolve({ success: true, path: downloadsDir });
+      } else {
+        mainWindow.webContents.send('download-progress', {
+          id,
+          progress: 0,
+          status: 'failed'
+        });
+        reject(new Error(`yt-dlp exited with code ${code}`));
+      }
+    });
+  });
+});
+
+ipcMain.handle('pause-download', async (event, id) => {
+  const downloadInfo = activeDownloads.get(id);
+  if (downloadInfo) {
+    console.log('Pausing download ID:', id);
+    downloadInfo.killedByUser = true;
+    downloadInfo.process.kill();
+    return true;
+  }
+  return false;
+});
+
+ipcMain.handle('get-video-info', async (event, url) => {
+  console.log('Getting video info for:', url);
+  return new Promise((resolve, reject) => {
+    const ytDlp = spawn('yt-dlp', ['--dump-json', '--no-playlist', url]);
+    let output = '';
+    let errorOutput = '';
+    
+    ytDlp.stdout.on('data', (data) => {
+      output += data.toString();
+    });
+
+    ytDlp.stderr.on('data', (data) => {
+      errorOutput += data.toString();
+      console.error('yt-dlp stderr:', data.toString());
+    });
+
+    ytDlp.on('close', (code) => {
+      console.log('yt-dlp exited with code:', code);
+      if (code === 0) {
+        try {
+          const info = JSON.parse(output);
+          console.log('Video info parsed:', info.title);
+          resolve({
+            title: decodeHTMLEntities(info.title),
+            duration: info.duration,
+            thumbnail: info.thumbnail,
+            uploader: info.uploader,
+            resolution: info.resolution || `${info.width}x${info.height}`,
+            format: info.format_note || info.ext,
+            filesize: info.filesize || info.filesize_approx
+          });
+        } catch (e) {
+          console.error('Failed to parse video info:', e);
+          reject(e);
+        }
+      } else {
+        console.error('yt-dlp failed:', errorOutput);
+        reject(new Error('Failed to get video info: ' + errorOutput));
+      }
+    });
+  });
+});
+
+ipcMain.handle('get-playlist-info', async (event, url) => {
+  console.log('Getting playlist info for:', url);
+  return new Promise((resolve, reject) => {
+    const ytDlp = spawn('yt-dlp', ['--flat-playlist', '-J', '--no-warnings', url]);
+    let output = '';
+    let errorOutput = '';
+
+    ytDlp.stdout.on('data', (data) => {
+      output += data.toString();
+    });
+
+    ytDlp.stderr.on('data', (data) => {
+      errorOutput += data.toString();
+      console.error('yt-dlp playlist stderr:', data.toString());
+    });
+
+    ytDlp.on('close', (code) => {
+      if (code === 0) {
+        try {
+          const info = JSON.parse(output);
+          // Normalize entries — flat-playlist gives id/url/title/duration per entry
+          const entries = (info.entries || []).map((entry, idx) => ({
+            index: idx,
+            id: entry.id,
+            url: entry.url || entry.webpage_url || `${url.split('?')[0]}?v=${entry.id}`,
+            title: decodeHTMLEntities(entry.title || entry.id || `Video ${idx + 1}`),
+            duration: entry.duration || null,
+            thumbnail: entry.thumbnail ||
+              (entry.thumbnails && entry.thumbnails.length > 0
+                ? entry.thumbnails[entry.thumbnails.length - 1].url
+                : null),
+            uploader: entry.uploader || info.uploader || null,
+          }));
+          resolve({
+            isPlaylist: info._type === 'playlist' || entries.length > 1,
+            title: decodeHTMLEntities(info.title || info.playlist_title || 'Playlist'),
+            uploader: info.uploader || info.channel || null,
+            count: entries.length,
+            entries,
+            // Also return single-video info if it turns out not to be a playlist
+            singleVideo: info._type !== 'playlist' && entries.length <= 1 ? {
+              title: decodeHTMLEntities(info.title),
+              duration: info.duration,
+              thumbnail: info.thumbnail,
+              uploader: info.uploader,
+              resolution: info.resolution || (info.width ? `${info.width}x${info.height}` : null),
+              format: info.format_note || info.ext,
+              filesize: info.filesize || info.filesize_approx,
+            } : null,
+          });
+        } catch (e) {
+          console.error('Failed to parse playlist info:', e);
+          reject(new Error('Failed to parse playlist info: ' + e.message));
+        }
+      } else {
+        console.error('yt-dlp playlist failed:', errorOutput);
+        reject(new Error('Failed to get playlist info: ' + errorOutput));
+      }
+    });
+  });
+});
+
+
+ipcMain.handle('get-video-path', async (event, filename) => {
+  const downloadsDir = path.join(os.homedir(), 'Downloads', 'LocalFap');
+  
+  // Try exact match first
+  const exactPath = path.join(downloadsDir, filename);
+  if (fs.existsSync(exactPath)) {
+    return exactPath;
+  }
+  
+  // Try exact match with different extensions
+  const baseName = filename.replace(/\.[^/.]+$/, '');
+  const extensions = ['.mp4', '.mkv', '.webm', '.avi', '.m4a'];
+  
+  for (const ext of extensions) {
+    const testPath = path.join(downloadsDir, baseName + ext);
+    if (fs.existsSync(testPath)) {
+      return testPath;
+    }
+  }
+
+  // If still not found, use fuzzy matching to bypass yt-dlp filename sanitization
+  const normalize = (str) => {
+    if (!str) return '';
+    return str
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;/g, "'")
+      .replace(/&#39;/g, "'")
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .toLowerCase();
+  };
+  
+  const targetNormal = normalize(baseName);
+  
+  if (fs.existsSync(downloadsDir)) {
+    const files = fs.readdirSync(downloadsDir);
+    for (const file of files) {
+      const fileExt = path.extname(file);
+      if (extensions.includes(fileExt)) {
+        const fileNormal = normalize(path.basename(file, fileExt));
+        if (fileNormal === targetNormal) {
+          return path.join(downloadsDir, file);
+        }
+      }
+    }
+  }
+  
+  throw new Error('Video file not found');
+});
+
+ipcMain.handle('read-video-file', async (event, filepath) => {
+  try {
+    const data = fs.readFileSync(filepath);
+    return data.toString('base64');
+  } catch (error) {
+    throw new Error('Failed to read video file: ' + error.message);
+  }
+});
+
+ipcMain.handle('open-video', async (event, filepath) => {
+  const { shell } = require('electron');
+  shell.openPath(filepath);
+});
+
+ipcMain.handle('open-folder', async (event, filepath) => {
+  const { shell } = require('electron');
+  const folderPath = path.dirname(filepath);
+  shell.showItemInFolder(filepath);
+});
+
+ipcMain.handle('select-folder', async () => {
+  const { dialog } = require('electron');
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory', 'createDirectory'],
+    title: 'Select Download Folder',
+    buttonLabel: 'Select Folder'
+  });
+  
+  if (!result.canceled && result.filePaths.length > 0) {
+    return result.filePaths[0];
+  }
+  return null;
+});
+
+ipcMain.handle('minimize-window', () => mainWindow.minimize());
+ipcMain.handle('maximize-window', () => mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize());
+ipcMain.handle('close-window', () => mainWindow.close());
+
+// Fetches thumbnail URLs for playlist entries in parallel batches.
+// Uses yt-dlp --print thumbnail which is much faster than --dump-json.
+// Sends 'playlist-thumbnails-progress' events as each batch finishes.
+ipcMain.handle('get-entry-thumbnails', async (event, entries) => {
+  // entries: [{index, url}, ...]
+  const BATCH_SIZE = 5;
+  const TIMEOUT_MS = 20000;
+  const allResults = [];
+
+  const fetchOne = ({ index, url }) => new Promise((resolve) => {
+    const ytDlp = spawn('yt-dlp', [
+      '--print', 'thumbnail',
+      '--no-playlist',
+      '--no-warnings',
+      url
+    ]);
+    let output = '';
+    let killed = false;
+
+    const timer = setTimeout(() => {
+      killed = true;
+      ytDlp.kill();
+      resolve({ index, thumbnail: null });
+    }, TIMEOUT_MS);
+
+    ytDlp.stdout.on('data', d => { output += d.toString(); });
+    ytDlp.on('close', () => {
+      if (killed) return;
+      clearTimeout(timer);
+      const thumbnail = output.trim() || null;
+      resolve({ index, thumbnail });
+    });
+    ytDlp.on('error', () => {
+      clearTimeout(timer);
+      resolve({ index, thumbnail: null });
+    });
+  });
+
+  for (let i = 0; i < entries.length; i += BATCH_SIZE) {
+    const batch = entries.slice(i, i + BATCH_SIZE);
+    const batchResults = await Promise.all(batch.map(fetchOne));
+    allResults.push(...batchResults);
+    // Send progress so renderer can update thumbnails as they arrive
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('playlist-thumbnails-progress', batchResults);
+    }
+  }
+
+  return allResults;
+});
+
