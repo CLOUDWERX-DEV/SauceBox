@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#fff',
+    color: '#000',
   },
   activeIndicator: {
     position: 'absolute',

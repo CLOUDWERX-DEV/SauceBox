@@ -298,7 +298,7 @@ export default function DownloadTab() {
             </View>
             <View style={styles.tipItem}>
               <Text style={styles.tipBullet}>•</Text>
-              <Text style={styles.tip}>Click on any video in History to watch it instantly</Text>
+              <Text style={styles.tip}>Click on any video in the Gallery to watch it instantly</Text>
             </View>
             <View style={styles.tipItem}>
               <Text style={styles.tipBullet}>•</Text>
@@ -406,7 +406,7 @@ const styles = {
     opacity: 0.5,
   },
   downloadButtonText: {
-    color: '#fff',
+    color: '#000',
     fontSize: 16,
     fontWeight: '700',
   },
@@ -447,7 +447,7 @@ const styles = {
     fontSize: 20,
   },
   batchButtonText: {
-    color: '#fff',
+    color: '#000',
     fontSize: 16,
     fontWeight: '700',
   },

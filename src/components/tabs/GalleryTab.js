@@ -289,7 +289,7 @@ export default function GalleryTab() {
         {history.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyIcon}>🕳️</Text>
-            <Text style={styles.emptyTitle}>No History Yet</Text>
+            <Text style={styles.emptyTitle}>Gallery is Empty</Text>
             <Text style={styles.emptyText}>Your downloads will appear here</Text>
             <Text style={styles.emptySubtext}>What happens in LocalFap, stays in LocalFap... unless you want it to 😏</Text>
           </View>
@@ -438,7 +438,7 @@ export default function GalleryTab() {
       <ConfirmModal
         visible={clearConfirmVisible}
         title="Clear Gallery?"
-        message="Are you sure you want to clear your entire video gallery? This will not delete the actual files from your hard drive, but it will remove all metadata, tags, and history from LocalFap."
+        message="Are you sure you want to clear your entire video gallery? This will not delete the actual files from your hard drive, but it will remove all metadata, tags, and gallery from LocalFap."
         confirmText="Clear Gallery"
         onConfirm={() => {
           clearHistory();

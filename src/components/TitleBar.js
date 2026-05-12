@@ -1,38 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { theme } from '../theme';
+import HelpModal from './HelpModal';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
 export default function TitleBar({ vaultEnabled, onLock }) {
+  const [helpVisible, setHelpVisible] = useState(false);
+  
   const handleMinimize = () => ipcRenderer?.invoke('minimize-window');
   const handleMaximize = () => ipcRenderer?.invoke('maximize-window');
   const handleClose = () => ipcRenderer?.invoke('close-window');
 
   return (
-    <View style={styles.titleBar}>
-      <View style={styles.titleSection}>
-        <Image source={{ uri: 'logo.png' }} style={styles.logo} />
-        <Text style={styles.title}>LocalFap</Text>
-        <Text style={styles.subtitle}>Your offline collection manager</Text>
-      </View>
-      <View style={styles.controls}>
-        {vaultEnabled && (
-          <TouchableOpacity style={styles.lockButton} onPress={onLock}>
-            <Text style={styles.lockButtonText}>🔒 Lock</Text>
+    <>
+      <View style={styles.titleBar}>
+        <View style={styles.titleSection}>
+          <Image source={{ uri: 'logo.png' }} style={styles.logo} />
+          <Text style={styles.title}>LocalFap</Text>
+          <Text style={styles.subtitle}>Your offline collection manager</Text>
+        </View>
+        <View style={styles.controls}>
+          {vaultEnabled && (
+            <TouchableOpacity style={styles.lockButton} onPress={onLock}>
+              <Text style={styles.lockButtonText}>🔒 Lock</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={styles.helpButton} onPress={() => setHelpVisible(true)}>
+            <Text style={styles.helpButtonText}>?</Text>
           </TouchableOpacity>
-        )}
-        <TouchableOpacity style={styles.button} onPress={handleMinimize}>
-          <Text style={styles.buttonText}>−</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleMaximize}>
-          <Text style={styles.buttonText}>□</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.closeButton]} onPress={handleClose}>
-          <Text style={styles.buttonText}>×</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleMinimize}>
+            <Text style={styles.buttonText}>−</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleMaximize}>
+            <Text style={styles.buttonText}>□</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.closeButton]} onPress={handleClose}>
+            <Text style={styles.buttonText}>×</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+      
+      <HelpModal visible={helpVisible} onClose={() => setHelpVisible(false)} />
+    </>
   );
 }
 
@@ -104,8 +114,24 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   lockButtonText: {
-    color: '#fff',
+    color: '#000',
     fontSize: 12,
     fontWeight: '700',
+  },
+  helpButton: {
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 16,
+    backgroundColor: `${theme.colors.primary}20`,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+    marginRight: 8,
+  },
+  helpButtonText: {
+    color: theme.colors.primary,
+    fontSize: 18,
+    fontWeight: '800',
   }
 });

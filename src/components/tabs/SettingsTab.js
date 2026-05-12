@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
     cursor: 'pointer',
   },
   saveButtonText: {
-    color: '#fff',
+    color: '#000',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -619,7 +619,7 @@ const styles = StyleSheet.create({
     minWidth: 120,
   },
   browseButtonText: {
-    color: '#fff',
+    color: '#000',
     fontSize: 14,
     fontWeight: '600',
   },
