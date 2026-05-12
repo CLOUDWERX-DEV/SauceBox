@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useStore } from '../store';
 import { theme } from '../theme';
@@ -10,6 +10,8 @@ export default function AppLock({ onUnlock }) {
 
   const handlePress = (num) => {
     if (error) setError(false);
+    if (pin.length >= 4) return;
+    
     const newPin = pin + num;
     setPin(newPin);
     if (newPin.length === 4) {
@@ -23,9 +25,21 @@ export default function AppLock({ onUnlock }) {
   };
 
   const handleDelete = () => {
-    setPin(pin.slice(0, -1));
+    setPin(prev => prev.slice(0, -1));
     setError(false);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (/^[0-9]$/.test(e.key)) {
+        handlePress(e.key);
+      } else if (e.key === 'Backspace' || e.key === 'Delete') {
+        handleDelete();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [pin, error, correctPin]);
 
   return (
     <View style={styles.container}>

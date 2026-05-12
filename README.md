@@ -20,14 +20,20 @@
 ### 📥 Massive Playlist Support & Selection
 Paste a playlist URL and LocalFap instantly pulls all the metadata into a beautiful modal grid. Choose to download the **entire playlist** with one click, or selectively pick and choose only the videos you want.
 
-### 🗄️ Beautiful Video Archive
-Your `History` tab isn't just a log—it's a fully-fledged video manager. Search through your local archive, view rich metadata (resolutions, file sizes, duration, uploaders), sort your collection, and even give videos a **Star Rating** from 1 to 5.
+### 🗄️ Beautiful Video Archive & Smart Tags 🏷️
+Your `History` tab isn't just a log—it's a fully-fledged video manager. Search through your local archive, view rich metadata, sort your collection, and give videos a **Star Rating**. Better yet, use the **Smart Tagging** system to create your own categories (like "Favorites" or "Cinematic") and instantly filter your massive archive to find exactly what you're looking for.
 
-### 🎬 Native GPU-Accelerated Playback
-No need to hunt down files in your system explorer. LocalFap features a gorgeous, built-in **In-App Video Player**. Just click a finished download and start watching your locally archived files instantly without buffering, ads, or tracking.
+### 🎬 Native Playback & Highlight Clipper ✂️
+No need to hunt down files in your system explorer. LocalFap features a gorgeous, built-in **In-App Video Player** to watch your files instantly. Only care about a 3-minute scene in a 5GB video? Toggle **Clip Mode**, enter a start time, and instantly use the built-in `ffmpeg` integration to slice out and save that highlight clip without re-encoding!
 
 ### ⏸️ Flawless Pause & Resume
 Got to go? Click Pause, or just close the app entirely. LocalFap intelligently saves the exact byte position of your active downloads. When you start the app again, it automatically queues your pending downloads so you can resume them flawlessly.
+
+### 🔒 Vault Lock & Stealth Mode 🥷
+Absolute privacy is guaranteed. Enable **Vault Mode** in the settings to protect the app behind a 4-digit PIN lock screen on startup. And if someone walks in the room, smash the **Panic Button** (`Ctrl + Shift + H`) to instantly hide the app from the taskbar, pause all active downloads, and mute any playing video.
+
+### 🌐 "Send to LocalFap" Browser Extension
+Skip the copy-pasting entirely. Install the included Chrome Companion Extension to simply right-click any video on your favorite tube sites and click "Send to LocalFap". The built-in local background server will instantly grab the URL and start downloading it in the app automatically.
 
 ### ⚙️ Deep Configuration
 *   **Bandwidth Throttling:** Limit download speeds (KB/s) so LocalFap doesn't choke your network.
@@ -36,12 +42,9 @@ Got to go? Click Pause, or just close the app entirely. LocalFap intelligently s
 *   **System Integration:** Native desktop notifications when downloads finish or fail.
 *   **Auto-Clear:** Automatically sweep completed videos from your active queue into your history.
 
-### 🕵️‍♂️ Privacy First & Ad-Free
-No tracking pixels, no telemetry, no external accounts. We bypass ad-walls and pre-roll garbage directly at the protocol level. What happens in LocalFap, stays completely local on your machine.
-
 ---
 
-## 📦 Installation
+## 📦 Installation & Setup
 
 To get started, clone the repository and install the dependencies:
 
@@ -51,7 +54,13 @@ cd LocalFap
 npm install
 ```
 
-Make sure you have `yt-dlp` installed and accessible in your system's PATH.
+**Requirements:** Make sure you have `yt-dlp` and `ffmpeg` installed and accessible in your system's PATH.
+
+### 🧩 Installing the Chrome Extension
+1. Open Google Chrome or any Chromium browser.
+2. Go to `chrome://extensions/`.
+3. Toggle **Developer mode** in the top right.
+4. Click **Load unpacked** and select the `chrome-extension/` folder located inside the LocalFap directory.
 
 ## 🛠️ Usage
 

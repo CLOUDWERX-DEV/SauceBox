@@ -6,7 +6,7 @@ import { theme } from '../theme';
 const tabs = [
   { id: 'download', icon: '⬇️', label: 'Download', subtitle: 'Download Videos' },
   { id: 'queue', icon: '📋', label: 'Queue', subtitle: 'Download Queue' },
-  { id: 'history', icon: '🕐', label: 'History', subtitle: 'Download History' },
+  { id: 'history', icon: '🎬', label: 'Gallery', subtitle: 'Video Archive' },
   { id: 'settings', icon: '⚙️', label: 'Settings', subtitle: 'Tweaks and Customization' }
 ];
 

@@ -4,7 +4,7 @@ import { theme } from '../theme';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
-export default function TitleBar() {
+export default function TitleBar({ vaultEnabled, onLock }) {
   const handleMinimize = () => ipcRenderer?.invoke('minimize-window');
   const handleMaximize = () => ipcRenderer?.invoke('maximize-window');
   const handleClose = () => ipcRenderer?.invoke('close-window');
@@ -17,6 +17,11 @@ export default function TitleBar() {
         <Text style={styles.subtitle}>Your offline collection manager</Text>
       </View>
       <View style={styles.controls}>
+        {vaultEnabled && (
+          <TouchableOpacity style={styles.lockButton} onPress={onLock}>
+            <Text style={styles.lockButtonText}>🔒 Lock</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity style={styles.button} onPress={handleMinimize}>
           <Text style={styles.buttonText}>−</Text>
         </TouchableOpacity>
@@ -88,5 +93,19 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     fontSize: 18,
     fontWeight: '300',
+  },
+  lockButton: {
+    height: 32,
+    paddingHorizontal: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 6,
+    backgroundColor: theme.colors.primary,
+    marginRight: 8,
+  },
+  lockButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
   }
 });

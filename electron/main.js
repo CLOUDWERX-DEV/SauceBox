@@ -77,16 +77,6 @@ if (app) {
     });
     server.listen(13337, '127.0.0.1');
 
-    // Stealth Mode Global Shortcut
-    globalShortcut.register('CommandOrControl+Shift+H', () => {
-      if (mainWindow.isVisible()) {
-        mainWindow.webContents.send('panic-stealth');
-        mainWindow.hide();
-      } else {
-        mainWindow.show();
-      }
-    });
-
     // Inject Referer headers for adult video CDNs to bypass hotlink protection.
     // Without this, thumbnail images return 403 because the CDN checks Referer.
     const { session } = require('electron');
@@ -95,7 +85,8 @@ if (app) {
       { pattern: '*://*.pornhub.com/*',        referer: 'https://www.pornhub.com/' },
       { pattern: '*://*.xvideos-cdn.com/*',    referer: 'https://www.xvideos.com/' },
       { pattern: '*://*.xvideos.com/*',        referer: 'https://www.xvideos.com/' },
-      { pattern: '*://*.xhamster*.com/*',      referer: 'https://xhamster.com/' },
+      { pattern: '*://*.xhamster.com/*',       referer: 'https://xhamster.com/' },
+      { pattern: '*://*.xhamster3.com/*',      referer: 'https://xhamster.com/' },
       { pattern: '*://*.redtubefiles.com/*',   referer: 'https://www.redtube.com/' },
       { pattern: '*://*.redtube.com/*',        referer: 'https://www.redtube.com/' },
       { pattern: '*://*.youporn.com/*',        referer: 'https://www.youporn.com/' },
@@ -130,6 +121,73 @@ if (app) {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 }
+
+let currentStealthHotkey = null;
+ipcMain.on('register-stealth-hotkey', (event, hotkey) => {
+  if (currentStealthHotkey) {
+    globalShortcut.unregister(currentStealthHotkey);
+  }
+  
+  if (hotkey) {
+    try {
+      globalShortcut.register(hotkey, () => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          if (mainWindow.isVisible()) {
+            mainWindow.webContents.send('panic-stealth');
+            mainWindow.hide();
+          } else {
+            mainWindow.show();
+          }
+        }
+      });
+      currentStealthHotkey = hotkey;
+      console.log('Registered stealth hotkey:', hotkey);
+    } catch (e) {
+      console.error('Failed to register hotkey:', hotkey, e);
+    }
+  }
+});
+
+let currentYtDlpPath = 'yt-dlp';
+let currentFfmpegPath = 'ffmpeg';
+
+ipcMain.on('update-binary-paths', (event, { ytdlpPath, ffmpegPath }) => {
+  if (ytdlpPath) currentYtDlpPath = ytdlpPath;
+  else currentYtDlpPath = 'yt-dlp';
+  
+  if (ffmpegPath) currentFfmpegPath = ffmpegPath;
+  else currentFfmpegPath = 'ffmpeg';
+  
+  console.log('Updated binary paths:', { ytdlpPath: currentYtDlpPath, ffmpegPath: currentFfmpegPath });
+});
+
+ipcMain.handle('get-binary-versions', async () => {
+  const getVersion = (binPath, arg = '--version') => new Promise(resolve => {
+    try {
+      const proc = spawn(binPath, [arg]);
+      let out = '';
+      proc.stdout.on('data', d => out += d.toString());
+      proc.on('close', code => {
+        if (code === 0) resolve(out.trim().split('\n')[0]);
+        else resolve('Not Found/Error');
+      });
+      proc.on('error', () => resolve('Not Found'));
+    } catch (e) {
+      resolve('Not Found');
+    }
+  });
+
+  const [ytVersion, ffmpegVersion] = await Promise.all([
+    getVersion(currentYtDlpPath, '--version'),
+    getVersion(currentFfmpegPath, '-version')
+  ]);
+
+  return { ytDlp: ytVersion, ffmpeg: ffmpegVersion };
+});
+
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
+});
 
 const activeDownloads = new Map();
 
@@ -186,7 +244,7 @@ ipcMain.handle('download-video', async (event, { id, url, outputPath, resume = f
     
     args.push(url);
 
-    const ytDlp = spawn('yt-dlp', args);
+    const ytDlp = spawn(currentYtDlpPath, args);
     activeDownloads.set(id, { process: ytDlp, killedByUser: false });
 
     let progress = '';
@@ -276,7 +334,7 @@ ipcMain.handle('pause-download', async (event, id) => {
 ipcMain.handle('get-video-info', async (event, url) => {
   console.log('Getting video info for:', url);
   return new Promise((resolve, reject) => {
-    const ytDlp = spawn('yt-dlp', ['--dump-json', '--no-playlist', url]);
+    const ytDlp = spawn(currentYtDlpPath, ['--dump-json', '--no-playlist', url]);
     let output = '';
     let errorOutput = '';
     
@@ -319,7 +377,7 @@ ipcMain.handle('get-video-info', async (event, url) => {
 ipcMain.handle('get-playlist-info', async (event, url) => {
   console.log('Getting playlist info for:', url);
   return new Promise((resolve, reject) => {
-    const ytDlp = spawn('yt-dlp', ['--flat-playlist', '-J', '--no-warnings', url]);
+    const ytDlp = spawn(currentYtDlpPath, ['--flat-playlist', '-J', '--no-warnings', url]);
     let output = '';
     let errorOutput = '';
 
@@ -451,6 +509,24 @@ ipcMain.handle('open-folder', async (event, filepath) => {
   shell.showItemInFolder(filepath);
 });
 
+ipcMain.handle('get-disk-space', async (event, folderPath) => {
+  try {
+    // If folder doesn't exist, statfs might fail, so we find the closest existing parent
+    let checkPath = folderPath;
+    while (!fs.existsSync(checkPath) && checkPath !== path.parse(checkPath).root) {
+      checkPath = path.dirname(checkPath);
+    }
+    const stat = await fs.promises.statfs(checkPath);
+    const total = stat.blocks * stat.bsize;
+    const free = stat.bavail * stat.bsize;
+    const used = total - free;
+    return { total, free, used, success: true };
+  } catch (error) {
+    console.error('Failed to get disk space:', error);
+    return { success: false, error: error.message };
+  }
+});
+
 ipcMain.handle('select-folder', async () => {
   const { dialog } = require('electron');
   const result = await dialog.showOpenDialog(mainWindow, {
@@ -479,7 +555,7 @@ ipcMain.handle('get-entry-thumbnails', async (event, entries) => {
   const allResults = [];
 
   const fetchOne = ({ index, url }) => new Promise((resolve) => {
-    const ytDlp = spawn('yt-dlp', [
+    const ytDlp = spawn(currentYtDlpPath, [
       '--print', 'thumbnail',
       '--no-playlist',
       '--no-warnings',
@@ -529,7 +605,7 @@ ipcMain.handle('trim-video', async (event, { inputPath, outputPath, startTime, d
       '-c', 'copy',
       outputPath
     ];
-    const ffmpeg = spawn('ffmpeg', args);
+    const ffmpeg = spawn(currentFfmpegPath, args);
     let errOutput = '';
     ffmpeg.stderr.on('data', d => { errOutput += d.toString(); });
     ffmpeg.on('close', (code) => {

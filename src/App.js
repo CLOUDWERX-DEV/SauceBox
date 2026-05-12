@@ -14,8 +14,15 @@ export default function App() {
   const downloads = useStore(state => state.downloads);
   const maxConcurrentDownloads = useStore(state => state.settings.maxConcurrentDownloads);
   const updateDownload = useStore(state => state.updateDownload);
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(() => !useStore.getState().settings.vaultEnabled);
   const vaultEnabled = useStore(state => state.settings.vaultEnabled);
+  const stealthHotkey = useStore(state => state.settings.stealthHotkey);
+
+  useEffect(() => {
+    if (ipcRenderer && stealthHotkey) {
+      ipcRenderer.send('register-stealth-hotkey', stealthHotkey);
+    }
+  }, [stealthHotkey]);
 
   useEffect(() => {
     if (ipcRenderer) {
@@ -26,37 +33,63 @@ export default function App() {
       const panicStealthHandler = () => {
         setIsUnlocked(false);
         const store = useStore.getState();
-        store.downloads.forEach(d => {
-          if (d.status === 'downloading') {
-            ipcRenderer.invoke('pause-download', d.id);
-            store.updateDownload(d.id, { status: 'paused', speed: null, eta: null });
-          }
-        });
+        if (store.settings.stealthPauseDownloads) {
+          store.downloads.forEach(d => {
+            if (d.status === 'downloading') {
+              ipcRenderer.invoke('pause-download', d.id);
+              store.updateDownload(d.id, { status: 'paused', speed: null, eta: null });
+            }
+          });
+        }
       };
 
       const progressHandler = (event, data) => {
-        const download = useStore.getState().downloads.find(d => d.id === data.id);
+        const store = useStore.getState();
+        const download = store.downloads.find(d => d.id === data.id);
         if (download) {
-          useStore.getState().updateDownload(download.id, { 
+          store.updateDownload(download.id, { 
             progress: data.progress, 
             status: data.status 
           });
           
+          const canNotify = () => {
+            const currentStore = useStore.getState();
+            if (!currentStore.settings.systemNotifications) return false;
+            // If vault is enabled and app is locked (in stealth/panic), check mute setting
+            if (currentStore.settings.vaultEnabled && !isUnlocked && currentStore.settings.stealthMuteNotifications) return false;
+            return true;
+          };
+
           if (data.status === 'completed') {
-            useStore.getState().addToHistory(download);
+            const currentSettings = store.settings;
+            if (currentSettings.autoTagDomainUploader) {
+              const generatedTags = [];
+              try {
+                const urlObj = new URL(download.url);
+                let domain = urlObj.hostname.replace('www.', '');
+                // Try to get just the main name (e.g. pornhub.com -> pornhub)
+                domain = domain.substring(0, domain.lastIndexOf('.'));
+                if (domain) generatedTags.push(domain);
+              } catch (e) {}
+              if (download.uploader && download.uploader !== 'Unknown') {
+                generatedTags.push(download.uploader);
+              }
+              download.tags = [...new Set([...(download.tags || []), ...generatedTags])];
+            }
+            store.addToHistory(download);
             
-            if (useStore.getState().settings.systemNotifications && window.Notification) {
+            if (canNotify() && window.Notification) {
               new Notification('Download Complete', {
                 body: `${download.title} has finished downloading.`,
                 icon: 'logo.png'
               });
             }
 
-            if (useStore.getState().settings.autoClearCompleted) {
-              useStore.getState().removeDownload(download.id);
+            if (store.settings.autoClearCompleted) {
+              store.removeDownload(download.id);
             }
           } else if (data.status === 'failed') {
-            if (useStore.getState().settings.systemNotifications && window.Notification) {
+            if (canNotify() && window.Notification) {
               new Notification('Download Failed', {
                 body: `${download.title} failed to download.`,
                 icon: 'logo.png'
@@ -94,7 +127,7 @@ export default function App() {
         ipcRenderer.removeListener('download-eta', etaHandler);
       };
     }
-  }, []);
+  }, [isUnlocked]);
 
   // On App Mount, reset any "downloading" items that got stuck because the app was closed
   useEffect(() => {
@@ -139,13 +172,33 @@ export default function App() {
           }
           
           const currentSettings = useStore.getState().settings;
+          const os = window.require ? window.require('os') : null;
+          const defaultPath = os ? `${os.homedir()}/Downloads/LocalFap` : '';
+          const checkPath = currentSettings.downloadPath || defaultPath;
+          
+          if (currentSettings.minFreeSpaceGB > 0 && checkPath) {
+            try {
+              const diskSpace = await ipcRenderer?.invoke('get-disk-space', checkPath);
+              if (diskSpace && diskSpace.success && diskSpace.free < currentSettings.minFreeSpaceGB * 1024 * 1024 * 1024) {
+                updateDownload(d.id, { status: 'failed', error: `Disk space low (<${currentSettings.minFreeSpaceGB}GB)` });
+                if (currentSettings.systemNotifications && window.Notification) {
+                  new Notification('Download Stopped', { body: `Disk space is critically low. (${currentSettings.minFreeSpaceGB}GB minimum)` });
+                }
+                return; // Stop here, don't download
+              }
+            } catch (e) {
+              console.warn('Could not check disk space', e);
+            }
+          }
+
           await ipcRenderer?.invoke('download-video', { 
             id: d.id, 
             url: d.url, 
             resume: d.isRetry,
             speedLimit: currentSettings.downloadSpeedLimit,
             container: currentSettings.preferredContainer,
-            proxy: currentSettings.proxyString
+            proxy: currentSettings.proxyString,
+            outputPath: currentSettings.downloadPath
           });
         } catch (err) {
           console.error(err);
@@ -166,7 +219,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <TitleBar />
+      <TitleBar vaultEnabled={vaultEnabled} onLock={() => setIsUnlocked(false)} />
       <View style={styles.content}>
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
         <MainContent activeTab={activeTab} />

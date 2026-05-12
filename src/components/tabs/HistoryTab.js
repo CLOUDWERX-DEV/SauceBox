@@ -103,7 +103,7 @@ export default function HistoryTab() {
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <View>
-            <Text style={styles.title}>Download History</Text>
+            <Text style={styles.title}>Video Gallery</Text>
             <Text style={styles.subtitle}>
               {history.length === 0
                 ? 'No downloads yet'

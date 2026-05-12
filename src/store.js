@@ -17,7 +17,14 @@ export const useStore = create(
         preferredContainer: 'mp4',
         proxyString: '',
         vaultEnabled: false,
-        vaultPin: '0000'
+        vaultPin: '0000',
+        stealthHotkey: 'CommandOrControl+Shift+H',
+        stealthPauseDownloads: false,
+        stealthMuteNotifications: true,
+        autoTagDomainUploader: true,
+        minFreeSpaceGB: 5,
+        ytdlpPath: '',
+        ffmpegPath: ''
       },
       
       addDownload: (download) => set((state) => {
