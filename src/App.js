@@ -17,6 +17,14 @@ export default function App() {
   const [isUnlocked, setIsUnlocked] = useState(() => !useStore.getState().settings.vaultEnabled);
   const vaultEnabled = useStore(state => state.settings.vaultEnabled);
   const stealthHotkey = useStore(state => state.settings.stealthHotkey);
+  const autoStartBroadcast = useStore(state => state.settings.autoStartBroadcast);
+  const quickCastVideo = useStore(state => state.quickCastVideo);
+  
+  useEffect(() => {
+    if (quickCastVideo) {
+      setActiveTab('broadcast');
+    }
+  }, [quickCastVideo]);
 
   useEffect(() => {
     if (ipcRenderer && stealthHotkey) {
@@ -175,15 +183,20 @@ export default function App() {
         }
       };
       
+      const broadcastLogHandler = (event, log) => {
+        useStore.getState().addBroadcastLog(log);
+      };
       
       ipcRenderer.on('external-add-url', externalAddHandler);
       ipcRenderer.on('panic-stealth', panicStealthHandler);
       ipcRenderer.on('download-progress', progressHandler);
+      ipcRenderer.on('broadcast-log', broadcastLogHandler);
       
       return () => {
         ipcRenderer.removeListener('external-add-url', externalAddHandler);
         ipcRenderer.removeListener('panic-stealth', panicStealthHandler);
         ipcRenderer.removeListener('download-progress', progressHandler);
+        ipcRenderer.removeListener('broadcast-log', broadcastLogHandler);
       };
     }
   }, [isUnlocked]);
@@ -236,7 +249,7 @@ export default function App() {
           
           const currentSettings = useStore.getState().settings;
           const os = window.require ? window.require('os') : null;
-          const defaultPath = os ? `${os.homedir()}/Downloads/LocalFap` : '';
+          const defaultPath = os ? `${os.homedir()}/Downloads/SauceBox` : '';
           const checkPath = currentSettings.downloadPath || defaultPath;
           
           if (currentSettings.minFreeSpaceGB > 0 && checkPath) {

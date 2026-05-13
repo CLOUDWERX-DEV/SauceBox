@@ -49,6 +49,7 @@ export default function HelpModal({ visible, onClose }) {
     { id: 'gallery', icon: '🗄️', label: 'Gallery & Import' },
     { id: 'stealth', icon: '🥷', label: 'Stealth & Privacy' },
     { id: 'player', icon: '🎬', label: 'Playback & Clips' },
+    { id: 'broadcast', icon: '📡', label: 'VR & Broadcasting' },
     { id: 'advanced', icon: '⚙️', label: 'Advanced Settings' },
     { id: 'troubleshooting', icon: '🔧', label: 'Troubleshooting' }
   ];
@@ -67,7 +68,7 @@ export default function HelpModal({ visible, onClose }) {
                 <Text style={styles.cardTitle}>Downloading Videos</Text>
               </View>
               <Text style={styles.paragraph}>
-                Paste any video or playlist URL into the Download tab and hit the download button. LocalFap will queue it up and fetch it automatically. For playlists, you'll get a picker to choose specific videos before downloading.
+                Paste any video or playlist URL into the Download tab and hit the download button. SauceBox will queue it up and fetch it automatically. For playlists, you'll get a picker to choose specific videos before downloading.
               </Text>
             </View>
 
@@ -87,7 +88,7 @@ export default function HelpModal({ visible, onClose }) {
                 <Text style={styles.cardTitle}>Chrome Extension</Text>
               </View>
               <Text style={styles.paragraph}>
-                Install the <Text style={styles.highlight}>LocalFap Companion Extension</Text> from the chrome-extension folder. Once installed, right-click any video while browsing and choose <Text style={styles.highlight}>"Send to LocalFap"</Text> to queue it instantly without switching apps.
+                Install the <Text style={styles.highlight}>SauceBox Companion Extension</Text> from the chrome-extension folder. Once installed, right-click any video while browsing and choose <Text style={styles.highlight}>"Send to SauceBox"</Text> to queue it instantly without switching apps.
               </Text>
             </View>
 
@@ -115,7 +116,7 @@ export default function HelpModal({ visible, onClose }) {
                 <Text style={styles.cardTitle}>Importing Existing Videos</Text>
               </View>
               <Text style={styles.paragraph}>
-                Already have videos on your hard drive? Click <Text style={styles.highlight}>Import</Text> in the Gallery tab. You can import a single file or an entire folder. LocalFap will scan each file and pull out the title, duration, resolution, and file size automatically.
+                Already have videos on your hard drive? Click <Text style={styles.highlight}>Import</Text> in the Gallery tab. You can import a single file or an entire folder. SauceBox will scan each file and pull out the title, duration, resolution, and file size automatically.
               </Text>
             </View>
 
@@ -150,7 +151,7 @@ export default function HelpModal({ visible, onClose }) {
                 <Text style={styles.cardTitle}>Auto-Tagging</Text>
               </View>
               <Text style={styles.paragraph}>
-                When enabled in Settings, LocalFap will automatically add a tag for the site the video came from (e.g., <Text style={styles.highlight}>Pornhub</Text>, <Text style={styles.highlight}>Spankbang</Text>). This happens automatically on download — you don't need to do anything.
+                When enabled in Settings, SauceBox will automatically add a tag for the site the video came from (e.g., <Text style={styles.highlight}>Pornhub</Text>, <Text style={styles.highlight}>Spankbang</Text>). This happens automatically on download — you don't need to do anything.
               </Text>
             </View>
           </View>
@@ -228,11 +229,54 @@ export default function HelpModal({ visible, onClose }) {
           </View>
         );
 
+      case 'broadcast':
+        return (
+          <View>
+            <Text style={styles.contentTitle}>Media Server & VR Broadcast</Text>
+            <Text style={styles.contentSubtitle}>Stream your local collection directly to Smart TVs, phones, and VR Headsets.</Text>
+
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardIcon}>📡</Text>
+                <Text style={styles.cardTitle}>Quick Cast</Text>
+              </View>
+              <Text style={styles.paragraph}>
+                In your Gallery, every video card has a Quick Cast 📡 button. Clicking this instantly starts the broadcast server and generates a temporary playlist with just that single video. You can scan the QR code to watch it instantly on another device.
+              </Text>
+            </View>
+
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardIcon}>▶️</Text>
+                <Text style={styles.cardTitle}>Playlist Builder</Text>
+              </View>
+              <Text style={styles.paragraph}>
+                Head to the Broadcast Tab to build a custom M3U playlist. You can search your library, reorder videos by dragging, and shuffle. Once ready, click <Text style={styles.highlight}>Host Stream URL</Text> to serve the M3U over your local network. VR players like Skybox VR can read this URL directly.
+              </Text>
+            </View>
+
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardIcon}>🎨</Text>
+                <Text style={styles.cardTitle}>Advanced Metadata & Transcoding</Text>
+              </View>
+              <Text style={styles.paragraph}>
+                SauceBox injects gorgeous thumbnails and custom tags directly into your M3U streams.
+              </Text>
+              <View style={styles.bulletList}>
+                <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Thumbnails</Text>: #EXTART headers provide beautiful cover art in compatible VR players.</Text>
+                <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Tags</Text>: Videos are automatically grouped by your custom tags in the playlist.</Text>
+                <Text style={styles.bulletItem}>• <Text style={styles.highlight}>On-the-Fly Transcoding</Text>: Enable this in Advanced Settings to force incompatible formats (like .mkv) to stream as .mp4 instantly.</Text>
+              </View>
+            </View>
+          </View>
+        );
+
       case 'advanced':
         return (
           <View>
             <Text style={styles.contentTitle}>Advanced Settings</Text>
-            <Text style={styles.contentSubtitle}>Fine-tune how LocalFap downloads and behaves.</Text>
+            <Text style={styles.contentSubtitle}>Fine-tune how SauceBox downloads and behaves.</Text>
 
             <View style={styles.card}>
               <View style={styles.cardHeader}>
@@ -240,7 +284,7 @@ export default function HelpModal({ visible, onClose }) {
                 <Text style={styles.cardTitle}>Download Speed & Concurrency</Text>
               </View>
               <Text style={styles.paragraph}>
-                If downloads are slowing down your internet, use the <Text style={styles.highlight}>Speed Limit</Text> setting to cap how much bandwidth LocalFap uses. You can also limit how many files download at the same time with <Text style={styles.highlight}>Concurrent Downloads</Text>.
+                If downloads are slowing down your internet, use the <Text style={styles.highlight}>Speed Limit</Text> setting to cap how much bandwidth SauceBox uses. You can also limit how many files download at the same time with <Text style={styles.highlight}>Concurrent Downloads</Text>.
               </Text>
             </View>
 
@@ -250,7 +294,7 @@ export default function HelpModal({ visible, onClose }) {
                 <Text style={styles.cardTitle}>Low Disk Space Protection</Text>
               </View>
               <Text style={styles.paragraph}>
-                Set a <Text style={styles.highlight}>Minimum Free Space</Text> limit in Settings (default is 5GB). If your disk gets too full, LocalFap will automatically pause all downloads instead of filling up your drive completely.
+                Set a <Text style={styles.highlight}>Minimum Free Space</Text> limit in Settings (default is 5GB). If your disk gets too full, SauceBox will automatically pause all downloads instead of filling up your drive completely.
               </Text>
             </View>
 
@@ -260,7 +304,7 @@ export default function HelpModal({ visible, onClose }) {
                 <Text style={styles.cardTitle}>Custom Binary Paths</Text>
               </View>
               <Text style={styles.paragraph}>
-                If you have a specific version of yt-dlp or ffmpeg installed somewhere other than the system PATH, you can point LocalFap directly to those executables in Settings. This is useful if you want to use a portable or newer version without changing your system settings.
+                If you have a specific version of yt-dlp or ffmpeg installed somewhere other than the system PATH, you can point SauceBox directly to those executables in Settings. This is useful if you want to use a portable or newer version without changing your system settings.
               </Text>
             </View>
 
@@ -304,13 +348,13 @@ export default function HelpModal({ visible, onClose }) {
                 <Text style={styles.cardTitle}>Thumbnails or Clipping Not Working?</Text>
               </View>
               <Text style={styles.paragraph}>
-                If LocalFap is failing to generate thumbnails for imported videos, unable to extract highlight clips, or struggling to parse accurate durations/file sizes, there is likely an issue with your <Text style={styles.highlight}>ffmpeg</Text> installation.
+                If SauceBox is failing to generate thumbnails for imported videos, unable to extract highlight clips, or struggling to parse accurate durations/file sizes, there is likely an issue with your <Text style={styles.highlight}>ffmpeg</Text> installation.
               </Text>
               <View style={styles.bulletList}>
                 <Text style={styles.bulletItem}>• Ensure <Text style={styles.highlight}>ffmpeg</Text> and <Text style={styles.highlight}>ffprobe</Text> are fully installed and accessible in your system's PATH variable.</Text>
                 <Text style={styles.bulletItem}>• Open your terminal and type <Text style={styles.code}>ffmpeg -version</Text>. If it says command not found, you need to reinstall it.</Text>
                 <Text style={styles.bulletItem}>• Windows users: Make sure you didn't just download the source code; you need the compiled <Text style={styles.code}>.exe</Text> binaries placed in a PATH-accessible folder.</Text>
-                <Text style={styles.bulletItem}>• Advanced: You can skip the system PATH entirely by pointing LocalFap to a custom ffmpeg/ffprobe executable path directly inside the Settings tab.</Text>
+                <Text style={styles.bulletItem}>• Advanced: You can skip the system PATH entirely by pointing SauceBox to a custom ffmpeg/ffprobe executable path directly inside the Settings tab.</Text>
               </View>
             </View>
             
@@ -320,11 +364,11 @@ export default function HelpModal({ visible, onClose }) {
                 <Text style={styles.cardTitle}>Blank UI / Disk Errors</Text>
               </View>
               <Text style={styles.paragraph}>
-                If the Gallery is empty or videos aren't showing, check that you haven't moved the video files manually via your file explorer. LocalFap stores the file path at import time — if the file moves, it can't find it anymore.
+                If the Gallery is empty or videos aren't showing, check that you haven't moved the video files manually via your file explorer. SauceBox stores the file path at import time — if the file moves, it can't find it anymore.
               </Text>
               <View style={styles.bulletList}>
                 <Text style={styles.bulletItem}>• Use the 📁 folder button on any gallery card to see where a file is expected to be.</Text>
-                <Text style={styles.bulletItem}>• If your disk is full, LocalFap will pause downloads. Check the Free Space setting in Settings.</Text>
+                <Text style={styles.bulletItem}>• If your disk is full, SauceBox will pause downloads. Check the Free Space setting in Settings.</Text>
               </View>
             </View>
 
@@ -337,8 +381,8 @@ export default function HelpModal({ visible, onClose }) {
                 There is no PIN recovery built in. If you're locked out, you'll need to reset it manually by editing the app's config file directly.
               </Text>
               <View style={styles.bulletList}>
-                <Text style={styles.bulletItem}>• All app data is stored in your browser's <Text style={styles.highlight}>localStorage</Text> under the key <Text style={styles.code}>localfap-storage</Text>.</Text>
-                <Text style={styles.bulletItem}>• Open DevTools in the app (<Text style={styles.code}>Ctrl + Shift + I</Text>), go to <Text style={styles.highlight}>Application → Local Storage</Text>, find the key <Text style={styles.code}>localfap-storage</Text>, and edit the <Text style={styles.code}>vaultPin</Text> field to a new 4-digit number.</Text>
+                <Text style={styles.bulletItem}>• All app data is stored in your browser's <Text style={styles.highlight}>localStorage</Text> under the key <Text style={styles.code}>saucebox-storage</Text>.</Text>
+                <Text style={styles.bulletItem}>• Open DevTools in the app (<Text style={styles.code}>Ctrl + Shift + I</Text>), go to <Text style={styles.highlight}>Application → Local Storage</Text>, find the key <Text style={styles.code}>saucebox-storage</Text>, and edit the <Text style={styles.code}>vaultPin</Text> field to a new 4-digit number.</Text>
                 <Text style={styles.bulletItem}>• You can also set <Text style={styles.code}>vaultEnabled</Text> to <Text style={styles.code}>false</Text> to disable the Vault entirely without needing the PIN.</Text>
               </View>
             </View>
@@ -349,13 +393,13 @@ export default function HelpModal({ visible, onClose }) {
                 <Text style={styles.cardTitle}>Where Config & Data is Stored</Text>
               </View>
               <Text style={styles.paragraph}>
-                LocalFap stores all settings, your gallery, queue, and tags in a single <Text style={styles.highlight}>localStorage</Text> entry inside Electron's renderer process. There is no separate config file on disk.
+                SauceBox stores all settings, your gallery, queue, and tags in a single <Text style={styles.highlight}>localStorage</Text> entry inside Electron's renderer process. There is no separate config file on disk.
               </Text>
               <View style={styles.bulletList}>
-                <Text style={styles.bulletItem}>• Key name: <Text style={styles.code}>localfap-storage</Text></Text>
+                <Text style={styles.bulletItem}>• Key name: <Text style={styles.code}>saucebox-storage</Text></Text>
                 <Text style={styles.bulletItem}>• Access it via DevTools → Application → Local Storage → <Text style={styles.code}>http://localhost:8081</Text></Text>
                 <Text style={styles.bulletItem}>• The data is stored as JSON. You can copy it out as a backup or restore it by pasting it back in.</Text>
-                <Text style={styles.bulletItem}>• Your actual video files are stored wherever you set your Download Path in Settings — LocalFap does not move or manage the files themselves.</Text>
+                <Text style={styles.bulletItem}>• Your actual video files are stored wherever you set your Download Path in Settings — SauceBox does not move or manage the files themselves.</Text>
               </View>
             </View>
 
@@ -370,7 +414,7 @@ export default function HelpModal({ visible, onClose }) {
               <View style={styles.bulletList}>
                 <Text style={styles.bulletItem}>• Open DevTools (<Text style={styles.code}>Ctrl + Shift + I</Text>)</Text>
                 <Text style={styles.bulletItem}>• Go to <Text style={styles.highlight}>Application → Local Storage</Text></Text>
-                <Text style={styles.bulletItem}>• Right-click and delete the <Text style={styles.code}>localfap-storage</Text> key</Text>
+                <Text style={styles.bulletItem}>• Right-click and delete the <Text style={styles.code}>saucebox-storage</Text> key</Text>
                 <Text style={styles.bulletItem}>• Restart the app — it will start with all default settings</Text>
                 <Text style={styles.bulletItem}>• Note: this removes your gallery, queue, and settings but does NOT delete your video files from disk</Text>
               </View>
@@ -394,7 +438,7 @@ export default function HelpModal({ visible, onClose }) {
                 <Text style={styles.headerIconText}>?</Text>
               </View>
               <View>
-                <Text style={styles.title}>LocalFap Documentation</Text>
+                <Text style={styles.title}>SauceBox Documentation</Text>
                 <Text style={styles.headerSubtext}>The Definitive Guide</Text>
               </View>
             </View>

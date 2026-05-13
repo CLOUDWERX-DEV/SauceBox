@@ -45,7 +45,7 @@ export default function AppLock({ onUnlock }) {
     <View style={styles.container}>
       <Text style={styles.icon}>🔒</Text>
       <Text style={styles.title}>Vault Locked</Text>
-      <Text style={styles.subtitle}>Enter your 4-digit PIN to access LocalFap</Text>
+      <Text style={styles.subtitle}>Enter your 4-digit PIN to access SauceBox</Text>
       
       <View style={styles.dotsContainer}>
         {[0, 1, 2, 3].map(i => (

@@ -9,7 +9,7 @@ const FALLBACK_URI = './logo.png';
 
 /**
  * Renders a video thumbnail.
- * Falls back to the LocalFap logo (centered, padded) if no thumbnail URI
+ * Falls back to the SauceBox logo (centered, padded) if no thumbnail URI
  * is provided or if the image fails to load, so cards never break.
  */
 export default function VideoThumbnail({ uri, style }) {

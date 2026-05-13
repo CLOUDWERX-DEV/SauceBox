@@ -3,6 +3,7 @@ import DownloadTab from './tabs/DownloadTab';
 import QueueTab from './tabs/QueueTab';
 import GalleryTab from './tabs/GalleryTab';
 import SettingsTab from './tabs/SettingsTab';
+import BroadcastTab from './tabs/BroadcastTab';
 
 export default function MainContent({ activeTab }) {
   const renderContent = () => {
@@ -13,6 +14,8 @@ export default function MainContent({ activeTab }) {
         return <QueueTab />;
       case 'history':
         return <GalleryTab />;
+      case 'broadcast':
+        return <BroadcastTab />;
       case 'settings':
         return <SettingsTab />;
       default:

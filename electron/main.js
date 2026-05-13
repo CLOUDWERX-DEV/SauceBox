@@ -4,6 +4,9 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const http = require('http');
+const express = require('express');
+const serveIndex = require('serve-index');
+const basicAuth = require('basic-auth');
 
 function decodeHTMLEntities(text) {
   if (!text) return text;
@@ -185,6 +188,180 @@ ipcMain.handle('get-binary-versions', async () => {
   return { ytDlp: ytVersion, ffmpeg: ffmpegVersion };
 });
 
+let mediaServerApp = null;
+let mediaServerInstance = null;
+
+function getLocalIp() {
+  const interfaces = os.networkInterfaces();
+  for (const devName in interfaces) {
+    const iface = interfaces[devName];
+    for (let i = 0; i < iface.length; i++) {
+      const alias = iface[i];
+      if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+        return alias.address;
+      }
+    }
+  }
+  return '127.0.0.1';
+}
+
+ipcMain.handle('get-local-ip', () => getLocalIp());
+
+ipcMain.handle('start-media-server', async (event, config) => {
+  if (mediaServerInstance) {
+    mediaServerInstance.close();
+  }
+  
+  return new Promise((resolve, reject) => {
+    mediaServerApp = express();
+    
+    if (config.authEnabled && config.username) {
+      mediaServerApp.use((req, res, next) => {
+        const user = basicAuth(req);
+        if (!user || user.name !== config.username || user.pass !== config.password) {
+          res.set('WWW-Authenticate', 'Basic realm="SauceBox Media Server"');
+          return res.status(401).send('Authentication required.');
+        }
+        next();
+      });
+    }
+
+    mediaServerApp.use((req, res, next) => {
+      if (req.path !== '/' && req.path !== '/favicon.ico') {
+        const ext = path.extname(req.path).toLowerCase();
+        if (['.m3u', '.mp4', '.mkv', '.webm', '.jpg', '.jpeg', '.png'].includes(ext)) {
+          if (mainWindow) {
+            mainWindow.webContents.send('broadcast-log', {
+              time: Date.now(),
+              ip: req.ip || req.socket.remoteAddress,
+              file: decodeURIComponent(req.path.slice(1))
+            });
+          }
+        }
+      }
+      next();
+    });
+
+    const servePath = config.downloadPath || path.join(os.homedir(), 'Downloads', 'SauceBox');
+
+    mediaServerApp.use((req, res, next) => {
+      if (req.query.transcode === '1' && config.transcodeEnabled && config.ffmpegPath) {
+        const ext = path.extname(req.path).toLowerCase();
+        if (ext === '.mkv' || ext === '.webm' || ext === '.avi') {
+          const filePath = path.join(servePath, decodeURIComponent(req.path));
+          if (fs.existsSync(filePath)) {
+            res.setHeader('Content-Type', 'video/mp4');
+            // Allow seeking in the transcoded stream if possible, but fragmented MP4 is continuous
+            const ffmpegArgs = [
+              '-i', filePath,
+              '-c:v', 'libx264',
+              '-preset', 'ultrafast',
+              '-tune', 'zerolatency',
+              '-c:a', 'aac',
+              '-movflags', 'frag_keyframe+empty_moov+default_base_moof',
+              '-f', 'mp4',
+              'pipe:1'
+            ];
+            const ffmpegProc = spawn(config.ffmpegPath, ffmpegArgs);
+            
+            ffmpegProc.stdout.pipe(res);
+            
+            ffmpegProc.stderr.on('data', (d) => {
+               // Silently drop ffmpeg logs to prevent console spam
+            });
+
+            req.on('close', () => {
+              ffmpegProc.kill('SIGKILL');
+            });
+            return;
+          }
+        }
+      }
+      next();
+    });
+
+    mediaServerApp.use('/', express.static(servePath), serveIndex(servePath, { 'icons': true, 'view': 'details' }));
+
+    try {
+      mediaServerInstance = mediaServerApp.listen(config.port, '0.0.0.0', () => {
+        resolve({ success: true, ip: getLocalIp() });
+      }).on('error', (err) => {
+        resolve({ success: false, error: err.message });
+      });
+    } catch (e) {
+      resolve({ success: false, error: e.message });
+    }
+  });
+});
+
+ipcMain.handle('stop-media-server', async () => {
+  if (mediaServerInstance) {
+    mediaServerInstance.close();
+    mediaServerInstance = null;
+  }
+  return { success: true };
+});
+
+ipcMain.handle('find-duplicates', async (event, downloadPath) => {
+  const targetDir = downloadPath || path.join(os.homedir(), 'Downloads', 'SauceBox');
+  if (!fs.existsSync(targetDir)) return [];
+  
+  const files = fs.readdirSync(targetDir);
+  const sizeMap = new Map();
+  
+  for (const file of files) {
+    if (!file.match(/\.(mp4|mkv|webm)$/i)) continue;
+    const filePath = path.join(targetDir, file);
+    try {
+      const stats = fs.statSync(filePath);
+      if (stats.size > 0) {
+        if (!sizeMap.has(stats.size)) sizeMap.set(stats.size, []);
+        sizeMap.get(stats.size).push(filePath);
+      }
+    } catch (e) {}
+  }
+  
+  const duplicates = [];
+  for (const [size, filePaths] of sizeMap.entries()) {
+    if (filePaths.length > 1) {
+      duplicates.push({ size, files: filePaths });
+    }
+  }
+  return duplicates;
+});
+
+ipcMain.handle('find-orphans', async (event, { downloadPath, dbPaths }) => {
+  const targetDir = downloadPath || path.join(os.homedir(), 'Downloads', 'SauceBox');
+  if (!fs.existsSync(targetDir)) return [];
+  
+  const files = fs.readdirSync(targetDir);
+  const orphans = [];
+  const dbPathSet = new Set(dbPaths.map(p => path.normalize(p)));
+  
+  for (const file of files) {
+    if (!file.match(/\.(mp4|mkv|webm)$/i)) continue;
+    const filePath = path.normalize(path.join(targetDir, file));
+    if (!dbPathSet.has(filePath)) {
+      orphans.push(filePath);
+    }
+  }
+  return orphans;
+});
+
+ipcMain.handle('verify-database', async (event, dbPaths) => {
+  const missing = [];
+  for (const p of dbPaths) {
+    try {
+      if (!fs.existsSync(p)) {
+        missing.push(p);
+      }
+    } catch (e) {
+      missing.push(p);
+    }
+  }
+  return missing;
+});
+
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
 });
@@ -194,7 +371,7 @@ const activeDownloads = new Map();
 ipcMain.handle('download-video', async (event, { id, url, outputPath, resume = false, speedLimit, container = 'mp4', proxy, quality = 'best' }) => {
   console.log('Starting download for:', url, 'Resume:', resume, 'ID:', id, 'Quality:', quality);
   return new Promise((resolve, reject) => {
-    const downloadsDir = outputPath || path.join(os.homedir(), 'Downloads', 'LocalFap');
+    const downloadsDir = outputPath || path.join(os.homedir(), 'Downloads', 'SauceBox');
     console.log('Download directory:', downloadsDir);
     
     if (!fs.existsSync(downloadsDir)) {
@@ -257,7 +434,7 @@ ipcMain.handle('download-video', async (event, { id, url, outputPath, resume = f
 
     // Output filename format: "Title [Uploader].ext"
     // This is intentional — the importer parses this exact format to auto-fill
-    // title and creator fields when importing LocalFap-downloaded files.
+    // title and creator fields when importing SauceBox-downloaded files.
     // %(uploader,channel,creator|Unknown)s uses the first non-empty of those fields.
     const outputTemplate = path.join(
       downloadsDir,
@@ -533,7 +710,7 @@ ipcMain.handle('get-video-path', async (event, arg) => {
   const filename   = typeof arg === 'string' ? arg : arg.filename;
   const customPath = typeof arg === 'string' ? null : arg.downloadPath;
 
-  const defaultDir = path.join(os.homedir(), 'Downloads', 'LocalFap');
+  const defaultDir = path.join(os.homedir(), 'Downloads', 'SauceBox');
 
   // Build the ordered list of directories to search: configured path first, then default.
   const searchDirs = [];

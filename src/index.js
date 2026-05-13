@@ -1,7 +1,7 @@
 import { AppRegistry } from 'react-native';
 import App from './App';
 
-AppRegistry.registerComponent('LocalFap', () => App);
-AppRegistry.runApplication('LocalFap', {
+AppRegistry.registerComponent('SauceBox', () => App);
+AppRegistry.runApplication('SauceBox', {
   rootTag: document.getElementById('root')
 });

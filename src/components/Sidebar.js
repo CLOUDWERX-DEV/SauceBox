@@ -10,6 +10,7 @@ const tabs = [
   { id: 'download', icon: '⬇️', label: 'Download', subtitle: 'Download Videos' },
   { id: 'queue', icon: '📋', label: 'Queue', subtitle: 'Download Queue' },
   { id: 'history', icon: '🎬', label: 'Gallery', subtitle: 'Video Archive' },
+  { id: 'broadcast', icon: '📡', label: 'Media Server', subtitle: 'VR & Cast Network' },
   { id: 'settings', icon: '⚙️', label: 'Settings', subtitle: 'Tweaks and Customization' }
 ];
 
@@ -29,7 +30,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
     <View style={styles.sidebar}>
       <View style={styles.logoSection}>
         <Image source={{ uri: 'logo.png' }} style={styles.logo} />
-        <Text style={styles.logoText}>LocalFap</Text>
+        <Text style={styles.logoText}>SauceBox</Text>
       </View>
 
       <View style={styles.tabsContainer}>

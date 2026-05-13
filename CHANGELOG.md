@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.2.0] - 2026-05-13
+### Added
+- Complete Media Server & VR Broadcast overhaul: added a Live Monitor to intercept network requests and show exactly what devices are streaming which files.
+- Quick Cast: Instant one-click streaming directly from video gallery cards. Instantly spawns a 1-item temporary playlist and QR code for TV/VR headsets.
+- Auto-Start Server: Added an option in settings to launch the media server headlessly on startup.
+- Advanced M3U Metadata: Implemented #EXTART metadata injection into playlists so premium VR players (like Skybox VR) display full cover art thumbnails and group videos by custom tags.
+- On-the-Fly Transcoding: Integrated real-time FFmpeg streaming to force-transcode incompatible formats (like .mkv and .webm) to .mp4 instantly while streaming to headsets.
+- Completely scrubbed all references to the internal project name, updating all user-facing documentation, logs, and components to SauceBox.
+
 ## [1.1.0] - 2026-05-13
 ### Added
 - Implemented robust UI text truncation for long filenames in the Import Wizard.
@@ -17,4 +26,4 @@
 
 ## [1.0.0] - 2026-05-12
 ### Initial Release
-- Initial stable release of LocalFap Media Manager.
+- Initial stable release of SauceBox Media Manager.

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { theme } from '../theme';
+import { useStore } from '../store';
 import HelpModal from './HelpModal';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
 export default function TitleBar({ vaultEnabled, onLock }) {
   const [helpVisible, setHelpVisible] = useState(false);
+  const serverStatus = useStore(state => state.serverStatus);
   
   const handleMinimize = () => ipcRenderer?.invoke('minimize-window');
   const handleMaximize = () => ipcRenderer?.invoke('maximize-window');
@@ -17,8 +19,16 @@ export default function TitleBar({ vaultEnabled, onLock }) {
       <View style={styles.titleBar}>
         <View style={styles.titleSection}>
           <Image source={{ uri: 'logo.png' }} style={styles.logo} />
-          <Text style={styles.title}>LocalFap</Text>
+          <Text style={styles.title}>SauceBox</Text>
         </View>
+
+        {serverStatus?.running && (
+          <View style={styles.serverBadge}>
+            <View style={styles.serverDot} />
+            <Text style={styles.serverText}>BROADCASTING AT <Text style={styles.serverUrl}>{serverStatus.url}</Text></Text>
+          </View>
+        )}
+
         <View style={styles.controls}>
           {vaultEnabled && (
             <TouchableOpacity style={styles.lockButton} onPress={onLock}>
@@ -80,6 +90,37 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: theme.colors.textTertiary,
     fontStyle: 'italic',
+  },
+  serverBadge: {
+    position: 'absolute',
+    left: '50%',
+    transform: [{ translateX: '-50%' }],
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: `${theme.colors.primary}20`,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+    gap: 8,
+  },
+  serverDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: theme.colors.primary,
+    boxShadow: `0 0 8px ${theme.colors.primary}`,
+  },
+  serverText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: theme.colors.primary,
+    letterSpacing: 1,
+  },
+  serverUrl: {
+    color: '#fff',
+    fontWeight: '600',
   },
   controls: {
     flexDirection: 'row',

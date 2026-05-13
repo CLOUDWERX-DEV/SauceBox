@@ -8,7 +8,7 @@ const { ipcRenderer } = window.require ? window.require('electron') : { ipcRende
 // ---------------------------------------------------------------------------
 // Filename parser
 // ---------------------------------------------------------------------------
-// LocalFap saves files as:  "Title [Uploader].ext"
+// SauceBox saves files as:  "Title [Uploader].ext"
 // This function extracts title and uploader from that convention.
 // It also handles:
 //   - Legacy bare filenames:          "Some Title.mp4"
@@ -299,7 +299,7 @@ export default function ImportModal({ visible, onClose }) {
             {/* ── Step: Select source ───────────────────────────── */}
             {step === 'select' && (
               <View style={styles.centerBox}>
-                <Text style={styles.hintText}>Import local video files into your LocalFap Gallery.</Text>
+                <Text style={styles.hintText}>Import local video files into your SauceBox Gallery.</Text>
                 <View style={styles.row}>
                   <TouchableOpacity style={styles.bigActionBtn} onPress={handleSelectFiles}>
                     <Text style={styles.bigActionEmoji}>📄</Text>
@@ -366,13 +366,13 @@ export default function ImportModal({ visible, onClose }) {
               <View style={styles.centerBox}>
                 <Text style={styles.successText}>Found {files.length} video(s)!</Text>
                 <Text style={styles.hintText}>
-                  LocalFap filenames are automatically parsed for title &amp; creator.
+                  SauceBox filenames are automatically parsed for title &amp; creator.
                 </Text>
 
                 <TouchableOpacity style={styles.stratBtn} onPress={() => handleStrategySelect('auto')}>
                   <Text style={styles.stratBtnTitle}>🤖 Auto-Parse (Recommended)</Text>
                   <Text style={styles.stratBtnSub}>
-                    Extracts title &amp; creator from filename. Best for LocalFap-downloaded files named{' '}
+                    Extracts title &amp; creator from filename. Best for SauceBox-downloaded files named{' '}
                     <Text style={styles.stratBtnCode}>"Title [Creator].mp4"</Text>.
                   </Text>
                 </TouchableOpacity>

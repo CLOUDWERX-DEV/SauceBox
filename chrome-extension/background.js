@@ -1,13 +1,13 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
-    id: "send-to-localfap",
-    title: "Send to LocalFap",
+    id: "send-to-saucebox",
+    title: "Send to SauceBox",
     contexts: ["page", "link"]
   });
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "send-to-localfap") {
+  if (info.menuItemId === "send-to-saucebox") {
     const url = info.linkUrl || info.pageUrl;
     if (url) {
       fetch('http://127.0.0.1:13337/add-download', {
@@ -20,11 +20,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          console.log('Successfully sent to LocalFap');
+          console.log('Successfully sent to SauceBox');
         }
       })
       .catch(err => {
-        console.error('Failed to communicate with LocalFap. Is the app open?', err);
+        console.error('Failed to communicate with SauceBox. Is the app open?', err);
       });
     }
   }

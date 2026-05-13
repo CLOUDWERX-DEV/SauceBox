@@ -8,6 +8,8 @@ const { ipcRenderer } = window.require ? window.require('electron') : { ipcRende
 export default function SettingsTab() {
   const settings = useStore(state => state.settings);
   const updateSettings = useStore(state => state.updateSettings);
+  const history = useStore(state => state.history);
+  const removeFromHistory = useStore(state => state.removeFromHistory);
   const [ytVersion, setYtVersion] = useState('Detecting...');
   const [ffmpegVersion, setFfmpegVersion] = useState('Detecting...');
   const [isRecording, setIsRecording] = useState(false);
@@ -72,7 +74,7 @@ export default function SettingsTab() {
     let interval;
     const fetchDiskSpace = async () => {
       const os = window.require ? window.require('os') : null;
-      const defaultPath = os ? `${os.homedir()}/Downloads/LocalFap` : '';
+      const defaultPath = os ? `${os.homedir()}/Downloads/SauceBox` : '';
       const checkPath = settings.downloadPath || defaultPath;
       if (checkPath && ipcRenderer) {
         try {
@@ -110,6 +112,59 @@ export default function SettingsTab() {
     }
   };
 
+  const handleFindDuplicates = async () => {
+    try {
+      const dups = await ipcRenderer?.invoke('find-duplicates', settings.downloadPath);
+      if (dups && dups.length > 0) {
+        let msg = `Found ${dups.length} sets of duplicates:\n\n`;
+        dups.forEach((d, i) => {
+          if (i < 5) msg += `Size ${d.size} bytes: ${d.files.length} files\n`;
+        });
+        if (dups.length > 5) msg += `...and ${dups.length - 5} more sets.`;
+        alert(msg);
+      } else {
+        alert('No exact duplicates found!');
+      }
+    } catch (e) {
+      alert('Error finding duplicates: ' + e.message);
+    }
+  };
+
+  const handleFindOrphans = async () => {
+    try {
+      const dbPaths = history.map(h => h.path).filter(Boolean);
+      const orphans = await ipcRenderer?.invoke('find-orphans', { downloadPath: settings.downloadPath, dbPaths });
+      if (orphans && orphans.length > 0) {
+        alert(`Found ${orphans.length} orphaned files in your directory that are NOT in the Gallery database.\n\nFirst few:\n${orphans.slice(0, 5).join('\n')}`);
+      } else {
+        alert('Your directory is clean! No orphaned video files found.');
+      }
+    } catch (e) {
+      alert('Error finding orphans: ' + e.message);
+    }
+  };
+
+  const handleVerifyDatabase = async () => {
+    try {
+      const dbPaths = history.map(h => h.path).filter(Boolean);
+      const missing = await ipcRenderer?.invoke('verify-database', dbPaths);
+      if (missing && missing.length > 0) {
+        const confirm = window.confirm(`Found ${missing.length} entries in your Gallery where the file has been manually deleted from the disk.\n\nWould you like to automatically remove these broken entries from your Gallery now?`);
+        if (confirm) {
+          missing.forEach(missingPath => {
+            const item = history.find(h => h.path === missingPath);
+            if (item) removeFromHistory(item.id);
+          });
+          alert('Database cleaned successfully!');
+        }
+      } else {
+        alert('Database is perfect! All files in the Gallery exist on disk.');
+      }
+    } catch (e) {
+      alert('Error verifying database: ' + e.message);
+    }
+  };
+
   const qualityOptions = [
     { value: 'best', label: 'Best Quality', desc: 'Highest available quality', icon: '👑' },
     { value: '1080', label: '1080p', desc: 'Full HD', icon: '🎬' },
@@ -134,7 +189,7 @@ export default function SettingsTab() {
           <View style={styles.pathContainer}>
             <TextInput
               style={styles.pathInput}
-              placeholder="~/Downloads/LocalFap (default)"
+              placeholder="~/Downloads/SauceBox (default)"
               placeholderTextColor="#555"
               value={customPath}
               onChangeText={setCustomPath}
@@ -236,7 +291,7 @@ export default function SettingsTab() {
           <View style={styles.switchRow}>
             <View style={styles.switchInfo}>
               <Text style={styles.switchLabel}>App Lock (Vault Mode)</Text>
-              <Text style={styles.switchDesc}>Require a PIN code to open LocalFap</Text>
+              <Text style={styles.switchDesc}>Require a PIN code to open SauceBox</Text>
             </View>
             <Switch
               value={settings.vaultEnabled}
@@ -364,6 +419,52 @@ export default function SettingsTab() {
       </View>
 
       <View style={styles.section}>
+        <Text style={styles.sectionTitle}>🧹 Maintenance & Cleanup</Text>
+        <View style={styles.card}>
+          <Text style={styles.label}>Keep your massive collection healthy and optimized.</Text>
+          
+          <View style={[styles.switchRow, { marginTop: 16 }]}>
+            <View style={styles.switchInfo}>
+              <Text style={styles.switchLabel}>Find Exact Duplicates</Text>
+              <Text style={styles.switchDesc}>Scan storage for identical video files to reclaim disk space</Text>
+            </View>
+            <TouchableOpacity 
+              style={[styles.saveButton, { backgroundColor: theme.colors.surfaceLight, borderWidth: 1, borderColor: theme.colors.primary }]}
+              onPress={handleFindDuplicates}
+            >
+              <Text style={[styles.saveButtonText, { color: theme.colors.primary }]}>Scan Storage</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={[styles.switchRow, { marginTop: 24, borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 24 }]}>
+            <View style={styles.switchInfo}>
+              <Text style={styles.switchLabel}>Find Orphaned Files</Text>
+              <Text style={styles.switchDesc}>Find files on your disk that are not registered in your Gallery</Text>
+            </View>
+            <TouchableOpacity 
+              style={[styles.saveButton, { backgroundColor: theme.colors.surfaceLight, borderWidth: 1, borderColor: theme.colors.primary }]}
+              onPress={handleFindOrphans}
+            >
+              <Text style={[styles.saveButtonText, { color: theme.colors.primary }]}>Find Orphans</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={[styles.switchRow, { marginTop: 24, borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 24 }]}>
+            <View style={styles.switchInfo}>
+              <Text style={styles.switchLabel}>Verify Database Integrity</Text>
+              <Text style={styles.switchDesc}>Remove broken Gallery entries where the file has been deleted manually</Text>
+            </View>
+            <TouchableOpacity 
+              style={[styles.saveButton, { backgroundColor: theme.colors.surfaceLight, borderWidth: 1, borderColor: theme.colors.error }]}
+              onPress={handleVerifyDatabase}
+            >
+              <Text style={[styles.saveButtonText, { color: theme.colors.error }]}>Clean Database</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.section}>
         <Text style={styles.sectionTitle}>⚡ Advanced</Text>
         <View style={styles.card}>
           <View style={styles.switchRow}>
@@ -408,6 +509,32 @@ export default function SettingsTab() {
               onValueChange={(value) => updateSettings({ autoDownload: value })}
               trackColor={{ false: theme.colors.surfaceLight, true: `${theme.colors.primary}40` }}
               thumbColor={settings.autoDownload ? theme.colors.primary : theme.colors.textTertiary}
+            />
+          </View>
+
+          <View style={[styles.switchRow, { marginTop: 24 }]}>
+            <View style={styles.switchInfo}>
+              <Text style={styles.switchLabel}>Auto-Start Media Server</Text>
+              <Text style={styles.switchDesc}>Automatically start the Broadcast stream server when app launches</Text>
+            </View>
+            <Switch
+              value={settings.autoStartBroadcast}
+              onValueChange={(value) => updateSettings({ autoStartBroadcast: value })}
+              trackColor={{ false: theme.colors.surfaceLight, true: `${theme.colors.primary}40` }}
+              thumbColor={settings.autoStartBroadcast ? theme.colors.primary : theme.colors.textTertiary}
+            />
+          </View>
+
+          <View style={[styles.switchRow, { marginTop: 24 }]}>
+            <View style={styles.switchInfo}>
+              <Text style={styles.switchLabel}>On-the-Fly Transcoding</Text>
+              <Text style={styles.switchDesc}>Force stream unsupported formats (mkv, webm) to MP4 (Requires ffmpeg)</Text>
+            </View>
+            <Switch
+              value={settings.broadcastTranscode || false}
+              onValueChange={(value) => updateSettings({ broadcastTranscode: value })}
+              trackColor={{ false: theme.colors.surfaceLight, true: `${theme.colors.primary}40` }}
+              thumbColor={settings.broadcastTranscode ? theme.colors.primary : theme.colors.textTertiary}
             />
           </View>
 
@@ -495,7 +622,7 @@ export default function SettingsTab() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>💖 Support</Text>
         <View style={styles.card}>
-          <Text style={styles.label}>Support the development of LocalFap</Text>
+          <Text style={styles.label}>Support the development of SauceBox</Text>
           <Text style={[styles.hint, { marginBottom: 16, fontSize: 13, color: theme.colors.textSecondary }]}>
             If you enjoy using this app and want to support further development, consider buying me a coffee!
           </Text>

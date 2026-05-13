@@ -18,6 +18,7 @@ export default function GalleryTab() {
   const updateHistoryRating = useStore(state => state.updateHistoryRating);
   const addTagToHistory = useStore(state => state.addTagToHistory);
   const removeTagFromHistory = useStore(state => state.removeTagFromHistory);
+  const setQuickCastVideo = useStore(state => state.setQuickCastVideo);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('date');
@@ -344,7 +345,7 @@ export default function GalleryTab() {
             <Text style={styles.emptyIcon}>🕳️</Text>
             <Text style={styles.emptyTitle}>Gallery is Empty</Text>
             <Text style={styles.emptyText}>Your downloads will appear here</Text>
-            <Text style={styles.emptySubtext}>What happens in LocalFap, stays in LocalFap... unless you want it to 😏</Text>
+            <Text style={styles.emptySubtext}>What happens in SauceBox, stays in SauceBox... unless you want it to 😏</Text>
           </View>
         ) : filteredHistory.length === 0 ? (
           <View style={styles.emptyState}>
@@ -357,6 +358,15 @@ export default function GalleryTab() {
             {filteredHistory.map((item, index) => (
               <View key={item.id || index} style={styles.historyCard}>
                 <View style={styles.cardActions}>
+                  <TouchableOpacity 
+                    style={styles.folderButtonHistory}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      setQuickCastVideo(item);
+                    }}
+                  >
+                    <Text style={[styles.folderButtonTextHistory, { fontSize: 10, color: theme.colors.primary }]}>📡</Text>
+                  </TouchableOpacity>
                   <TouchableOpacity 
                     style={styles.folderButtonHistory}
                     onPress={(e) => {
@@ -382,6 +392,16 @@ export default function GalleryTab() {
                   style={styles.thumbnail}
                 />
                 <View style={styles.overlay}>
+                  <TouchableOpacity 
+                    style={[styles.playButton, { backgroundColor: theme.colors.primary, marginRight: 12 }]}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      setQuickCastVideo(item);
+                    }}
+                    title="Quick Cast to TV/VR"
+                  >
+                    <Text style={[styles.playIcon, { fontSize: 18 }]}>📡</Text>
+                  </TouchableOpacity>
                   <TouchableOpacity 
                     style={styles.playButton}
                     onPress={() => handlePlayVideo(item)}

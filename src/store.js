@@ -6,10 +6,20 @@ export const useStore = create(
     (set) => ({
       downloads: [],
       history: [],
+      serverStatus: { running: false, url: null },
+      setServerStatus: (status) => set({ serverStatus: status }),
+      broadcastLogs: [],
+      addBroadcastLog: (log) => set((state) => ({ 
+        broadcastLogs: [log, ...state.broadcastLogs].slice(0, 50) 
+      })),
+      clearBroadcastLogs: () => set({ broadcastLogs: [] }),
+      quickCastVideo: null,
+      setQuickCastVideo: (video) => set({ quickCastVideo: video }),
       settings: {
         downloadPath: '',
         quality: 'best',
         autoDownload: true,
+        autoStartBroadcast: false,
         maxConcurrentDownloads: 0,
         downloadSpeedLimit: 0,
         autoClearCompleted: false,
@@ -88,7 +98,7 @@ export const useStore = create(
       }))
     }),
     {
-      name: 'localfap-storage',
+      name: 'saucebox-storage',
     }
   )
 );

@@ -378,7 +378,7 @@ export default function DownloadTab() {
             </View>
             <View style={styles.tipItem}>
               <Text style={styles.tipBullet}>•</Text>
-              <Text style={styles.tip}>Downloads are saved to ~/Downloads/LocalFap by default</Text>
+              <Text style={styles.tip}>Downloads are saved to ~/Downloads/SauceBox by default</Text>
             </View>
             <View style={styles.tipItem}>
               <Text style={styles.tipBullet}>•</Text>

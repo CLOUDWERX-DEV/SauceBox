@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "LocalFap Companion",
+  "name": "SauceBox Companion",
   "version": "1.0.0",
-  "description": "Send videos directly to your LocalFap desktop app.",
+  "description": "Send videos directly to your SauceBox desktop app.",
   "permissions": ["contextMenus"],
   "host_permissions": ["http://127.0.0.1:13337/"],
   "icons": {
