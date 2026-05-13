@@ -513,7 +513,7 @@ export default function SettingsTab() {
         <View style={styles.card}>
           <View style={styles.aboutRow}>
             <Text style={styles.aboutLabel}>Version</Text>
-            <Text style={styles.aboutValue}>1.0.0</Text>
+            <Text style={styles.aboutValue}>1.1.0</Text>
           </View>
           <View style={styles.aboutRow}>
             <Text style={styles.aboutLabel}>Backend</Text>

@@ -18,7 +18,6 @@ export default function TitleBar({ vaultEnabled, onLock }) {
         <View style={styles.titleSection}>
           <Image source={{ uri: 'logo.png' }} style={styles.logo} />
           <Text style={styles.title}>LocalFap</Text>
-          <Text style={styles.subtitle}>Your offline collection manager</Text>
         </View>
         <View style={styles.controls}>
           {vaultEnabled && (
@@ -49,7 +48,7 @@ export default function TitleBar({ vaultEnabled, onLock }) {
 const styles = StyleSheet.create({
   titleBar: {
     height: 40,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceLight,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
