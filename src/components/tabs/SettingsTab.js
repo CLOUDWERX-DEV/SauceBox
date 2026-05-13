@@ -112,10 +112,13 @@ export default function SettingsTab() {
 
   const qualityOptions = [
     { value: 'best', label: 'Best Quality', desc: 'Highest available quality', icon: '👑' },
-    { value: '1080p', label: '1080p', desc: 'Full HD', icon: '🎬' },
-    { value: '720p', label: '720p', desc: 'HD', icon: '📺' },
-    { value: '480p', label: '480p', desc: 'SD', icon: '📱' }
+    { value: '1080', label: '1080p', desc: 'Full HD', icon: '🎬' },
+    { value: '720',  label: '720p',  desc: 'HD',      icon: '📺' },
+    { value: '480',  label: '480p',  desc: 'SD',       icon: '📱' },
+    { value: '240',  label: '240p',  desc: 'Low',      icon: '🔋' },
   ];
+
+  const openExternal = (url) => ipcRenderer?.invoke('open-external', url);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -498,7 +501,7 @@ export default function SettingsTab() {
           </Text>
           <TouchableOpacity 
             style={[styles.saveButton, { backgroundColor: '#FFDD00', alignSelf: 'flex-start' }]}
-            onPress={() => window.open('https://buymeacoffee.com/cloudwerxl3', '_blank')}
+            onPress={() => openExternal('https://buymeacoffee.com/cloudwerxl3')}
           >
             <Text style={[styles.saveButtonText, { color: '#000' }]}>☕ Buy me a coffee</Text>
           </TouchableOpacity>
@@ -522,7 +525,7 @@ export default function SettingsTab() {
           </View>
           <View style={[styles.aboutRow, styles.aboutRowLast]}>
             <Text style={styles.aboutLabel}>Made by</Text>
-            <TouchableOpacity onPress={() => window.open('http://cloudwerxlab.com', '_blank')}>
+            <TouchableOpacity onPress={() => openExternal('https://cloudwerxlab.com')}>
               <Text style={[styles.aboutValue, { color: theme.colors.primary, textDecorationLine: 'underline', cursor: 'pointer' }]}>
                 CLOUDWERX LAB
               </Text>

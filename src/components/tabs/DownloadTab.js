@@ -57,12 +57,18 @@ export default function DownloadTab() {
         setPlaylistInfo({ ...info, url: url.trim() });
         setPlaylistModalVisible(true);
       } else {
-        // Single video — use existing preview modal
-        // If singleVideo data came back from flat-playlist, use it; otherwise fetch full info
-        let videoData = info.singleVideo;
-        if (!videoData) {
+        // Single video — always call get-video-info for the full formats array.
+        // The flat-playlist singleVideo shortcut skips --dump-json so it won't
+        // have availableQualities. We need the full format list so the preview
+        // modal can show only quality options that actually exist on this video.
+        let videoData;
+        try {
           videoData = await ipcRenderer?.invoke('get-video-info', url.trim());
+        } catch (e) {
+          // Fallback to flat-playlist singleVideo if full info fails
+          videoData = info.singleVideo;
         }
+        if (!videoData) videoData = info.singleVideo;
         setPreviewInfo({ ...videoData, url: url.trim() });
         setPreviewModalVisible(true);
       }
@@ -75,9 +81,36 @@ export default function DownloadTab() {
     }
   };
 
-  const handleDownloadFromPreview = () => {
+  const handleDownloadFromPreview = (quality = 'best') => {
     setPreviewModalVisible(false);
-    queueDownload(previewInfo.url);
+    const info = previewInfo;
+    // Normalize quality: strip any trailing 'p' from persisted/legacy values (e.g. "480p" → "480")
+    const qualityHeight = quality !== 'best' ? String(quality).replace(/p$/i, '') : null;
+
+    // Build the resolution display hint:
+    // - Specific quality (e.g. "480") → show "480p" immediately on the card
+    // - "best" quality → use the top of availableQualities (sorted desc by get-video-info)
+    //   so the card shows the actual best available height (e.g. "1080p") not nothing
+    // - No format info at all → null; ffmpeg fills it in after the download completes
+    const bestAvailHeight = Array.isArray(info?.availableQualities) && info.availableQualities.length > 0
+      ? info.availableQualities[0]   // already sorted descending
+      : null;
+    const resolutionHint = qualityHeight
+      ? `${qualityHeight}p`
+      : (bestAvailHeight ? `${bestAvailHeight}p` : null);
+
+    const download = {
+      url: info.url,
+      title: info.title || 'Unknown Title',
+      thumbnail: info.thumbnail,
+      duration: info.duration,
+      uploader: info.uploader,
+      resolution: resolutionHint,
+      format: info.format,
+      filesize: info.filesize,
+      quality: qualityHeight || 'best',
+    };
+    addDownload(download);
     setUrl('');
   };
 
@@ -97,15 +130,31 @@ export default function DownloadTab() {
 
       const info = await ipcRenderer?.invoke('get-video-info', urlToDownload);
 
+      // Normalize the quality from settings — strip any old 'p' suffix
+      const settingsQualityHeight = settings.quality !== 'best'
+        ? String(settings.quality).replace(/p$/i, '')
+        : null;
+
+      // Best available height from the format list (sorted desc by get-video-info)
+      const bestAvailHeight = Array.isArray(info?.availableQualities) && info.availableQualities.length > 0
+        ? info.availableQualities[0]
+        : null;
+
+      // Resolution display hint: specific quality → Np, best → top of available list, else null
+      const resolutionHint = settingsQualityHeight
+        ? `${settingsQualityHeight}p`
+        : (bestAvailHeight ? `${bestAvailHeight}p` : null);
+
       const download = {
         url: urlToDownload,
         title: info?.title || 'Unknown Title',
         thumbnail: info?.thumbnail,
         duration: info?.duration,
         uploader: info?.uploader,
-        resolution: info?.resolution,
+        resolution: resolutionHint,
         format: info?.format,
-        filesize: info?.filesize
+        filesize: info?.filesize,
+        quality: settingsQualityHeight || 'best',
       };
 
       addDownload(download);
@@ -147,15 +196,28 @@ export default function DownloadTab() {
       setLoadingMsg('📡 Fetching video info...');
       const videoData = await ipcRenderer?.invoke('get-video-info', url.trim());
 
+      const settingsQualityHeight = settings.quality !== 'best'
+        ? String(settings.quality).replace(/p$/i, '')
+        : null;
+
+      const bestAvailHeight = Array.isArray(videoData?.availableQualities) && videoData.availableQualities.length > 0
+        ? videoData.availableQualities[0]
+        : null;
+
+      const resolutionHint = settingsQualityHeight
+        ? `${settingsQualityHeight}p`
+        : (bestAvailHeight ? `${bestAvailHeight}p` : null);
+
       const download = {
         url: url.trim(),
         title: videoData?.title || 'Unknown Title',
         thumbnail: videoData?.thumbnail,
         duration: videoData?.duration,
         uploader: videoData?.uploader,
-        resolution: videoData?.resolution,
+        resolution: resolutionHint,
         format: videoData?.format,
-        filesize: videoData?.filesize
+        filesize: videoData?.filesize,
+        quality: settingsQualityHeight || 'best'
       };
 
       addDownload(download);
@@ -175,17 +237,26 @@ export default function DownloadTab() {
     setPlaylistModalVisible(false);
     setUrl('');
 
+    const settingsQualityHeight = settings.quality !== 'best'
+      ? String(settings.quality).replace(/p$/i, '')
+      : null;
+
     for (const entry of selectedEntries) {
       try {
+        const resolutionHint = settingsQualityHeight
+          ? `${settingsQualityHeight}p`
+          : null;
+
         const download = {
           url: entry.url,
           title: entry.title || 'Unknown Title',
           thumbnail: entry.thumbnail || null,
           duration: entry.duration || null,
           uploader: entry.uploader || null,
-          resolution: null,
+          resolution: resolutionHint,
           format: null,
           filesize: null,
+          quality: settingsQualityHeight || 'best',
         };
 
         addDownload(download);
@@ -200,15 +271,28 @@ export default function DownloadTab() {
       try {
         const info = await ipcRenderer?.invoke('get-video-info', batchUrl);
 
+        const settingsQualityHeight = settings.quality !== 'best'
+          ? String(settings.quality).replace(/p$/i, '')
+          : null;
+
+        const bestAvailHeight = Array.isArray(info?.availableQualities) && info.availableQualities.length > 0
+          ? info.availableQualities[0]
+          : null;
+
+        const resolutionHint = settingsQualityHeight
+          ? `${settingsQualityHeight}p`
+          : (bestAvailHeight ? `${bestAvailHeight}p` : null);
+
         const download = {
           url: batchUrl,
           title: info?.title || 'Unknown Title',
           thumbnail: info?.thumbnail,
           duration: info?.duration,
           uploader: info?.uploader,
-          resolution: info?.resolution,
+          resolution: resolutionHint,
           format: info?.format,
-          filesize: info?.filesize
+          filesize: info?.filesize,
+          quality: settingsQualityHeight || 'best'
         };
 
         addDownload(download);
@@ -256,7 +340,7 @@ export default function DownloadTab() {
               </TouchableOpacity>
             </View>
             <Text style={styles.inputHint}>
-              Supports most major video platforms &amp; playlists • Press Enter to download
+              Supports most major video platforms &amp; playlists • Press Enter to download • Use Preview to inspect video info and choose download quality
             </Text>
           </View>
 
@@ -318,6 +402,7 @@ export default function DownloadTab() {
       <VideoPreviewModal
         visible={previewModalVisible}
         videoInfo={previewInfo}
+        defaultQuality={String(settings.quality || 'best').replace(/p$/i, '')}
         onClose={() => setPreviewModalVisible(false)}
         onDownload={handleDownloadFromPreview}
       />

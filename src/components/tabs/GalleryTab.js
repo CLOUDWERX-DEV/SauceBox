@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput } from 'react-native';
+import VideoThumbnail from '../VideoThumbnail';
 import { useStore } from '../../store';
 import { theme } from '../../theme';
 import VideoPlayer from '../VideoPlayer';
@@ -11,6 +12,7 @@ const { ipcRenderer } = window.require ? window.require('electron') : { ipcRende
 
 export default function GalleryTab() {
   const history = useStore(state => state.history);
+  const settings = useStore(state => state.settings);
   const clearHistory = useStore(state => state.clearHistory);
   const removeFromHistory = useStore(state => state.removeFromHistory);
   const updateHistoryRating = useStore(state => state.updateHistoryRating);
@@ -21,12 +23,15 @@ export default function GalleryTab() {
   const [sortBy, setSortBy] = useState('date');
   const [filterResolution, setFilterResolution] = useState('all');
   const [filterRating, setFilterRating] = useState(0);
-  const [filterTag, setFilterTag] = useState(null);
+  const [filterTags, setFilterTags] = useState([]);
   const [editingTagId, setEditingTagId] = useState(null);
   const [newTagText, setNewTagText] = useState('');
   const [editingVideo, setEditingVideo] = useState(null);
   const [importVisible, setImportVisible] = useState(false);
   const [clearConfirmVisible, setClearConfirmVisible] = useState(false);
+  const [clearDiskToo, setClearDiskToo] = useState(false);
+  const [deleteConfirmItem, setDeleteConfirmItem] = useState(null); // item pending delete
+  const [deleteFromDisk, setDeleteFromDisk] = useState(false);
 
   const allTags = Array.from(new Set(history.flatMap(h => h.tags || []))).sort();
 
@@ -66,9 +71,13 @@ export default function GalleryTab() {
       let videoPath = item.path;
       if (!videoPath) {
         // Fallback for older downloads without absolute path
-        videoPath = await ipcRenderer?.invoke('get-video-path', `${item.title}.mp4`);
+        videoPath = await ipcRenderer?.invoke('get-video-path', {
+          filename: `${item.title}.mp4`,
+          downloadPath: settings.downloadPath,
+        });
       }
-      setSelectedVideo({ path: videoPath, title: item.title });
+      // Spread the full item so VideoPlayer's originalItem has id, tags, rating etc.
+      setSelectedVideo({ ...item, path: videoPath });
     } catch (error) {
       console.error('Failed to find video:', error);
       alert('Video file not found. The download may have failed or the file was moved.');
@@ -79,13 +88,38 @@ export default function GalleryTab() {
     try {
       let videoPath = item.path;
       if (!videoPath) {
-        videoPath = await ipcRenderer?.invoke('get-video-path', `${item.title}.mp4`);
+        videoPath = await ipcRenderer?.invoke('get-video-path', {
+          filename: `${item.title}.mp4`,
+          downloadPath: settings.downloadPath,
+        });
       }
       await ipcRenderer?.invoke('open-folder', videoPath);
     } catch (error) {
       console.error('Failed to open folder:', error);
       alert('Could not open folder. The video file may have been moved or deleted.');
     }
+  };
+
+  const handleDeleteItem = async () => {
+    if (!deleteConfirmItem) return;
+    if (deleteFromDisk && deleteConfirmItem.path) {
+      await ipcRenderer?.invoke('delete-file', deleteConfirmItem.path);
+    }
+    removeFromHistory(deleteConfirmItem.id);
+    setDeleteConfirmItem(null);
+    setDeleteFromDisk(false);
+  };
+
+  const handleClearAll = async () => {
+    if (clearDiskToo) {
+      const paths = history.map(h => h.path).filter(Boolean);
+      if (paths.length > 0) {
+        await ipcRenderer?.invoke('delete-files', paths);
+      }
+    }
+    clearHistory();
+    setClearConfirmVisible(false);
+    setClearDiskToo(false);
   };
 
   // Filter and sort history
@@ -95,7 +129,7 @@ export default function GalleryTab() {
       const matchesResolution = filterResolution === 'all' ||
         (item.resolution && item.resolution.includes(filterResolution));
       const matchesRating = filterRating === 0 || (item.rating || 0) >= filterRating;
-      const matchesTag = !filterTag || (item.tags && item.tags.includes(filterTag));
+      const matchesTag = filterTags.length === 0 || filterTags.every(tag => item.tags && item.tags.includes(tag));
       return matchesSearch && matchesResolution && matchesRating && matchesTag;
     })
     .sort((a, b) => {
@@ -118,13 +152,26 @@ export default function GalleryTab() {
         <View style={styles.header}>
           <View>
             <Text style={styles.title}>Video Gallery</Text>
-            <Text style={styles.subtitle}>
-              {history.length === 0
+            {(() => {
+              const totalBytes = history.reduce((acc, h) => acc + (Number(h.filesize) || 0), 0);
+              const totalSize = formatFileSize(totalBytes);
+              const countLabel = history.length === 0
                 ? 'No downloads yet'
                 : filteredHistory.length === history.length
-                  ? `${history.length} Videos`
-                  : `${filteredHistory.length} of ${history.length} shown`}
-            </Text>
+                  ? `${history.length} ${history.length === 1 ? 'Video' : 'Videos'}`
+                  : `${filteredHistory.length} of ${history.length} shown`;
+              return (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  <Text style={styles.subtitle}>{countLabel}</Text>
+                  {totalSize && history.length > 0 && (
+                    <>
+                      <Text style={styles.subtitleDot}>·</Text>
+                      <Text style={styles.subtitleSize}>{totalSize}</Text>
+                    </>
+                  )}
+                </View>
+              );
+            })()}
           </View>
           <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
             <TouchableOpacity style={styles.importButton} onPress={() => setImportVisible(true)}>
@@ -262,20 +309,26 @@ export default function GalleryTab() {
                 <Text style={styles.filterLabel}>Tag:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterButtons}>
                   <TouchableOpacity
-                    style={[styles.filterButton, !filterTag && styles.filterButtonActive]}
-                    onPress={() => setFilterTag(null)}
+                    style={[styles.filterButton, filterTags.length === 0 && styles.filterButtonActive]}
+                    onPress={() => setFilterTags([])}
                   >
-                    <Text style={[styles.filterButtonText, !filterTag && styles.filterButtonTextActive]}>
+                    <Text style={[styles.filterButtonText, filterTags.length === 0 && styles.filterButtonTextActive]}>
                       All
                     </Text>
                   </TouchableOpacity>
                   {allTags.map(tag => (
                     <TouchableOpacity
                       key={tag}
-                      style={[styles.filterButton, filterTag === tag && styles.filterButtonActive]}
-                      onPress={() => setFilterTag(tag)}
+                      style={[styles.filterButton, filterTags.includes(tag) && styles.filterButtonActive]}
+                      onPress={() => {
+                        if (filterTags.includes(tag)) {
+                          setFilterTags(filterTags.filter(t => t !== tag));
+                        } else {
+                          setFilterTags([...filterTags, tag]);
+                        }
+                      }}
                     >
-                      <Text style={[styles.filterButtonText, filterTag === tag && styles.filterButtonTextActive]}>
+                      <Text style={[styles.filterButtonText, filterTags.includes(tag) && styles.filterButtonTextActive]}>
                         🏷️ {tag}
                       </Text>
                     </TouchableOpacity>
@@ -317,18 +370,17 @@ export default function GalleryTab() {
                     style={styles.deleteButton}
                     onPress={(e) => {
                       e.stopPropagation();
-                      removeFromHistory(item.id);
+                      setDeleteFromDisk(false);
+                      setDeleteConfirmItem(item);
                     }}
                   >
                     <Text style={styles.deleteButtonText}>✕</Text>
                   </TouchableOpacity>
                 </View>
-                {item.thumbnail && (
-                  <Image 
-                    source={{ uri: item.thumbnail }} 
-                    style={styles.thumbnail}
-                  />
-                )}
+                <VideoThumbnail
+                  uri={item.thumbnail}
+                  style={styles.thumbnail}
+                />
                 <View style={styles.overlay}>
                   <TouchableOpacity 
                     style={styles.playButton}
@@ -432,20 +484,56 @@ export default function GalleryTab() {
         visible={!!selectedVideo}
         videoPath={selectedVideo?.path}
         videoTitle={selectedVideo?.title}
+        originalItem={selectedVideo}
         onClose={() => setSelectedVideo(null)}
       />
 
-      <ConfirmModal
-        visible={clearConfirmVisible}
-        title="Clear Gallery?"
-        message="Are you sure you want to clear your entire video gallery? This will not delete the actual files from your hard drive, but it will remove all metadata, tags, and gallery from LocalFap."
-        confirmText="Clear Gallery"
-        onConfirm={() => {
-          clearHistory();
-          setClearConfirmVisible(false);
-        }}
-        onCancel={() => setClearConfirmVisible(false)}
-      />
+      {/* Per-card delete confirmation */}
+      {(() => {
+        const singleSize = deleteConfirmItem?.filesize
+          ? formatFileSize(deleteConfirmItem.filesize)
+          : null;
+        return (
+          <ConfirmModal
+            visible={!!deleteConfirmItem}
+            title="Remove Video?"
+            message={`Remove "${deleteConfirmItem?.title || 'this video'}" from your gallery?`}
+            confirmText="Remove"
+            onConfirm={handleDeleteItem}
+            onCancel={() => { setDeleteConfirmItem(null); setDeleteFromDisk(false); }}
+            checkboxLabel={singleSize
+              ? `Also permanently delete the file from disk (${singleSize})`
+              : 'Also permanently delete the file from disk'}
+            checkboxValue={deleteFromDisk}
+            onCheckboxChange={setDeleteFromDisk}
+          />
+        );
+      })()}
+
+      {/* Clear all confirmation */}
+      {(() => {
+        const totalBytes = history.reduce((acc, h) => acc + (Number(h.filesize) || 0), 0);
+        const totalSize = totalBytes > 0 ? formatFileSize(totalBytes) : null;
+        const knownCount = history.filter(h => h.filesize).length;
+        const sizeLabel = totalSize
+          ? `Also permanently delete all video files from disk (${totalSize}${
+              knownCount < history.length ? ', known files only' : ''
+            })`
+          : 'Also permanently delete all video files from disk';
+        return (
+          <ConfirmModal
+            visible={clearConfirmVisible}
+            title="Clear Gallery?"
+            message="Remove all videos from your gallery? This cannot be undone."
+            confirmText="Clear Gallery"
+            onConfirm={handleClearAll}
+            onCancel={() => { setClearConfirmVisible(false); setClearDiskToo(false); }}
+            checkboxLabel={sizeLabel}
+            checkboxValue={clearDiskToo}
+            onCheckboxChange={setClearDiskToo}
+          />
+        );
+      })()}
 
       <EditVideoModal
         visible={!!editingVideo}
@@ -490,6 +578,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: theme.colors.textSecondary,
     fontStyle: 'italic',
+  },
+  subtitleDot: {
+    fontSize: 16,
+    color: theme.colors.textSecondary,
+    opacity: 0.5,
+  },
+  subtitleSize: {
+    fontSize: 15,
+    color: theme.colors.primary,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   importButton: {
     backgroundColor: theme.colors.primary,

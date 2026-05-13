@@ -26,8 +26,63 @@ export default function App() {
 
   useEffect(() => {
     if (ipcRenderer) {
-      const externalAddHandler = (event, url) => {
-        useStore.getState().addDownload({ url, title: 'Fetching metadata...' });
+      const externalAddHandler = async (event, url) => {
+        const store = useStore.getState();
+        
+        // Check for duplicates in history
+        const existingDownload = store.history.find(h => h.url === url);
+        if (existingDownload) {
+          const confirmDownload = window.confirm(
+            `You already downloaded this video on ${new Date(existingDownload.timestamp).toLocaleDateString()}!\n\n` +
+            `Title: ${existingDownload.title}\n\nDo you want to download it again?`
+          );
+          if (!confirmDownload) return;
+        }
+
+        // Add a temporary entry so the UI responds immediately
+        store.addDownload({ url, title: 'Fetching metadata...' });
+        
+        try {
+          const info = await ipcRenderer?.invoke('get-video-info', url);
+          const settings = useStore.getState().settings;
+          const settingsQualityHeight = settings.quality !== 'best'
+            ? String(settings.quality).replace(/p$/i, '')
+            : null;
+
+          const bestAvailHeight = Array.isArray(info?.availableQualities) && info.availableQualities.length > 0
+            ? info.availableQualities[0]
+            : null;
+
+          const resolutionHint = settingsQualityHeight
+            ? `${settingsQualityHeight}p`
+            : (bestAvailHeight ? `${bestAvailHeight}p` : null);
+
+          // Find the temp entry and update it
+          const currentStore = useStore.getState();
+          const target = currentStore.downloads.find(d => d.url === url && d.title === 'Fetching metadata...');
+          if (target) {
+            currentStore.updateDownload(target.id, {
+              title: info?.title || 'Unknown Title',
+              thumbnail: info?.thumbnail,
+              duration: info?.duration,
+              uploader: info?.uploader,
+              resolution: resolutionHint,
+              format: info?.format,
+              filesize: info?.filesize,
+              quality: settingsQualityHeight || 'best'
+            });
+          }
+        } catch (e) {
+          console.error("Failed to fetch info for external url:", e);
+          const currentStore = useStore.getState();
+          const target = currentStore.downloads.find(d => d.url === url && d.title === 'Fetching metadata...');
+          if (target) {
+            currentStore.updateDownload(target.id, {
+              title: url,
+              quality: currentStore.settings.quality || 'best'
+            });
+          }
+        }
       };
       
       const panicStealthHandler = () => {
@@ -48,8 +103,10 @@ export default function App() {
         const download = store.downloads.find(d => d.id === data.id);
         if (download) {
           store.updateDownload(download.id, { 
-            progress: data.progress, 
-            status: data.status 
+            ...(data.progress !== undefined && { progress: data.progress }),
+            ...(data.status !== undefined && { status: data.status }),
+            ...(data.speed !== undefined && { speed: data.speed }),
+            ...(data.eta !== undefined && { eta: data.eta })
           });
           
           const canNotify = () => {
@@ -63,11 +120,22 @@ export default function App() {
           if (data.status === 'completed') {
             const currentSettings = store.settings;
             try {
-              const videoPath = await ipcRenderer?.invoke('get-video-path', `${download.title}.mp4`);
+              const videoPath = await ipcRenderer?.invoke('get-video-path', {
+                filename: `${download.title}.mp4`,
+                downloadPath: currentSettings.downloadPath,
+              });
               if (videoPath) {
                 const meta = await ipcRenderer?.invoke('get-local-metadata', videoPath);
-                if (meta?.filesize) download.filesize = meta.filesize;
-                download.path = videoPath;
+                // Build the real-metadata update object — override whatever yt-dlp
+                // reported at queue time with what ffmpeg actually sees in the file.
+                const realMeta = { path: videoPath };
+                if (meta?.resolution)              realMeta.resolution = meta.resolution;
+                if (meta?.filesize)                realMeta.filesize   = meta.filesize;
+                if (meta?.duration && !download.duration) realMeta.duration = meta.duration;
+                // Push into store so the Queue card updates its displayed values immediately
+                store.updateDownload(download.id, realMeta);
+                // Also update local copy so addToHistory gets the corrected data
+                Object.assign(download, realMeta);
               }
             } catch (e) {}
             if (currentSettings.autoTagDomainUploader) {
@@ -107,32 +175,15 @@ export default function App() {
         }
       };
       
-      const speedHandler = (event, data) => {
-        const download = useStore.getState().downloads.find(d => d.id === data.id);
-        if (download) {
-          useStore.getState().updateDownload(download.id, { speed: data.speed });
-        }
-      };
-      
-      const etaHandler = (event, data) => {
-        const download = useStore.getState().downloads.find(d => d.id === data.id);
-        if (download) {
-          useStore.getState().updateDownload(download.id, { eta: data.eta });
-        }
-      };
       
       ipcRenderer.on('external-add-url', externalAddHandler);
       ipcRenderer.on('panic-stealth', panicStealthHandler);
       ipcRenderer.on('download-progress', progressHandler);
-      ipcRenderer.on('download-speed', speedHandler);
-      ipcRenderer.on('download-eta', etaHandler);
       
       return () => {
         ipcRenderer.removeListener('external-add-url', externalAddHandler);
         ipcRenderer.removeListener('panic-stealth', panicStealthHandler);
         ipcRenderer.removeListener('download-progress', progressHandler);
-        ipcRenderer.removeListener('download-speed', speedHandler);
-        ipcRenderer.removeListener('download-eta', etaHandler);
       };
     }
   }, [isUnlocked]);
@@ -166,13 +217,17 @@ export default function App() {
           if (!d.resolution || !d.uploader || d.uploader === 'Unknown') {
             try {
               const info = await ipcRenderer?.invoke('get-video-info', d.url);
+              // Only update fields that were missing at queue time.
+              // NEVER touch resolution here — it is set correctly at queue time from
+              // the selected quality or availableQualities. Overwriting it with
+              // get-video-info data would show the best-format dimensions (e.g. "1920x1080")
+              // instead of the actually selected quality.
               updateDownload(d.id, {
-                uploader: info.uploader || d.uploader,
-                resolution: info.resolution || d.resolution,
-                format: info.format || d.format,
-                filesize: info.filesize || info.filesize_approx || d.filesize,
-                duration: info.duration || d.duration,
-                thumbnail: info.thumbnail || d.thumbnail
+                uploader:  info.uploader  || d.uploader,
+                format:    info.format    || d.format,
+                filesize:  info.filesize  || info.filesize_approx || d.filesize,
+                duration:  info.duration  || d.duration,
+                thumbnail: info.thumbnail || d.thumbnail,
               });
             } catch (e) {
               console.warn('Could not fetch rich video info before download', e);
@@ -206,7 +261,8 @@ export default function App() {
             speedLimit: currentSettings.downloadSpeedLimit,
             container: currentSettings.preferredContainer,
             proxy: currentSettings.proxyString,
-            outputPath: currentSettings.downloadPath
+            outputPath: currentSettings.downloadPath,
+            quality: d.quality || currentSettings.quality || 'best',
           });
         } catch (err) {
           console.error(err);

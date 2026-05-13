@@ -3,6 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useStore } from '../store';
 import { theme } from '../theme';
 
+const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const openExternal = (url) => ipcRenderer?.invoke('open-external', url);
+
 const tabs = [
   { id: 'download', icon: '⬇️', label: 'Download', subtitle: 'Download Videos' },
   { id: 'queue', icon: '📋', label: 'Queue', subtitle: 'Download Queue' },
@@ -71,7 +74,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
         </View>
         <TouchableOpacity 
           style={styles.donateButtonSide}
-          onPress={() => window.open('https://buymeacoffee.com/cloudwerxl3', '_blank')}
+          onPress={() => openExternal('https://buymeacoffee.com/cloudwerxl3')}
         >
           <Text style={styles.donateButtonText}>☕ Buy me a coffee</Text>
         </TouchableOpacity>
