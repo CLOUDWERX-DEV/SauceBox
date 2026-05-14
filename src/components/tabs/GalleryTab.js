@@ -191,7 +191,8 @@ export default function GalleryTab() {
           </View>
         </View>
 
-        <View style={styles.filterBar}>
+        {history.length > 0 && (
+          <View style={styles.filterBar}>
           <View style={styles.searchContainer}>
             <Text style={styles.searchIcon}>🔍</Text>
             <TextInput
@@ -343,14 +344,14 @@ export default function GalleryTab() {
               </View>
             )}
           </View>
-        </View>
+          </View>
+        )}
 
         {history.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyIcon}>🕳️</Text>
             <Text style={styles.emptyTitle}>Gallery is Empty</Text>
             <Text style={styles.emptyText}>Your downloads will appear here</Text>
-            <Text style={styles.emptySubtext}>What happens in SauceBox, stays in SauceBox... unless you want it to 😏</Text>
           </View>
         ) : filteredHistory.length === 0 ? (
           <View style={styles.emptyState}>

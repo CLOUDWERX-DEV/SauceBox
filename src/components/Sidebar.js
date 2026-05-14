@@ -37,7 +37,8 @@ export default function Sidebar({ activeTab, onTabChange }) {
       if (randomVideo.path) {
         const customPlayerPath = useStore.getState().settings.customPlayerPath;
         ipcRenderer?.invoke('open-video', { filepath: randomVideo.path, customPlayerPath });
-        if (window.Notification) {
+        const notificationsEnabled = useStore.getState().settings?.notifications !== false;
+        if (window.Notification && notificationsEnabled) {
           new Notification('🎲 Random Local Sauce!', {
             body: `Enjoy: ${randomVideo.title}`,
             icon: 'logo.png'
@@ -49,12 +50,13 @@ export default function Sidebar({ activeTab, onTabChange }) {
         'https://www.pornhub.com/video/random',
         'https://spankbang.com/s/random/',
         'https://www.eporner.com/',
-        'https://www.xvideos.com/random'
+        'https://www.xvideos.com/'
       ];
       const randomSite = sites[Math.floor(Math.random() * sites.length)];
       openExternal(randomSite);
-      if (window.Notification) {
-        new Notification('💦 Time to stock up!', {
+      const notificationsEnabled = useStore.getState().settings?.notifications !== false;
+      if (window.Notification && notificationsEnabled) {
+        new Notification('🎲 Time to stock up!', {
           body: `Opening ${new URL(randomSite).hostname} for you...`,
           icon: 'logo.png'
         });
@@ -74,7 +76,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
           style={[styles.logo, isRotating && styles.logoRotating]} 
         />
         <Text style={styles.logoText}>SauceBox</Text>
-        <Text style={styles.logoSubtext}>Feeling Lucky? 🎲💦</Text>
+        <Text style={styles.logoSubtext}>Feeling Lucky? 🎲</Text>
       </TouchableOpacity>
 
       <View style={styles.tabsContainer}>

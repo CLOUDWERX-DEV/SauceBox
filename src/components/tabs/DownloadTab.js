@@ -361,34 +361,38 @@ export default function DownloadTab() {
           <View style={styles.divider} />
         </View>
 
-        <View style={styles.tipsCard}>
-          <Text style={styles.tipsTitle}>💡 Pro Tips</Text>
-          <View style={styles.tipsList}>
-            <View style={styles.tipItem}>
-              <Text style={styles.tipBullet}>•</Text>
-              <Text style={styles.tip}>Paste a playlist URL and select exactly which videos to download</Text>
-            </View>
-            <View style={styles.tipItem}>
-              <Text style={styles.tipBullet}>•</Text>
-              <Text style={styles.tip}>Use Batch Mode to download multiple videos simultaneously</Text>
-            </View>
-            <View style={styles.tipItem}>
-              <Text style={styles.tipBullet}>•</Text>
-              <Text style={styles.tip}>Works with most major adult sites and video platforms</Text>
-            </View>
-            <View style={styles.tipItem}>
-              <Text style={styles.tipBullet}>•</Text>
-              <Text style={styles.tip}>Downloads are saved to ~/Downloads/SauceBox by default</Text>
-            </View>
-            <View style={styles.tipItem}>
-              <Text style={styles.tipBullet}>•</Text>
-              <Text style={styles.tip}>Click on any video in the Gallery to watch it instantly</Text>
-            </View>
-            <View style={styles.tipItem}>
-              <Text style={styles.tipBullet}>•</Text>
-              <Text style={styles.tip}>All your data is saved locally and persists between sessions</Text>
+        <View style={styles.bottomCardsContainer}>
+          <View style={styles.tipsCard}>
+            <Text style={styles.tipsTitle}>📖 How to Use SauceBox</Text>
+            <View style={styles.tipsList}>
+              <View style={styles.tipItem}>
+                <View style={styles.stepCircle}><Text style={styles.stepNumber}>1</Text></View>
+                <Text style={styles.tip}>Paste any video or playlist URL into the input field above.</Text>
+              </View>
+              <View style={styles.tipItem}>
+                <View style={styles.stepCircle}><Text style={styles.stepNumber}>2</Text></View>
+                <Text style={styles.tip}>Click the 👁️ Preview button to inspect video qualities and select a specific resolution.</Text>
+              </View>
+              <View style={styles.tipItem}>
+                <View style={styles.stepCircle}><Text style={styles.stepNumber}>3</Text></View>
+                <Text style={styles.tip}>Hit 🚀 Download (or press Enter) to fetch the video and automatically extract metadata.</Text>
+              </View>
+              <View style={styles.tipItem}>
+                <View style={styles.stepCircle}><Text style={styles.stepNumber}>4</Text></View>
+                <Text style={styles.tip}>Monitor progress in the Queue, or manage concurrent downloads in Settings.</Text>
+              </View>
+              <View style={styles.tipItem}>
+                <View style={styles.stepCircle}><Text style={styles.stepNumber}>5</Text></View>
+                <Text style={styles.tip}>Head to the Gallery to play locally, cast to your VR headset, or trim scenes!</Text>
+              </View>
+              <View style={styles.tipItem}>
+                <View style={styles.stepCircle}><Text style={styles.stepNumber}>🧩</Text></View>
+                <Text style={styles.tip}>Use the Chrome Extension to right-click and send videos instantly to SauceBox.</Text>
+              </View>
             </View>
           </View>
+
+
         </View>
         </div>
       </div>
@@ -424,11 +428,12 @@ const styles = {
   },
   card: {
     backgroundColor: theme.colors.surface,
-    borderRadius: 20,
-    padding: 32,
+    borderRadius: 24,
+    padding: 36,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    marginBottom: 24,
+    marginBottom: 32,
+    boxShadow: `0 8px 32px ${theme.colors.border}`,
   },
   inputContainer: {
     marginBottom: 24,
@@ -467,22 +472,23 @@ const styles = {
     backgroundColor: theme.colors.primary,
     paddingHorizontal: 36,
     paddingVertical: 18,
-    borderRadius: 12,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
     minWidth: 180,
     cursor: 'pointer',
+    boxShadow: `0 4px 15px ${theme.colors.primary}40`,
   },
   previewButton: {
-    backgroundColor: `${theme.colors.primary}20`,
+    backgroundColor: theme.colors.surfaceLight,
     paddingHorizontal: 20,
     paddingVertical: 18,
-    borderRadius: 12,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
     cursor: 'pointer',
     borderWidth: 2,
-    borderColor: theme.colors.primary,
+    borderColor: `${theme.colors.primary}50`,
   },
   previewButtonText: {
     fontSize: 20,
@@ -542,12 +548,80 @@ const styles = {
     marginBottom: 32,
     display: 'none',
   },
+  bottomCardsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 24,
+  },
   tipsCard: {
+    flex: 1,
+    minWidth: 300,
     backgroundColor: theme.colors.surface,
     borderRadius: 20,
     padding: 28,
     borderWidth: 1,
     borderColor: theme.colors.borderLight,
+    boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+  },
+  awesomeCard: {
+    flex: 1,
+    minWidth: 300,
+    backgroundColor: `${theme.colors.primary}08`,
+    borderRadius: 20,
+    padding: 28,
+    borderWidth: 1,
+    borderColor: `${theme.colors.primary}30`,
+    flexDirection: 'row',
+    gap: 20,
+    boxShadow: `0 4px 20px ${theme.colors.borderLight}`,
+    overflow: 'hidden',
+  },
+  awesomeIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: `${theme.colors.primary}20`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+  },
+  awesomeIcon: {
+    fontSize: 32,
+  },
+  awesomeContent: {
+    flex: 1,
+  },
+  awesomeTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: theme.colors.primary,
+    marginBottom: 8,
+    letterSpacing: 0.5,
+  },
+  awesomeDesc: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    lineHeight: '22px',
+    marginBottom: 16,
+  },
+  awesomeFeatures: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  awesomeBadge: {
+    backgroundColor: theme.colors.surfaceLight,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: `${theme.colors.primary}40`,
+  },
+  awesomeBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.colors.text,
   },
   tipsTitle: {
     fontSize: 20,
@@ -562,10 +636,26 @@ const styles = {
     flexDirection: 'row',
     gap: 12,
   },
-  tipBullet: {
-    fontSize: 16,
+  stepCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: `${theme.colors.primary}20`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+    marginTop: 2,
+  },
+  stepNumber: {
     color: theme.colors.primary,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  proTipRow: {
+    flexDirection: 'column',
+    gap: 6,
+    marginBottom: 4,
   },
   tip: {
     flex: 1,

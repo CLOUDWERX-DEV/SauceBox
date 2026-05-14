@@ -47,10 +47,12 @@ export default function HelpModal({ visible, onClose }) {
   const tabs = [
     { id: 'basics', icon: '🚀', label: 'Getting Started' },
     { id: 'gallery', icon: '🗄️', label: 'Gallery & Import' },
+    { id: 'extension', icon: '🧩', label: 'Web Extension' },
     { id: 'stealth', icon: '🥷', label: 'Stealth & Privacy' },
     { id: 'player', icon: '🎬', label: 'Playback & Clips' },
     { id: 'broadcast', icon: '📡', label: 'VR & Broadcasting' },
     { id: 'advanced', icon: '⚙️', label: 'Advanced Settings' },
+    { id: 'sites', icon: '🔞', label: 'Supported Sites' },
     { id: 'troubleshooting', icon: '🔧', label: 'Troubleshooting' }
   ];
 
@@ -100,6 +102,20 @@ export default function HelpModal({ visible, onClose }) {
               <Text style={styles.paragraph}>
                 The Queue tab shows all your pending and active downloads. You can pause, resume, or retry individual items. Once a download finishes, it automatically moves to your Gallery.
               </Text>
+            </View>
+
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardIcon}>🎲</Text>
+                <Text style={styles.cardTitle}>Feeling Lucky?</Text>
+              </View>
+              <Text style={styles.paragraph}>
+                Click the SauceBox logo in the top-left corner of the sidebar to trigger the "Feeling Lucky" function!
+              </Text>
+              <View style={styles.bulletList}>
+                <Text style={styles.bulletItem}>• If you have videos in your Gallery, it will randomly pick one and instantly start playing it.</Text>
+                <Text style={styles.bulletItem}>• If your Gallery is empty, it will open a random supported adult site in your default browser to help you stock up.</Text>
+              </View>
             </View>
           </View>
         );
@@ -152,6 +168,55 @@ export default function HelpModal({ visible, onClose }) {
               </View>
               <Text style={styles.paragraph}>
                 When enabled in Settings, SauceBox will automatically add a tag for the site the video came from (e.g., <Text style={styles.highlight}>Pornhub</Text>, <Text style={styles.highlight}>Spankbang</Text>). This happens automatically on download — you don't need to do anything.
+              </Text>
+            </View>
+          </View>
+        );
+
+      case 'extension':
+        return (
+          <View>
+            <Text style={styles.contentTitle}>Web Extension</Text>
+            <Text style={styles.contentSubtitle}>Send videos to SauceBox without leaving your browser.</Text>
+
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardIcon}>📥</Text>
+                <Text style={styles.cardTitle}>How to Install (Chrome/Brave/Edge)</Text>
+              </View>
+              <Text style={styles.paragraph}>
+                SauceBox includes a companion browser extension. Since it's not on the Chrome Web Store, you need to load it manually in "Developer Mode".
+              </Text>
+              <View style={styles.bulletList}>
+                <Text style={styles.bulletItem}>1. Open your browser and go to <Text style={styles.code}>chrome://extensions</Text> (or brave://extensions, edge://extensions).</Text>
+                <Text style={styles.bulletItem}>2. Turn on the <Text style={styles.highlight}>Developer mode</Text> toggle in the top right corner.</Text>
+                <Text style={styles.bulletItem}>3. Click the <Text style={styles.highlight}>Load unpacked</Text> button in the top left.</Text>
+                <Text style={styles.bulletItem}>4. Select the <Text style={styles.highlight}>chrome-extension</Text> folder located inside your main SauceBox application folder.</Text>
+                <Text style={styles.bulletItem}>5. The extension is now installed! You should see the SauceBox icon in your toolbar.</Text>
+              </View>
+            </View>
+
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardIcon}>🖱️</Text>
+                <Text style={styles.cardTitle}>How to Use It</Text>
+              </View>
+              <Text style={styles.paragraph}>
+                Once installed, the extension runs silently in the background. Here's how to queue videos:
+              </Text>
+              <View style={styles.bulletList}>
+                <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Right-Click Context Menu:</Text> While watching a video on any supported site, right-click anywhere on the page and click <Text style={styles.highlight}>"Send to SauceBox"</Text>. The video URL will immediately be sent to your desktop app.</Text>
+                <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Toolbar Icon:</Text> Click the SauceBox icon in your browser toolbar to send the current active tab's URL to the app.</Text>
+              </View>
+            </View>
+
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardIcon}>⚠️</Text>
+                <Text style={styles.cardTitle}>Important Notes</Text>
+              </View>
+              <Text style={styles.paragraph}>
+                The SauceBox desktop app MUST be running (even if it's minimized or in Stealth mode) for the extension to work. It communicates locally over <Text style={styles.code}>localhost:13337</Text>. It does not send your data to the cloud.
               </Text>
             </View>
           </View>
@@ -310,12 +375,50 @@ export default function HelpModal({ visible, onClose }) {
 
             <View style={styles.card}>
               <View style={styles.cardHeader}>
+                <Text style={styles.cardIcon}>⚙️</Text>
+                <Text style={styles.cardTitle}>Auto-Clear & Maintenance</Text>
+              </View>
+              <Text style={styles.paragraph}>
+                In Settings, you can enable <Text style={styles.highlight}>Auto-Clear Completed</Text> to keep your Queue clean. The app also features Maintenance tools to scan your hard drive for exact duplicates, find orphaned files, and clean the database of missing items.
+              </Text>
+            </View>
+
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
                 <Text style={styles.cardIcon}>🌍</Text>
                 <Text style={styles.cardTitle}>Proxy</Text>
               </View>
               <Text style={styles.paragraph}>
                 If a site is blocked in your region, enter an <Text style={styles.highlight}>HTTP</Text> or <Text style={styles.highlight}>SOCKS5</Text> proxy address in Settings. All download requests will be routed through it.
               </Text>
+            </View>
+          </View>
+        );
+
+      case 'sites':
+        return (
+          <View>
+            <Text style={styles.contentTitle}>Supported Sites</Text>
+            <Text style={styles.contentSubtitle}>SauceBox supports thousands of sites natively via yt-dlp. Here are the core adult networks explicitly supported:</Text>
+
+            <View style={styles.card}>
+              <View style={styles.bulletList}>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>Pornhub</Text> — PornHub, PornHubPagedVideoList, PornHubPlaylist, PornHubUser</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>4tube</Text> — 4tube</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>Beeg</Text> — Beeg</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>CAM4</Text> — CAM4</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>Camsoda</Text> — Camsoda</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>Chaturbate</Text> — Chaturbate</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>Eporner</Text> — Eporner</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>HellPorno</Text> — HellPorno</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>Motherless</Text> — Motherless, MotherlessGallery</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>Nuvid</Text> — Nuvid</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>RedTube</Text> — RedTube</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>SpankBang</Text> — SpankBang, SpankBangPlaylist</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>Stripchat</Text> — Stripchat</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>ThisVid</Text> — ThisVid</Text>
+                <Text style={styles.bulletItem}><Text style={styles.highlight}>Xvideos</Text> — Included under Pornhub extractors</Text>
+              </View>
             </View>
           </View>
         );

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Switch } from 'react-native';
+import packageJson from '../../../package.json';
+
+const version = packageJson.version;
 import { useStore } from '../../store';
 import { theme } from '../../theme';
 
@@ -679,7 +682,7 @@ export default function SettingsTab() {
         <View style={styles.card}>
           <View style={styles.aboutRow}>
             <Text style={styles.aboutLabel}>Version</Text>
-            <Text style={styles.aboutValue}>1.1.0</Text>
+            <Text style={styles.aboutValue}>{version}</Text>
           </View>
           <View style={styles.aboutRow}>
             <Text style={styles.aboutLabel}>Backend</Text>

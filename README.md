@@ -54,17 +54,48 @@ SauceBox features a built-in media server that generates dynamic M3U playlists o
 
 ---
 
-## 📦 Installation & Setup
+## 🔞 Supported Sites
+SauceBox natively supports thousands of video platforms via `yt-dlp`. Here are the core adult networks explicitly supported and tested:
 
-To get started, clone the repository and install the dependencies:
+- **Pornhub** — `PornHub`, `PornHubPagedVideoList`, `PornHubPlaylist`, `PornHubUser`
+- **4tube** — `4tube`
+- **Beeg** — `Beeg`
+- **CAM4** — `CAM4`
+- **Camsoda** — `Camsoda`
+- **Chaturbate** — `Chaturbate`
+- **Eporner** — `Eporner`
+- **HellPorno** — `HellPorno`
+- **Motherless** — `Motherless`, `MotherlessGallery`
+- **Nuvid** — `Nuvid`
+- **RedTube** — `RedTube`
+- **SpankBang** — `SpankBang`, `SpankBangPlaylist`
+- **Stripchat** — `Stripchat`
+- **ThisVid** — `ThisVid`
+- **Xvideos** — Included under Pornhub extractors
+
+---
+
+## 📦 Cross-Platform Installation
+
+SauceBox is fully cross-platform and can be compiled into native installers for **Windows**, **macOS**, and **Linux**.
+
+### 1. Development Setup
+To build or run from source:
 
 ```bash
 git clone https://github.com/CLOUDWERX-DEV/SauceBox.git
 cd SauceBox
 npm install
 ```
-
 **Requirements:** Make sure you have `yt-dlp` and `ffmpeg` installed and accessible in your system's PATH.
+
+### 2. Building Releases
+We use `electron-builder` to package native applications.
+- **Linux** (AppImage, deb, rpm, pacman): `npm run dist -- --linux`
+- **Windows** (NSIS Installer, Portable): `npm run dist -- --win`
+- **macOS** (DMG, Zip): `npm run dist -- --mac`
+
+*See [docs/RELEASES.md](docs/RELEASES.md) for a complete, in-depth guide on building and deploying cross-platform releases.*
 
 ### 🧩 Installing the Chrome Extension
 1. Open Google Chrome or any Chromium browser.
@@ -98,5 +129,5 @@ If you love using this app, consider supporting its future development by buying
 ---
 
 <p align="center">
-  Made with 💦 and React Native by <a href="http://cloudwerxlab.com">CLOUDWERX LAB</a>
+  Made with 🔥 and React Native by <a href="http://cloudwerxlab.com">CLOUDWERX LAB</a>
 </p>
