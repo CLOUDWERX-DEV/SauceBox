@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { theme } from '../theme';
 import { useStore } from '../store';
 import HelpModal from './HelpModal';
+import { version } from '../../package.json';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
@@ -20,6 +21,9 @@ export default function TitleBar({ vaultEnabled, onLock }) {
         <View style={styles.titleSection}>
           <Image source={{ uri: 'logo.png' }} style={styles.logo} />
           <Text style={styles.title}>SauceBox</Text>
+          <View style={styles.versionBadge}>
+            <Text style={styles.versionText}>v{version}</Text>
+          </View>
         </View>
 
         {serverStatus?.running && (
@@ -84,6 +88,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: theme.colors.primary,
+    letterSpacing: 0.5,
+  },
+  versionBadge: {
+    backgroundColor: `${theme.colors.primary}40`,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 4,
+    borderWidth: 1,
+    borderColor: `${theme.colors.primary}80`,
+  },
+  versionText: {
+    color: theme.colors.primary,
+    fontSize: 10,
+    fontWeight: '800',
     letterSpacing: 0.5,
   },
   subtitle: {

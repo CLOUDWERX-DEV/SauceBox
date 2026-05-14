@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1] - 2026-05-14
+### Fixed
+- Resolved Broadcast auto-start persist bug. The media server status now strictly adheres to the active backend instance state rather than persisting falsely across sessions.
+- Fixed an issue where the Broadcast "Stop Server" button received an event object instead of correctly issuing the stop command.
+- Removed duplicate Quick Cast buttons from the Gallery tab to maintain a cleaner UI interface.
+### Added
+- Added a centralized dynamic version number badge to the main application Title Bar, mapped directly to the active build version.
+
 ## [1.2.0] - 2026-05-13
 ### Added
 - Complete Media Server & VR Broadcast overhaul: added a Live Monitor to intercept network requests and show exactly what devices are streaming which files.
