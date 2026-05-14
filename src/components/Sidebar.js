@@ -35,7 +35,8 @@ export default function Sidebar({ activeTab, onTabChange }) {
     if (history.length > 0) {
       const randomVideo = history[Math.floor(Math.random() * history.length)];
       if (randomVideo.path) {
-        ipcRenderer?.invoke('open-video', randomVideo.path);
+        const customPlayerPath = useStore.getState().settings.customPlayerPath;
+        ipcRenderer?.invoke('open-video', { filepath: randomVideo.path, customPlayerPath });
         if (window.Notification) {
           new Notification('🎲 Random Local Sauce!', {
             body: `Enjoy: ${randomVideo.title}`,

@@ -77,8 +77,13 @@ export default function GalleryTab() {
           downloadPath: settings.downloadPath,
         });
       }
-      // Spread the full item so VideoPlayer's originalItem has id, tags, rating etc.
-      setSelectedVideo({ ...item, path: videoPath });
+      
+      if (settings.customPlayerPath && settings.customPlayerPath.trim() !== '') {
+        await ipcRenderer?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
+      } else {
+        // Spread the full item so VideoPlayer's originalItem has id, tags, rating etc.
+        setSelectedVideo({ ...item, path: videoPath });
+      }
     } catch (error) {
       console.error('Failed to find video:', error);
       alert('Video file not found. The download may have failed or the file was moved.');

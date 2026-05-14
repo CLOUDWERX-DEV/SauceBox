@@ -63,7 +63,11 @@ export default function QueueTab() {
         filename: `${download.title}.mp4`,
         downloadPath: settings.downloadPath,
       });
-      setSelectedVideo({ path: videoPath, title: download.title });
+      if (settings.customPlayerPath && settings.customPlayerPath.trim() !== '') {
+        await ipcRenderer?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
+      } else {
+        setSelectedVideo({ path: videoPath, title: download.title });
+      }
     } catch (error) {
       console.error('Failed to find video:', error);
       alert('Video file not found. The download may have failed or the file was moved.');

@@ -34,7 +34,8 @@ export const useStore = create(
         autoTagDomainUploader: true,
         minFreeSpaceGB: 5,
         ytdlpPath: '',
-        ffmpegPath: ''
+        ffmpegPath: '',
+        customPlayerPath: ''
       },
       
       addDownload: (download) => set((state) => {

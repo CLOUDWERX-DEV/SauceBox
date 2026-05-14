@@ -80,7 +80,8 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
 
   const handleOpenExternal = async () => {
     try {
-      await ipcRenderer?.invoke('open-video', videoPath);
+      const customPlayerPath = useStore.getState().settings.customPlayerPath;
+      await ipcRenderer?.invoke('open-video', { filepath: videoPath, customPlayerPath });
     } catch (error) {
       console.error('Failed to open video:', error);
     }

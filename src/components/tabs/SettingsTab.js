@@ -415,6 +415,45 @@ export default function SettingsTab() {
               onChangeText={(text) => updateSettings({ ffmpegPath: text })}
             />
           </View>
+
+          <View style={{ marginTop: 24, paddingTop: 24, borderTopWidth: 1, borderTopColor: theme.colors.border }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+              <Text style={styles.switchLabel}>Custom Video Player</Text>
+            </View>
+            <Text style={[styles.switchDesc, { marginBottom: 8 }]}>Custom path to your preferred external video player (e.g. VLC, MPV). Leave empty to use the built-in app player.</Text>
+            <View style={styles.pathContainer}>
+              <TextInput
+                style={[styles.pathInput, { flex: 1, backgroundColor: theme.colors.surfaceLight }]}
+                placeholder="Select custom player executable..."
+                placeholderTextColor="#555"
+                value={settings.customPlayerPath || ''}
+                editable={false}
+              />
+              <TouchableOpacity 
+                style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16 }]}
+                onPress={async () => {
+                  try {
+                    const result = await ipcRenderer?.invoke('select-file', 'Select Video Player Executable');
+                    if (result) {
+                      updateSettings({ customPlayerPath: result });
+                    }
+                  } catch (e) {
+                    console.error('Failed to select file:', e);
+                  }
+                }}
+              >
+                <Text style={styles.browseButtonText}>Select</Text>
+              </TouchableOpacity>
+              {settings.customPlayerPath && settings.customPlayerPath.trim() !== '' && (
+                <TouchableOpacity 
+                  style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16, backgroundColor: theme.colors.error }]}
+                  onPress={() => updateSettings({ customPlayerPath: '' })}
+                >
+                  <Text style={[styles.browseButtonText, { color: '#fff' }]}>Clear</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
         </View>
       </View>
 

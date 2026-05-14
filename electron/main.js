@@ -780,9 +780,27 @@ ipcMain.handle('read-video-file', async (event, filepath) => {
   }
 });
 
-ipcMain.handle('open-video', async (event, filepath) => {
+ipcMain.handle('open-video', async (event, payload) => {
   const { shell } = require('electron');
-  shell.openPath(filepath);
+  
+  let filepath = typeof payload === 'string' ? payload : payload.filepath;
+  let customPlayerPath = typeof payload === 'string' ? null : payload.customPlayerPath;
+
+  if (customPlayerPath && customPlayerPath.trim() !== '') {
+    const { spawn } = require('child_process');
+    try {
+      const child = spawn(customPlayerPath, [filepath], { detached: true, stdio: 'ignore' });
+      child.unref();
+      return { success: true };
+    } catch (e) {
+      console.error('Failed to launch custom player:', e);
+      shell.openPath(filepath);
+      return { success: false, error: e.message };
+    }
+  } else {
+    shell.openPath(filepath);
+    return { success: true };
+  }
 });
 
 ipcMain.handle('open-folder', async (event, filepath) => {
@@ -821,6 +839,19 @@ ipcMain.handle('select-folder', async () => {
     properties: ['openDirectory', 'createDirectory'],
     title: 'Select Download Folder',
     buttonLabel: 'Select Folder'
+  });
+  
+  if (!result.canceled && result.filePaths.length > 0) {
+    return result.filePaths[0];
+  }
+  return null;
+});
+
+ipcMain.handle('select-file', async (event, title) => {
+  const { dialog } = require('electron');
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile'],
+    title: title || 'Select File',
   });
   
   if (!result.canceled && result.filePaths.length > 0) {
