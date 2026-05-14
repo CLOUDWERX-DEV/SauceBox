@@ -113,10 +113,8 @@ export default function BroadcastTab() {
         // Automatically save stream after starting server
         generateM3U(newPlaylist);
       });
-    } else if (settings.autoStartBroadcast && !serverRunning) {
-      handleToggleServer(true); // auto start on mount if enabled
     }
-  }, [quickCastVideo, settings.autoStartBroadcast]);
+  }, [quickCastVideo]);
 
   const generateM3U = (currentPlaylist = playlist) => {
     if (!fs || !path || currentPlaylist.length === 0) return;
@@ -331,7 +329,7 @@ export default function BroadcastTab() {
         </View>
         <TouchableOpacity 
           style={[styles.toggleButton, { backgroundColor: serverRunning ? theme.colors.error : theme.colors.primary }]}
-          onPress={handleToggleServer}
+          onPress={() => handleToggleServer()}
         >
           <Text style={[styles.toggleButtonText, serverRunning && { color: '#fff' }]}>
             {serverRunning ? 'Stop Server' : 'Start Server'}

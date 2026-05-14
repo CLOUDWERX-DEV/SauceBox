@@ -209,6 +209,31 @@ export default function App() {
         useStore.getState().updateDownload(d.id, { status: 'paused', speed: null, eta: null });
       }
     });
+
+    // Check if we should auto-start the broadcast server on app launch
+    const currentSettings = useStore.getState().settings;
+    if (currentSettings.autoStartBroadcast) {
+      const config = {
+        port: parseInt(currentSettings.broadcastPort, 10) || 6969,
+        authEnabled: currentSettings.broadcastAuth || false,
+        username: currentSettings.broadcastUsername || 'admin',
+        password: currentSettings.broadcastPassword || '',
+        dlnaEnabled: currentSettings.broadcastDlna !== false,
+        transcodeEnabled: currentSettings.broadcastTranscode || false,
+        downloadPath: currentSettings.downloadPath,
+        ffmpegPath: currentSettings.ffmpegPath
+      };
+      if (ipcRenderer) {
+        ipcRenderer.invoke('start-media-server', config).then(res => {
+           if (res && res.success) {
+             useStore.getState().setServerStatus({ running: true, url: `http://${res.ip || '127.0.0.1'}:${config.port}` });
+           }
+        }).catch(err => console.error(err));
+      }
+    } else {
+      // If we shouldn't auto-start, forcefully reset the persisted serverStatus state
+      useStore.getState().setServerStatus({ running: false, url: null });
+    }
   }, []);
 
   // Queue Manager

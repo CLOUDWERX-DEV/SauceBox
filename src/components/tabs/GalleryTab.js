@@ -393,16 +393,6 @@ export default function GalleryTab() {
                 />
                 <View style={styles.overlay}>
                   <TouchableOpacity 
-                    style={[styles.playButton, { backgroundColor: theme.colors.primary, marginRight: 12 }]}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      setQuickCastVideo(item);
-                    }}
-                    title="Quick Cast to TV/VR"
-                  >
-                    <Text style={[styles.playIcon, { fontSize: 18 }]}>📡</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
                     style={styles.playButton}
                     onPress={() => handlePlayVideo(item)}
                   >
