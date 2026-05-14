@@ -37,7 +37,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
       if (randomVideo.path) {
         const customPlayerPath = useStore.getState().settings.customPlayerPath;
         ipcRenderer?.invoke('open-video', { filepath: randomVideo.path, customPlayerPath });
-        const notificationsEnabled = useStore.getState().settings?.notifications !== false;
+        const notificationsEnabled = useStore.getState().settings?.systemNotifications !== false;
         if (window.Notification && notificationsEnabled) {
           new Notification('🎲 Random Local Sauce!', {
             body: `Enjoy: ${randomVideo.title}`,
@@ -54,7 +54,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
       ];
       const randomSite = sites[Math.floor(Math.random() * sites.length)];
       openExternal(randomSite);
-      const notificationsEnabled = useStore.getState().settings?.notifications !== false;
+      const notificationsEnabled = useStore.getState().settings?.systemNotifications !== false;
       if (window.Notification && notificationsEnabled) {
         new Notification('🎲 Time to stock up!', {
           body: `Opening ${new URL(randomSite).hostname} for you...`,
