@@ -692,6 +692,14 @@ export default function SettingsTab() {
             <Text style={styles.aboutLabel}>Framework</Text>
             <Text style={styles.aboutValue}>React Native + Electron</Text>
           </View>
+          <View style={styles.aboutRow}>
+            <Text style={styles.aboutLabel}>Website</Text>
+            <TouchableOpacity onPress={() => openExternal('https://saucebox.app')}>
+              <Text style={[styles.aboutValue, { color: theme.colors.primary, textDecorationLine: 'underline', cursor: 'pointer' }]}>
+                saucebox.app
+              </Text>
+            </TouchableOpacity>
+          </View>
           <View style={[styles.aboutRow, styles.aboutRowLast]}>
             <Text style={styles.aboutLabel}>Made by</Text>
             <TouchableOpacity onPress={() => openExternal('https://cloudwerxlab.com')}>
