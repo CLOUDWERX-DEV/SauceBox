@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.3.2] - 2026-05-14
+### Added
+- Added a warning card to the Broadcast Tab to explicitly explain the network sharing implications of the current download directory.
+- Added explicit CTAs to the Gallery Tab's empty state to direct users to the Download Tab or Import tool.
+
+### Fixed
+- Fixed an issue where copying the server URL to the clipboard on the Broadcast Tab threw a "Document is not focused" runtime error by adding a robust invisible-input fallback mechanism.
+- Corrected the branding color scheme of the "SauceBox" text in the main TitleBar and Sidebar to reflect pure white and primary orange.
+
+## [1.3.1] - 2026-05-14
+### Fixed
+- Fixed an issue where the "Host Stream URL" button did not auto-start the media server.
+- Resolved "Live Monitor Log" text truncation, ensuring full paths and IPs are visible.
+- Ensured the Playlist URL is hidden appropriately when the server is stopped.
+- Prevented Live Monitor log spam by rate-limiting duplicated stream requests (e.g., from VLC HTTP chunk requests) for the same file and IP.
+
 ## [1.3.0] - 2026-05-14
 ### Added
 - Integrated `electron-builder` natively into `package.json` to properly support packaging cross-platform binaries across Linux (AppImage, deb, rpm), Windows (NSIS executable, Portable), and macOS (dmg).

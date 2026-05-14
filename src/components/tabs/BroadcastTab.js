@@ -217,8 +217,12 @@ export default function BroadcastTab() {
     setPlaylist(newP);
   };
   
-  const handleSaveStream = () => {
+  const handleSaveStream = async () => {
     if (!fs || !path || playlist.length === 0) return;
+    
+    if (!serverRunning) {
+      await handleToggleServer(true);
+    }
     
     let m3u = "#EXTM3U\n";
     m3u += `#PLAYLIST:${serverName}\n`;
@@ -320,6 +324,14 @@ export default function BroadcastTab() {
         <Text style={styles.subtitle}>Stream your local collection to TVs, phones, and VR Headsets 🥽</Text>
       </View>
 
+      <View style={styles.warningCard}>
+        <Text style={styles.warningCardTitle}>⚠️ Heads up!</Text>
+        <Text style={styles.warningCardText}>
+          The folder currently set as your download path ({settings.downloadPath || 'your downloads folder'}) will be fully shared over the network. 
+          Anyone with this server URL can access and play the media inside. Please make sure you are on a trusted network and only sharing what you intend to!
+        </Text>
+      </View>
+
       <View style={styles.statusBanner}>
         <View style={styles.statusIndicator}>
           <View style={[styles.statusDot, { backgroundColor: serverRunning ? theme.colors.primary : theme.colors.error }]} />
@@ -350,8 +362,28 @@ export default function BroadcastTab() {
               <TouchableOpacity 
                 style={styles.copyButton}
                 onPress={() => {
-                  navigator.clipboard.writeText(`http://${localIp}:${port}`);
-                  alert('Copied to clipboard!');
+                  const copyUrl = `http://${localIp}:${port}`;
+                  if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(copyUrl)
+                      .then(() => alert('Copied to clipboard!'))
+                      .catch(err => {
+                        const el = document.createElement('textarea');
+                        el.value = copyUrl;
+                        document.body.appendChild(el);
+                        el.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(el);
+                        alert('Copied to clipboard!');
+                      });
+                  } else {
+                    const el = document.createElement('textarea');
+                    el.value = copyUrl;
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(el);
+                    alert('Copied to clipboard!');
+                  }
                 }}
               >
                 <Text style={styles.copyButtonText}>Copy URL</Text>
@@ -581,12 +613,12 @@ export default function BroadcastTab() {
               <TouchableOpacity style={styles.actionButton} onPress={() => setPlaylist([])} disabled={playlist.length === 0}>
                 <Text style={styles.actionButtonText}>🗑️ Clear</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.actionButton, { backgroundColor: theme.colors.primary, flex: 2 }]} onPress={handleSaveStream} disabled={!serverRunning || playlist.length === 0}>
+              <TouchableOpacity style={[styles.actionButton, { backgroundColor: theme.colors.primary, flex: 2 }]} onPress={handleSaveStream} disabled={playlist.length === 0}>
                 <Text style={[styles.actionButtonText, { color: '#000' }]}>📡 Host Stream URL</Text>
               </TouchableOpacity>
             </View>
             
-            {playlistUrl && (
+            {serverRunning && playlistUrl && (
               <View style={styles.playlistUrlContainer}>
                 <Text style={styles.activeLabel}>Playlist URL:</Text>
                 <TextInput style={styles.textInputFull} value={playlistUrl} editable={false} />
@@ -607,7 +639,9 @@ export default function BroadcastTab() {
                   broadcastLogs.map((log, idx) => (
                     <View key={idx} style={styles.logEntry}>
                       <Text style={styles.logTime}>{new Date(log.time).toLocaleTimeString()}</Text>
-                      <Text style={styles.logIp} numberOfLines={1}>Device {log.ip} is currently streaming: {log.file}</Text>
+                      <Text style={{ flex: 1, color: theme.colors.primary, fontSize: 11, fontWeight: 'bold' }}>
+                        Device {log.ip} is currently streaming: <Text style={{ color: theme.colors.textSecondary, fontWeight: 'normal' }}>{log.file}</Text>
+                      </Text>
                     </View>
                   ))
                 )}
@@ -792,6 +826,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  warningCard: {
+    backgroundColor: `${theme.colors.error}20`,
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: `${theme.colors.error}80`,
+    marginBottom: 24,
+  },
+  warningCardTitle: {
+    color: theme.colors.error,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  warningCardText: {
+    color: theme.colors.textSecondary,
+    fontSize: 13,
+    lineHeight: 18,
   },
   switchInfo: {
     flex: 1,

@@ -10,6 +10,11 @@
 </p>
 
 <p align="center">
+  <img src="docs/assets/saucebox-main-ui.png" width="48%" alt="SauceBox Main UI" />
+  <img src="docs/assets/saucebox-broadcast-tab.png" width="48%" alt="SauceBox Media Server" />
+</p>
+
+<p align="center">
   Built with React Native Web, Electron, and the immense power of <code>yt-dlp</code>. 
   Experience a seamless, ad-free, and hyper-fast desktop client designed specifically for bulk-downloading, organizing, and playing content from top adult networks.
 </p>

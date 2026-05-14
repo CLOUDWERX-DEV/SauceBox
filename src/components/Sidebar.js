@@ -75,7 +75,10 @@ export default function Sidebar({ activeTab, onTabChange }) {
           source={{ uri: 'logo.png' }} 
           style={[styles.logo, isRotating && styles.logoRotating]} 
         />
-        <Text style={styles.logoText}>SauceBox</Text>
+        <Text style={styles.logoText}>
+          <Text style={{ color: '#ffffff' }}>Sauce</Text>
+          <Text style={{ color: theme.colors.primary }}>Box</Text>
+        </Text>
         <Text style={styles.logoSubtext}>Feeling Lucky? 🎲</Text>
       </TouchableOpacity>
 

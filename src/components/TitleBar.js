@@ -21,7 +21,10 @@ export default function TitleBar({ vaultEnabled, onLock }) {
       <View style={styles.titleBar}>
         <View style={styles.titleSection}>
           <Image source={{ uri: 'logo.png' }} style={styles.logo} />
-          <Text style={styles.title}>SauceBox</Text>
+          <Text style={styles.title}>
+            <Text style={{ color: '#ffffff' }}>Sauce</Text>
+            <Text style={{ color: theme.colors.primary }}>Box</Text>
+          </Text>
           <View style={styles.versionBadge}>
             <Text style={styles.versionText}>v{version}</Text>
           </View>

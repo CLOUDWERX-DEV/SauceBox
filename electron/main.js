@@ -226,16 +226,25 @@ ipcMain.handle('start-media-server', async (event, config) => {
       });
     }
 
+    const recentLogs = new Map();
+
     mediaServerApp.use((req, res, next) => {
       if (req.path !== '/' && req.path !== '/favicon.ico') {
         const ext = path.extname(req.path).toLowerCase();
         if (['.m3u', '.mp4', '.mkv', '.webm', '.jpg', '.jpeg', '.png'].includes(ext)) {
           if (mainWindow) {
-            mainWindow.webContents.send('broadcast-log', {
-              time: Date.now(),
-              ip: req.ip || req.socket.remoteAddress,
-              file: decodeURIComponent(req.path.slice(1))
-            });
+            const ip = req.ip || req.socket.remoteAddress;
+            const logKey = `${ip}-${req.path}`;
+            const now = Date.now();
+            
+            if (!recentLogs.has(logKey) || now - recentLogs.get(logKey) > 10000) {
+              recentLogs.set(logKey, now);
+              mainWindow.webContents.send('broadcast-log', {
+                time: now,
+                ip: ip,
+                file: decodeURIComponent(req.path.slice(1))
+              });
+            }
           }
         }
       }

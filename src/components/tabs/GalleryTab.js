@@ -351,7 +351,18 @@ export default function GalleryTab() {
           <View style={styles.emptyState}>
             <Text style={styles.emptyIcon}>🕳️</Text>
             <Text style={styles.emptyTitle}>Gallery is Empty</Text>
-            <Text style={styles.emptyText}>Your downloads will appear here</Text>
+            <Text style={styles.emptyText}>Your downloads will appear here.</Text>
+            
+            <TouchableOpacity 
+              style={[styles.importButton, { marginTop: 24 }]} 
+              onPress={() => setImportVisible(true)}
+            >
+              <Text style={styles.importButtonText}>📥 IMPORT VIDEOS</Text>
+            </TouchableOpacity>
+            
+            <Text style={[styles.emptyText, { marginTop: 16, fontSize: 14 }]}>
+              Or use the <Text style={{ color: theme.colors.primary, fontWeight: 'bold' }}>Download Tab</Text> to grab new videos from the web!
+            </Text>
           </View>
         ) : filteredHistory.length === 0 ? (
           <View style={styles.emptyState}>
