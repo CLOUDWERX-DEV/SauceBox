@@ -3,8 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { theme } from '../theme';
 import { useStore } from '../store';
 import HelpModal from './HelpModal';
-import { version } from '../../package.json';
+import packageJson from '../../package.json';
 
+const version = packageJson.version;
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
 export default function TitleBar({ vaultEnabled, onLock }) {
