@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useStore } from '../store';
 import { theme } from '../theme';
@@ -20,18 +20,61 @@ export default function Sidebar({ activeTab, onTabChange }) {
 
   const activeDownloads = downloads.filter(d => d.status === 'pending' || d.status === 'downloading');
 
+  const [isRotating, setIsRotating] = useState(false);
+
   const getBadgeCount = (tabId) => {
     if (tabId === 'queue') return activeDownloads.length;
     if (tabId === 'history') return history.length;
     return 0;
   };
 
+  const handleFeelingLucky = () => {
+    setIsRotating(true);
+    setTimeout(() => setIsRotating(false), 500);
+
+    if (history.length > 0) {
+      const randomVideo = history[Math.floor(Math.random() * history.length)];
+      if (randomVideo.path) {
+        ipcRenderer?.invoke('open-video', randomVideo.path);
+        if (window.Notification) {
+          new Notification('🎲 Random Local Sauce!', {
+            body: `Enjoy: ${randomVideo.title}`,
+            icon: 'logo.png'
+          });
+        }
+      }
+    } else {
+      const sites = [
+        'https://www.pornhub.com/video/random',
+        'https://spankbang.com/s/random/',
+        'https://www.eporner.com/',
+        'https://www.xvideos.com/random'
+      ];
+      const randomSite = sites[Math.floor(Math.random() * sites.length)];
+      openExternal(randomSite);
+      if (window.Notification) {
+        new Notification('💦 Time to stock up!', {
+          body: `Opening ${new URL(randomSite).hostname} for you...`,
+          icon: 'logo.png'
+        });
+      }
+    }
+  };
+
   return (
     <View style={styles.sidebar}>
-      <View style={styles.logoSection}>
-        <Image source={{ uri: 'logo.png' }} style={styles.logo} />
+      <TouchableOpacity 
+        style={styles.logoSection}
+        onPress={handleFeelingLucky}
+        activeOpacity={0.7}
+      >
+        <Image 
+          source={{ uri: 'logo.png' }} 
+          style={[styles.logo, isRotating && styles.logoRotating]} 
+        />
         <Text style={styles.logoText}>SauceBox</Text>
-      </View>
+        <Text style={styles.logoSubtext}>Feeling Lucky? 🎲💦</Text>
+      </TouchableOpacity>
 
       <View style={styles.tabsContainer}>
         {tabs.map((tab) => {
@@ -106,6 +149,10 @@ const styles = StyleSheet.create({
     height: 64,
     marginBottom: 12,
     resizeMode: 'contain',
+    transition: 'transform 0.5s ease-in-out',
+  },
+  logoRotating: {
+    transform: [{ rotate: '360deg' }, { scale: 1.2 }],
   },
   logoText: {
     fontSize: 24,
