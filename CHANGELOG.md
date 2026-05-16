@@ -12,6 +12,7 @@
 - **Quality resolution badges**: Gallery, Queue, and live download cards now display human-readable badges ("4K", "2K") instead of raw resolution strings like "2160p" / "1440p".
 - **Settings quality description**: Added an explanatory note above the quality selector explaining the fallback behaviour when a site does not offer the selected resolution.
 - **Broadcast Security section renamed**: Renamed "Security" to "Security & Exposure" to reflect the new internet-facing options.
+- **Webpack build optimization**: Overhauled `webpack.config.js` to use `SplitChunksPlugin` (separating vendor, common, and app chunks), `TerserPlugin` with 2-pass compression, content-hashed filenames for cache busting, and raised performance budget limits appropriate for an Electron app. Build is now warning-free and produces better-cached output chunks.
 
 ## [1.3.3] - 2026-05-16
 ### Added
