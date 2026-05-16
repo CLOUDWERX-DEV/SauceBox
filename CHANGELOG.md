@@ -12,6 +12,11 @@
 
 ### Added
 - **Source Directory Map**: Added a comprehensive source directory tree to `CONTRIBUTING.md` so new contributors immediately understand the modular file structure and know where to place new components.
+- **Branding Copy Document**: Created `docs/BRANDING_COPY.md` with 10 short descriptions, 10 extended descriptions, and 10 taglines for use in marketing materials.
+- **Branding Applied Everywhere**: Deployed the chosen branding copy across all surfaces — README header/body, `package.json` description field (appears in `.deb` / NSIS / AppImage installer metadata), HelpModal header subtext, and HelpContent "Getting Started" subtitle.
+
+### Fixed
+- **Help Modal Sidebar Too Wide**: Force-locked the Help panel navigation sidebar to 160px using `flexGrow: 0`, `flexShrink: 0`, `minWidth`, and `maxWidth`. In React Native Web, a plain `width` on a `ScrollView` is insufficient — the component would flex to fill available space, making the nav panel dominate the modal layout.
 
 ## [1.3.4] - 2026-05-16
 ### Added
