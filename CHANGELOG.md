@@ -7,6 +7,9 @@
 - **PIN Reset Instructions**: Added an OS-aware "Forgot your PIN?" hint card below the Vault PIN field. It dynamically computes the exact Local Storage folder path for the current OS (Windows `%APPDATA%\saucebox\...`, macOS `~/Library/Application Support/saucebox/...`, Linux `~/.config/saucebox/...`) and shows the correct shell command or Finder/Explorer tip to delete it and regain access.
 
 ### Fixed
+- **Phantom Babel Syntax Errors**: Fixed a massive Webpack configuration bug where both `main` and `runtime` chunks were attempting to save as `bundle.js` in development, causing parallel write collisions, corrupting the Babel `.cache`, and throwing phantom syntax errors.
+- **Production Packaged Builds**: Fixed a critical issue where the built `.deb` / `.AppImage` binaries would show a blank screen. `electron/main.js` now correctly serves the statically compiled `dist/index.html` via `app.isPackaged` rather than hardcoding the localhost dev server.
+- **Dangling Dev Server**: Fixed an issue where closing the Electron window during development left the `webpack serve` instance running invisibly on port 8081 by adding `--kill-others` to the concurrently script.
 - **Help Modal sidebar width**: Reduced the sidebar from 260px to 220px and tightened horizontal padding to prevent layout overflow on small windows.
 
 ### Changed

@@ -12,7 +12,7 @@
   "scripts": {
     "start": "webpack serve --mode development",
     "electron": "electron .",
-    "dev": "concurrently \"npm run start\" \"wait-on http://localhost:8081 && electron .\"",
+    "dev": "concurrently --kill-others \"npm run start\" \"wait-on http://localhost:8081 && electron .\"",
     "build": "webpack --mode production",
     "dist": "npm run build && electron-builder"
   },

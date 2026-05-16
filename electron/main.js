@@ -38,7 +38,11 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadURL('http://localhost:8081');
+  if (app.isPackaged) {
+    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+  } else {
+    mainWindow.loadURL('http://localhost:8081');
+  }
 }
 
 if (app) {

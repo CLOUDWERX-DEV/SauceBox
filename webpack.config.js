@@ -12,7 +12,7 @@ module.exports = (env, argv) => {
       path: path.resolve(__dirname, 'dist'),
       // Use content-hashed filenames in production so the browser/Electron
       // cache busts correctly when the bundle changes.
-      filename: isProd ? '[name].[contenthash:8].js' : 'bundle.js',
+      filename: isProd ? '[name].[contenthash:8].js' : '[name].bundle.js',
       chunkFilename: isProd ? '[name].[contenthash:8].chunk.js' : '[name].chunk.js',
       clean: isProd, // wipe /dist before each prod build
     },
