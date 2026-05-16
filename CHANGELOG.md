@@ -18,6 +18,7 @@
 ### Fixed
 - **Help Modal Sidebar Too Wide**: Force-locked the Help panel navigation sidebar to 160px using `flexGrow: 0`, `flexShrink: 0`, `minWidth`, and `maxWidth`. In React Native Web, a plain `width` on a `ScrollView` is insufficient — the component would flex to fill available space, making the nav panel dominate the modal layout.
 - **Linux Taskbar Icon Missing (Dev Mode)**: Added `app.setIcon(nativeImage.createFromPath(...))` call after `createWindow()` on Linux. The `BrowserWindow` `icon` option only sets the window decoration icon — `app.setIcon()` is the correct Electron API for the taskbar/dock icon on Linux desktop environments.
+- **Logo Missing in Packaged Builds (.deb / AppImage)**: The logo/icon images referenced via bare URI strings (`'logo.png'`) only resolved correctly in dev mode where webpack-dev-server serves `public/` as static files. In packaged builds loaded via `file://`, no server exists and those paths resolve to nothing. Fixed by adding a `asset/inline` webpack rule for PNG/JPG/GIF/WebP/SVG files and importing `logo.png` directly as a JS module in `TitleBar.js`, `Sidebar.js`, `VideoThumbnail.js`, and `App.js`. Webpack now inlines the image as a base64 data URI, which works identically in all environments.
 
 ## [1.3.4] - 2026-05-16
 ### Added
