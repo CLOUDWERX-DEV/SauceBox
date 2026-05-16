@@ -45,12 +45,13 @@ Got to go? Click Pause, or just close the app entirely. SauceBox intelligently s
 Absolute privacy is guaranteed. Enable **Vault Mode** in the settings to protect the app behind a 4-digit PIN lock screen on startup. And if someone walks in the room, smash the **Stealth Hotkey** (`Ctrl + Shift + H` by default) to instantly hide the app from the taskbar, pause all active downloads, and mute any playing video. Configure stealth options specifically to your liking.
 
 ### 🌐 "Send to SauceBox" Browser Extension
-Skip the copy-pasting entirely. Install the included Chrome Companion Extension to simply right-click any video on your favorite tube sites and click "Send to SauceBox". The built-in local background server will instantly grab the URL and start downloading it in the app automatically.
+Skip the copy-pasting entirely. Install the included Chrome Companion Extension to simply right-click any video on your favorite tube sites and click "Send to SauceBox", or **click the extension icon** in your toolbar to instantly send the current page URL. The built-in local background server will instantly grab the URL and start downloading it in the app automatically.
 
 ### 📡 Media Server & VR Broadcast
 SauceBox features a built-in media server that generates dynamic M3U playlists of your gallery. Instantly stream your videos to your Smart TV, phone, or VR headset. Includes "Quick Cast" for 1-click single-video streaming directly from the gallery, on-the-fly `.mkv` to `.mp4` transcoding, and rich metadata injection so premium VR players show your beautiful cover art and custom tags natively.
 
 ### ⚙️ Deep Configuration
+*   **Dependency Management:** Built-in auto-detection for `yt-dlp` and `ffmpeg` with simple, cross-platform installation instructions and UI file-browsers if you use portable binaries.
 *   **Bandwidth Throttling:** Limit download speeds (KB/s) so SauceBox doesn't choke your network.
 *   **Format Selection:** Choose your preferred video container (`.mp4`, `.mkv`, `.webm`).
 *   **Network Proxies:** Built-in proxy fields to bypass ISP and regional censorship effortlessly.
