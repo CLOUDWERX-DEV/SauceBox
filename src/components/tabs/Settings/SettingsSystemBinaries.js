@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { theme } from '../../../theme';
-import { useStore } from '../../store';
+import { useStore } from '../../../store';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 

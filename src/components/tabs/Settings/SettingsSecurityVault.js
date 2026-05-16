@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, Switch, TouchableOpacity } from 'react-native';
 import { theme } from '../../../theme';
-import { useStore } from '../../store';
+import { useStore } from '../../../store';
 
 export default function SettingsSecurityVault() {
   const settings = useStore(state => state.settings);

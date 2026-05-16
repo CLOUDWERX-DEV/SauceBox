@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Switch, TextInput } from 'react-native';
 import { theme } from '../../../theme';
-import { useStore } from '../../store';
+import { useStore } from '../../../store';
 
 export default function SettingsAdvanced() {
   const settings = useStore(state => state.settings);

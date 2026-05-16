@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { theme } from '../../../theme';
-import { useStore } from '../../store';
+import { useStore } from '../../../store';
 
 const qualityOptions = [
   { value: 'best', label: 'Best Quality', desc: 'Highest available quality', icon: '👑' },
