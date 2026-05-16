@@ -1,6 +1,8 @@
 node_modules/
 dist/
 build/
+!build/icons/
+!build/icon.ico
 .DS_Store
 *.log
 npm-debug.log*
