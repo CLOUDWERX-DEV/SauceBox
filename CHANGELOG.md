@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.7] - 2026-05-16
+
+### Fixed
+- **Scrollbar Behavior Polish**: Changed the application's layout overflow behaviour. Removed the nested `main-content-wrapper` div inside `DownloadTab.js` to avoid layout nesting bugs and updated `overflow-y: scroll;` to `overflow-y: auto;` in the HTML shell (`public/index.html`) and tab containers (`GalleryTab.js`, `SettingsTab.js`, `BroadcastTab.js`, `QueueStyles.js`). The scrollbar now only appears if content actually exceeds the viewport height, ensuring a smooth, clean, premium UI on all resolutions.
+
 ## [1.3.6] - 2026-05-16
 
 ### Added

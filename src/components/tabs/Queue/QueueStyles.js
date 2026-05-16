@@ -4,7 +4,7 @@ import { theme } from '../../../theme';
 export const queueStyles = StyleSheet.create({
   container: {
     flex: 1,
-    overflowY: 'scroll',
+    overflowY: 'auto',
     overflowX: 'hidden',
   },
   content: {

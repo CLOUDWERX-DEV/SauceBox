@@ -248,7 +248,7 @@ export default function GalleryTab({ onNavigate }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    overflowY: 'scroll',
+    overflowY: 'auto',
     overflowX: 'hidden',
   },
   content: {

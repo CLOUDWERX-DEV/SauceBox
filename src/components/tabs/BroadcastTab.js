@@ -394,7 +394,7 @@ export default function BroadcastTab() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, overflowY: 'scroll' },
+  container: { flex: 1, overflowY: 'auto' },
   content: { padding: 32, paddingBottom: 60 },
   header: { marginBottom: 32 },
   title: { fontSize: 32, fontWeight: '700', color: theme.colors.text, marginBottom: 8 },

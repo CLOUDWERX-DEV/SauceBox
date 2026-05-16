@@ -276,25 +276,23 @@ export default function DownloadTab({ onNavigate }) {
 
   return (
     <>
-      <div className="main-content-wrapper">
-        <div style={styles.content}>
-          <View style={styles.card}>
-            <DownloadInputForm 
-              url={url} 
-              setUrl={setUrl} 
-              loading={loading} 
-              loadingMsg={loadingMsg} 
-              handlePreview={handlePreview} 
-              handleDownload={handleDownload} 
-            />
-            <BatchSection onOpenBatchMode={() => setBatchModalVisible(true)} />
-            <View style={styles.divider} />
-          </View>
+      <div style={styles.content}>
+        <View style={styles.card}>
+          <DownloadInputForm 
+            url={url} 
+            setUrl={setUrl} 
+            loading={loading} 
+            loadingMsg={loadingMsg} 
+            handlePreview={handlePreview} 
+            handleDownload={handleDownload} 
+          />
+          <BatchSection onOpenBatchMode={() => setBatchModalVisible(true)} />
+          <View style={styles.divider} />
+        </View>
 
-          <View style={styles.bottomCardsContainer}>
-            <HowToUseCard onNavigate={onNavigate} />
-          </View>
-        </div>
+        <View style={styles.bottomCardsContainer}>
+          <HowToUseCard onNavigate={onNavigate} />
+        </View>
       </div>
 
       <BatchDownloadModal
