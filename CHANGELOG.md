@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.3.5] - 2026-05-16
+## [1.3.6] - 2026-05-16
 
 ### Added
 - **Branding Copy Document**: Created `docs/BRANDING_COPY.md` with 10 short descriptions, 10 extended descriptions, and 10 taglines for use in marketing materials.
