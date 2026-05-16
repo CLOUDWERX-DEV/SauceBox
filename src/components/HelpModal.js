@@ -69,7 +69,7 @@ export default function HelpModal({ visible, onClose }) {
               </View>
               <View>
                 <Text style={styles.title}>SauceBox Documentation</Text>
-                <Text style={styles.headerSubtext}>The Definitive Guide</Text>
+                <Text style={styles.headerSubtext}>Your sauce. Your box. Your rules.</Text>
               </View>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>

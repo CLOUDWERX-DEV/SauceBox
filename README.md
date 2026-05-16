@@ -5,7 +5,8 @@
 <h1 align="center">SauceBox</h1>
 
 <p align="center">
-  <strong>Your Personal, High-Speed Adult Content Manager and Downloader</strong><br/>
+  <strong>Download, organize, and stream adult content — all from one app! SauceBox.</strong><br/>
+  <em>Your sauce. Your box. Your rules.</em><br/><br/>
   <a href="https://saucebox.app">saucebox.app</a>
 </p>
 
@@ -14,8 +15,7 @@
 </p>
 
 <p align="center">
-  Built with React Native Web, Electron, and the immense power of <code>yt-dlp</code>. 
-  Experience a seamless, ad-free, and hyper-fast desktop client designed specifically for bulk-downloading, organizing, and playing content from top adult networks.
+  SauceBox combines the raw power of <code>yt-dlp</code> with a premium desktop interface to give adult content enthusiasts a fully private, locally-hosted media empire — with VR broadcasting, batch downloading, and a panic-button stealth mode built right in.
 </p>
 
 ---

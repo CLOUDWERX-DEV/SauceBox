@@ -8,7 +8,7 @@ export default function HelpContent({ activeTab, displayHotkey }) {
       return (
         <View>
           <Text style={styles.contentTitle}>Getting Started</Text>
-          <Text style={styles.contentSubtitle}>Download and manage your offline video library.</Text>
+          <Text style={styles.contentSubtitle}>SauceBox combines the raw power of yt-dlp with a premium desktop interface to give adult content enthusiasts a fully private, locally-hosted media empire — with VR broadcasting, batch downloading, and a panic-button stealth mode built right in.</Text>
 
           <View style={styles.card}>
             <View style={styles.cardHeader}>
