@@ -1,23 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { useStore } from '../../store';
-import { theme } from '../../theme';
 import BatchDownloadModal from '../BatchDownloadModal';
 import VideoPreviewModal from '../VideoPreviewModal';
 import PlaylistModal from '../PlaylistModal';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+import { downloadStyles as styles } from './Download/DownloadStyles';
+import DownloadInputForm from './Download/DownloadInputForm';
+import BatchSection from './Download/BatchSection';
+import HowToUseCard from './Download/HowToUseCard';
 
-const funnyPlaceholders = [
-  "Paste that spicy link here... 🌶️",
-  "Drop the URL like it's hot 🔥",
-  "Your secret's safe with us 🤫",
-  "Time to expand the collection 📚",
-  "What are we downloading today? 😏",
-  "Another one for the vault 🔐",
-  "Building that library 📖",
-  "Quality content incoming 💎"
-];
+const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
 export default function DownloadTab() {
   const [url, setUrl] = useState('');
@@ -31,7 +24,6 @@ export default function DownloadTab() {
 
   const addDownload = useStore(state => state.addDownload);
   const settings = useStore(state => state.settings);
-  const addToHistory = useStore(state => state.addToHistory);
 
   // Unified URL resolver — detects playlist vs single video
   const resolveUrl = async (targetUrl) => {
@@ -57,15 +49,10 @@ export default function DownloadTab() {
         setPlaylistInfo({ ...info, url: url.trim() });
         setPlaylistModalVisible(true);
       } else {
-        // Single video — always call get-video-info for the full formats array.
-        // The flat-playlist singleVideo shortcut skips --dump-json so it won't
-        // have availableQualities. We need the full format list so the preview
-        // modal can show only quality options that actually exist on this video.
         let videoData;
         try {
           videoData = await ipcRenderer?.invoke('get-video-info', url.trim());
         } catch (e) {
-          // Fallback to flat-playlist singleVideo if full info fails
           videoData = info.singleVideo;
         }
         if (!videoData) videoData = info.singleVideo;
@@ -84,16 +71,10 @@ export default function DownloadTab() {
   const handleDownloadFromPreview = (quality = 'best') => {
     setPreviewModalVisible(false);
     const info = previewInfo;
-    // Normalize quality: strip any trailing 'p' from persisted/legacy values (e.g. "480p" → "480")
     const qualityHeight = quality !== 'best' ? String(quality).replace(/p$/i, '') : null;
 
-    // Build the resolution display hint:
-    // - Specific quality (e.g. "480") → show "480p" immediately on the card
-    // - "best" quality → use the top of availableQualities (sorted desc by get-video-info)
-    //   so the card shows the actual best available height (e.g. "1080p") not nothing
-    // - No format info at all → null; ffmpeg fills it in after the download completes
     const bestAvailHeight = Array.isArray(info?.availableQualities) && info.availableQualities.length > 0
-      ? info.availableQualities[0]   // already sorted descending
+      ? info.availableQualities[0]
       : null;
     const resolutionHint = qualityHeight
       ? `${qualityHeight}p`
@@ -114,11 +95,9 @@ export default function DownloadTab() {
     setUrl('');
   };
 
-  // Queue a single video download
   const queueDownload = async (urlToDownload) => {
     setLoading(true);
     try {
-      // Check for duplicates
       const existingDownload = useStore.getState().history.find(h => h.url === urlToDownload);
       if (existingDownload) {
         const confirmDownload = window.confirm(
@@ -130,17 +109,14 @@ export default function DownloadTab() {
 
       const info = await ipcRenderer?.invoke('get-video-info', urlToDownload);
 
-      // Normalize the quality from settings — strip any old 'p' suffix
       const settingsQualityHeight = settings.quality !== 'best'
         ? String(settings.quality).replace(/p$/i, '')
         : null;
 
-      // Best available height from the format list (sorted desc by get-video-info)
       const bestAvailHeight = Array.isArray(info?.availableQualities) && info.availableQualities.length > 0
         ? info.availableQualities[0]
         : null;
 
-      // Resolution display hint: specific quality → Np, best → top of available list, else null
       const resolutionHint = settingsQualityHeight
         ? `${settingsQualityHeight}p`
         : (bestAvailHeight ? `${bestAvailHeight}p` : null);
@@ -174,7 +150,6 @@ export default function DownloadTab() {
       const info = await ipcRenderer?.invoke('get-playlist-info', url.trim());
 
       if (info.isPlaylist && info.entries.length > 1) {
-        // Playlist — open selection modal
         setPlaylistInfo({ ...info, url: url.trim() });
         setPlaylistModalVisible(true);
         setLoading(false);
@@ -182,7 +157,6 @@ export default function DownloadTab() {
         return;
       }
 
-      // Single video — queue with full metadata
       const existingDownload = useStore.getState().history.find(h => h.url === url.trim());
       if (existingDownload) {
         const confirmDownload = window.confirm(
@@ -192,7 +166,6 @@ export default function DownloadTab() {
         if (!confirmDownload) return;
       }
 
-      // Always use get-video-info for single videos to guarantee thumbnail
       setLoadingMsg('📡 Fetching video info...');
       const videoData = await ipcRenderer?.invoke('get-video-info', url.trim());
 
@@ -232,7 +205,6 @@ export default function DownloadTab() {
     }
   };
 
-  // Called when user confirms selection in PlaylistModal
   const handleDownloadFromPlaylist = async (selectedEntries) => {
     setPlaylistModalVisible(false);
     setUrl('');
@@ -302,98 +274,26 @@ export default function DownloadTab() {
     }
   };
 
-  const randomPlaceholder = funnyPlaceholders[Math.floor(Math.random() * funnyPlaceholders.length)];
-
   return (
     <>
       <div className="main-content-wrapper">
         <div style={styles.content}>
-        <View style={styles.card}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>📎 Video URL</Text>
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={styles.input}
-                placeholder={randomPlaceholder}
-                placeholderTextColor="#555"
-                value={url}
-                onChangeText={setUrl}
-                onSubmitEditing={() => handleDownload()}
-              />
-              <TouchableOpacity
-                style={[styles.previewButton, loading && styles.downloadButtonDisabled]}
-                onPress={handlePreview}
-                disabled={loading}
-              >
-                <Text style={styles.previewButtonText}>
-                  {loading ? '⏳' : '👁️'}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.downloadButton, loading && styles.downloadButtonDisabled]}
-                onPress={() => handleDownload()}
-                disabled={loading}
-              >
-                <Text style={styles.downloadButtonText}>
-                  {loading ? (loadingMsg || '⏳ Fetching...') : '🚀 Download'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.inputHint}>
-              Supports most major video platforms &amp; playlists • Press Enter to download • Use Preview to inspect video info and choose download quality
-            </Text>
+          <View style={styles.card}>
+            <DownloadInputForm 
+              url={url} 
+              setUrl={setUrl} 
+              loading={loading} 
+              loadingMsg={loadingMsg} 
+              handlePreview={handlePreview} 
+              handleDownload={handleDownload} 
+            />
+            <BatchSection onOpenBatchMode={() => setBatchModalVisible(true)} />
+            <View style={styles.divider} />
           </View>
 
-          <View style={styles.batchSection}>
-            <View style={styles.batchInfo}>
-              <Text style={styles.batchTitle}>Need to download multiple videos?</Text>
-              <Text style={styles.batchDesc}>Use batch mode to queue multiple URLs at once</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.batchButton}
-              onPress={() => setBatchModalVisible(true)}
-            >
-              <Text style={styles.batchButtonIcon}>📦</Text>
-              <Text style={styles.batchButtonText}>Open Batch Mode</Text>
-            </TouchableOpacity>
+          <View style={styles.bottomCardsContainer}>
+            <HowToUseCard />
           </View>
-
-          <View style={styles.divider} />
-        </View>
-
-        <View style={styles.bottomCardsContainer}>
-          <View style={styles.tipsCard}>
-            <Text style={styles.tipsTitle}>📖 How to Use SauceBox</Text>
-            <View style={styles.tipsList}>
-              <View style={styles.tipItem}>
-                <View style={styles.stepCircle}><Text style={styles.stepNumber}>1</Text></View>
-                <Text style={styles.tip}>Paste any video or playlist URL into the input field above.</Text>
-              </View>
-              <View style={styles.tipItem}>
-                <View style={styles.stepCircle}><Text style={styles.stepNumber}>2</Text></View>
-                <Text style={styles.tip}>Click the 👁️ Preview button to inspect video qualities and select a specific resolution.</Text>
-              </View>
-              <View style={styles.tipItem}>
-                <View style={styles.stepCircle}><Text style={styles.stepNumber}>3</Text></View>
-                <Text style={styles.tip}>Hit 🚀 Download (or press Enter) to fetch the video and automatically extract metadata.</Text>
-              </View>
-              <View style={styles.tipItem}>
-                <View style={styles.stepCircle}><Text style={styles.stepNumber}>4</Text></View>
-                <Text style={styles.tip}>Monitor progress in the Queue, or manage concurrent downloads in Settings.</Text>
-              </View>
-              <View style={styles.tipItem}>
-                <View style={styles.stepCircle}><Text style={styles.stepNumber}>5</Text></View>
-                <Text style={styles.tip}>Head to the Gallery to play locally, cast to your VR headset, or trim scenes!</Text>
-              </View>
-              <View style={styles.tipItem}>
-                <View style={styles.stepCircle}><Text style={styles.stepNumber}>🧩</Text></View>
-                <Text style={styles.tip}>Use the Chrome Extension to right-click and send videos instantly to SauceBox.</Text>
-              </View>
-            </View>
-          </View>
-
-
-        </View>
         </div>
       </div>
 
@@ -420,247 +320,3 @@ export default function DownloadTab() {
     </>
   );
 }
-
-const styles = {
-  content: {
-    padding: 32,
-    paddingBottom: 60,
-  },
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 24,
-    padding: 36,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginBottom: 32,
-    boxShadow: `0 8px 32px ${theme.colors.border}`,
-  },
-  inputContainer: {
-    marginBottom: 24,
-  },
-  inputLabel: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: theme.colors.primary,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 12,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 8,
-  },
-  input: {
-    flex: 1,
-    backgroundColor: theme.colors.surfaceLight,
-    borderRadius: 12,
-    padding: 18,
-    fontSize: 15,
-    color: theme.colors.text,
-    borderWidth: 2,
-    borderColor: `${theme.colors.primary}30`,
-    outlineStyle: 'none',
-  },
-  inputHint: {
-    fontSize: 12,
-    color: theme.colors.textTertiary,
-    fontStyle: 'italic',
-    marginTop: 8,
-  },
-  downloadButton: {
-    backgroundColor: theme.colors.primary,
-    paddingHorizontal: 36,
-    paddingVertical: 18,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    minWidth: 180,
-    cursor: 'pointer',
-    boxShadow: `0 4px 15px ${theme.colors.primary}40`,
-  },
-  previewButton: {
-    backgroundColor: theme.colors.surfaceLight,
-    paddingHorizontal: 20,
-    paddingVertical: 18,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    cursor: 'pointer',
-    borderWidth: 2,
-    borderColor: `${theme.colors.primary}50`,
-  },
-  previewButtonText: {
-    fontSize: 20,
-  },
-  downloadButtonDisabled: {
-    opacity: 0.5,
-  },
-  downloadButtonText: {
-    color: '#000',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  batchSection: {
-    backgroundColor: `${theme.colors.primary}10`,
-    borderRadius: 16,
-    padding: 24,
-    borderWidth: 2,
-    borderColor: `${theme.colors.primary}30`,
-    borderStyle: 'dashed',
-    marginBottom: 32,
-  },
-  batchInfo: {
-    marginBottom: 16,
-  },
-  batchTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.text,
-    marginBottom: 6,
-  },
-  batchDesc: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-  },
-  batchButton: {
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    cursor: 'pointer',
-  },
-  batchButtonIcon: {
-    fontSize: 20,
-  },
-  batchButtonText: {
-    color: '#000',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: theme.colors.border,
-    marginBottom: 32,
-    display: 'none',
-  },
-  bottomCardsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 24,
-  },
-  tipsCard: {
-    flex: 1,
-    minWidth: 300,
-    backgroundColor: theme.colors.surface,
-    borderRadius: 20,
-    padding: 28,
-    borderWidth: 1,
-    borderColor: theme.colors.borderLight,
-    boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-  },
-  awesomeCard: {
-    flex: 1,
-    minWidth: 300,
-    backgroundColor: `${theme.colors.primary}08`,
-    borderRadius: 20,
-    padding: 28,
-    borderWidth: 1,
-    borderColor: `${theme.colors.primary}30`,
-    flexDirection: 'row',
-    gap: 20,
-    boxShadow: `0 4px 20px ${theme.colors.borderLight}`,
-    overflow: 'hidden',
-  },
-  awesomeIconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: `${theme.colors.primary}20`,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.primary,
-  },
-  awesomeIcon: {
-    fontSize: 32,
-  },
-  awesomeContent: {
-    flex: 1,
-  },
-  awesomeTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: theme.colors.primary,
-    marginBottom: 8,
-    letterSpacing: 0.5,
-  },
-  awesomeDesc: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    lineHeight: '22px',
-    marginBottom: 16,
-  },
-  awesomeFeatures: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  awesomeBadge: {
-    backgroundColor: theme.colors.surfaceLight,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: `${theme.colors.primary}40`,
-  },
-  awesomeBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: theme.colors.text,
-  },
-  tipsTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: theme.colors.primary,
-    marginBottom: 20,
-  },
-  tipsList: {
-    gap: 12,
-  },
-  tipItem: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  stepCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: `${theme.colors.primary}20`,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.primary,
-    marginTop: 2,
-  },
-  stepNumber: {
-    color: theme.colors.primary,
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  proTipRow: {
-    flexDirection: 'column',
-    gap: 6,
-    marginBottom: 4,
-  },
-  tip: {
-    flex: 1,
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    lineHeight: '22px',
-  }
-};
