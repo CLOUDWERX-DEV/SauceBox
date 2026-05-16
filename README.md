@@ -11,7 +11,6 @@
 
 <p align="center">
   <img src="docs/assets/saucebox-main-ui.png" width="48%" alt="SauceBox Main UI" />
-  <img src="docs/assets/saucebox-broadcast-tab.png" width="48%" alt="SauceBox Media Server" />
 </p>
 
 <p align="center">
