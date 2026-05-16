@@ -20,6 +20,50 @@ export default function SettingsTab({ onNavigate }) {
   const [tempPin, setTempPin] = useState('');
   const [diskSpace, setDiskSpace] = useState(null);
 
+  // Compute the OS-specific path to delete for a PIN reset.
+  // Electron persists localStorage in the app userData directory.
+  const getPinResetInfo = () => {
+    try {
+      const os = window.require ? window.require('os') : null;
+      const path = window.require ? window.require('path') : null;
+      if (!os || !path) return null;
+
+      const home = os.homedir();
+      const platform = process.platform;
+
+      if (platform === 'win32') {
+        const appData = process.env.APPDATA || path.join(home, 'AppData', 'Roaming');
+        const dir = path.join(appData, 'saucebox', 'Local Storage', 'leveldb');
+        return {
+          os: 'Windows',
+          dir,
+          instruction: `Open File Explorer and delete the folder:\n${dir}`,
+          shortPath: `%APPDATA%\\saucebox\\Local Storage\\leveldb`,
+        };
+      } else if (platform === 'darwin') {
+        const dir = path.join(home, 'Library', 'Application Support', 'saucebox', 'Local Storage', 'leveldb');
+        return {
+          os: 'macOS',
+          dir,
+          instruction: `Open Finder, press Cmd+Shift+G, paste the path, and delete the folder.`,
+          shortPath: `~/Library/Application Support/saucebox/Local Storage/leveldb`,
+        };
+      } else {
+        const dir = path.join(home, '.config', 'saucebox', 'Local Storage', 'leveldb');
+        return {
+          os: 'Linux',
+          dir,
+          instruction: `Open a terminal and run:\nrm -rf "${dir}"`,
+          shortPath: `~/.config/saucebox/Local Storage/leveldb`,
+        };
+      }
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const pinResetInfo = getPinResetInfo();
+
   useEffect(() => {
     const fetchVersions = async () => {
       try {
@@ -310,38 +354,90 @@ export default function SettingsTab({ onNavigate }) {
           </View>
           
           {settings.vaultEnabled && (
-            <View style={[styles.switchRow, { marginTop: 24 }]}>
-              <View style={styles.switchInfo}>
-                <Text style={styles.switchLabel}>Vault PIN Code</Text>
-                <Text style={styles.switchDesc}>4-digit PIN required to unlock</Text>
-              </View>
-              <TextInput
-                style={[styles.pathInput, { flex: 0, width: 100, textAlign: 'center', letterSpacing: isEditingPin ? 4 : 8 }]}
-                value={isEditingPin ? tempPin : settings.vaultPin}
-                secureTextEntry={!isEditingPin}
-                placeholder={isEditingPin ? "0000" : ""}
-                maxLength={4}
-                keyboardType="numeric"
-                onFocus={() => {
-                  setIsEditingPin(true);
-                  setTempPin('');
-                }}
-                onBlur={() => {
-                  setIsEditingPin(false);
-                  setTempPin('');
-                }}
-                onChangeText={(text) => {
-                  const num = text.replace(/[^0-9]/g, '');
-                  setTempPin(num);
-                  if (num.length === 4) {
-                    updateSettings({ vaultPin: num });
+            <>
+              <View style={[styles.switchRow, { marginTop: 24 }]}>
+                <View style={styles.switchInfo}>
+                  <Text style={styles.switchLabel}>Vault PIN Code</Text>
+                  <Text style={styles.switchDesc}>4-digit PIN required to unlock</Text>
+                </View>
+                <TextInput
+                  style={[styles.pathInput, { flex: 0, width: 100, textAlign: 'center', letterSpacing: isEditingPin ? 4 : 8 }]}
+                  value={isEditingPin ? tempPin : settings.vaultPin}
+                  secureTextEntry={!isEditingPin}
+                  placeholder={isEditingPin ? "0000" : ""}
+                  maxLength={4}
+                  keyboardType="numeric"
+                  onFocus={() => {
+                    setIsEditingPin(true);
+                    setTempPin('');
+                  }}
+                  onBlur={() => {
                     setIsEditingPin(false);
-                    // Note: Blur happens automatically when we stop editing, but we rely on the visual state change.
-                  }
-                }}
-              />
-            </View>
+                    setTempPin('');
+                  }}
+                  onChangeText={(text) => {
+                    const num = text.replace(/[^0-9]/g, '');
+                    setTempPin(num);
+                    if (num.length === 4) {
+                      updateSettings({ vaultPin: num });
+                      setIsEditingPin(false);
+                    }
+                  }}
+                />
+              </View>
+
+              {/* PIN reset instructions */}
+              {pinResetInfo && (
+                <View style={{
+                  marginTop: 16,
+                  padding: 14,
+                  backgroundColor: `${theme.colors.primary}10`,
+                  borderRadius: 10,
+                  borderWidth: 1,
+                  borderColor: `${theme.colors.primary}30`,
+                  borderStyle: 'dashed',
+                }}>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: theme.colors.primary, marginBottom: 6 }}>
+                    🔑 Forgot your PIN?
+                  </Text>
+                  <Text style={{ fontSize: 12, color: theme.colors.textSecondary, lineHeight: 18 }}>
+                    Close SauceBox, then delete the Local Storage folder below. This resets ALL app data (gallery, settings, PIN).
+                  </Text>
+                  <View style={{
+                    marginTop: 10,
+                    padding: 8,
+                    backgroundColor: theme.colors.surface,
+                    borderRadius: 6,
+                    borderWidth: 1,
+                    borderColor: theme.colors.border,
+                  }}>
+                    <Text style={{ fontFamily: 'monospace', fontSize: 11, color: theme.colors.text, userSelect: 'text' }}>
+                      {pinResetInfo.shortPath}
+                    </Text>
+                  </View>
+                  {process.platform === 'win32' && (
+                    <Text style={{ fontSize: 11, color: theme.colors.textTertiary, marginTop: 8 }}>
+                      💡 Tip: Press Win+R, type %APPDATA%\saucebox and open the "Local Storage" folder.
+                    </Text>
+                  )}
+                  {process.platform === 'darwin' && (
+                    <Text style={{ fontSize: 11, color: theme.colors.textTertiary, marginTop: 8 }}>
+                      💡 Tip: In Finder press Cmd+Shift+G and paste the path above.
+                    </Text>
+                  )}
+                  {(process.platform !== 'win32' && process.platform !== 'darwin') && (
+                    <Text style={{ fontSize: 11, color: theme.colors.textTertiary, marginTop: 8 }}>
+                      {'💡 Tip: Run in terminal — '}
+                      <Text style={{ fontFamily: 'monospace', color: theme.colors.primary }}>
+                        {`rm -rf "${pinResetInfo.dir}"`}
+                      </Text>
+                    </Text>
+                  )}
+                </View>
+              )}
+            </>
           )}
+
 
           <View style={[styles.switchRow, { marginTop: 24, borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 24 }]}>
             <View style={styles.switchInfo}>

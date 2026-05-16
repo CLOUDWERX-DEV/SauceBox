@@ -4,6 +4,7 @@
 ### Added
 - **4K / 2K Resolution Support**: Extended the quality selector in Settings, VideoPreviewModal (the Preview button), and the download pipeline to support Ultra HD (2160p / 4K) and Quad HD (1440p / 2K) resolutions. yt-dlp format strings are updated to request the correct height, with automatic fallback to the next-closest quality if the site does not offer it.
 - **Internet Exposure Mode**: Added a new "Expose Server to the Internet" toggle in the Broadcast tab's Security section. When enabled, the app detects the user's public IP (via ipify), displays a second QR code card styled in a red danger theme, and shows the external URL alongside the local-network URL. A native confirmation dialog warns the user of the security implications before enabling.
+- **PIN Reset Instructions**: Added an OS-aware "Forgot your PIN?" hint card below the Vault PIN field. It dynamically computes the exact Local Storage folder path for the current OS (Windows `%APPDATA%\saucebox\...`, macOS `~/Library/Application Support/saucebox/...`, Linux `~/.config/saucebox/...`) and shows the correct shell command or Finder/Explorer tip to delete it and regain access.
 
 ### Fixed
 - **Help Modal sidebar width**: Reduced the sidebar from 260px to 220px and tightened horizontal padding to prevent layout overflow on small windows.
