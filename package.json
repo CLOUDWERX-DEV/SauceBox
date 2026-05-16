@@ -1,6 +1,6 @@
 {
   "name": "saucebox",
-  "version": "1.3.4",
+  "version": "1.3.5",
   "description": "The Ultimate Local Video Downloader",
   "author": {
     "name": "CLOUDWERX LAB",
@@ -20,35 +20,37 @@
     "appId": "com.cloudwerxlab.saucebox",
     "productName": "SauceBox",
     "directories": {
-      "output": "dist-bin"
+      "output": "dist-bin",
+      "buildResources": "build"
     },
     "files": [
       "dist/**/*",
       "electron/**/*",
       "public/**/*",
+      "build/**/*",
       "package.json"
     ],
     "mac": {
       "category": "public.app-category.video",
       "target": ["dmg", "zip"],
-      "icon": "public/icon.png"
+      "icon": "build/icons/512x512.png"
     },
     "win": {
       "target": ["nsis", "portable"],
-      "icon": "public/icon.png"
+      "icon": "build/icon.ico"
     },
     "nsis": {
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-      "installerIcon": "public/icon.png",
-      "uninstallerIcon": "public/icon.png",
-      "installerHeaderIcon": "public/icon.png",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
       "createDesktopShortcut": true
     },
     "linux": {
       "target": ["AppImage", "deb", "tar.gz"],
-      "icon": "public/icon.png",
+      "icon": "build/icons",
       "category": "Video",
       "maintainer": "CLOUDWERX LAB <saucebox@cloudwerxlab.com>"
     }

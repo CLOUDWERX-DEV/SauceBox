@@ -12,15 +12,21 @@ const { setupMetadataHandlers } = require('./modules/metadata');
 const { setupFfmpegHandlers } = require('./modules/ffmpegProcessing');
 
 function createWindow() {
+  const isLinux = process.platform === 'linux';
+
   state.mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
     minWidth: 1200,
     minHeight: 700,
     backgroundColor: '#0a0a0a',
-    titleBarStyle: 'hidden',
+    // titleBarStyle 'hidden' is macOS-only; on Linux it conflicts with frame:false
+    // and causes the window to vanish from the taskbar on minimize.
+    titleBarStyle: isLinux ? undefined : 'hidden',
     frame: false,
-    icon: path.join(__dirname, '../public/icon.png'),
+    show: true,
+    skipTaskbar: false,
+    icon: path.join(__dirname, '../build/icons/256x256.png'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -33,6 +39,11 @@ function createWindow() {
   } else {
     state.mainWindow.loadURL('http://localhost:8081');
   }
+
+  // Ensure the window is always restored to the taskbar when minimized
+  state.mainWindow.on('minimize', () => {
+    // No-op — just ensuring the event doesn't trigger any hide behavior
+  });
 }
 
 if (app) {

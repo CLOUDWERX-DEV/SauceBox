@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.5] - 2026-05-16
+### Changed
+- **Modular Refactoring (HelpModal)**: Decomposed the 773-line `HelpModal.js` into a 191-line orchestrator. Extracted the massive switch-case content renderer into `src/components/Help/HelpContent.js` and shared styles into `src/components/Help/HelpStyles.js`.
+- **Modular Refactoring (DownloadTab)**: Decomposed the 666-line `DownloadTab.js` into a 270-line orchestrator. Extracted the URL input form into `DownloadInputForm.js`, the batch section into `BatchSection.js`, and the tips card into `HowToUseCard.js` under `src/components/tabs/Download/`.
+- **Modular Refactoring (QueueTab)**: Decomposed the 634-line `QueueTab.js` into a 184-line orchestrator. Extracted the download card renderer into `DownloadCard.js` and the empty state UI into `EmptyQueueState.js` under `src/components/tabs/Queue/`.
+
+### Fixed
+- **Linux .deb Icon Missing**: Fixed a critical packaging issue where the application icon would not appear in Linux app menus (GNOME, Cinnamon, KDE, etc.) after installing the `.deb` package. Generated a complete set of XDG-compliant icon sizes (16x16 through 512x512) in `build/icons/` and updated the `electron-builder` Linux config to point to the icon directory rather than a single PNG file.
+- **Frameless Window Minimize Bug**: Fixed an issue where minimizing the app on Linux desktop environments caused the window to disappear entirely instead of minimizing to the taskbar. Added explicit `skipTaskbar: false` to the BrowserWindow config and removed the unsupported `titleBarStyle: 'hidden'` property on Linux, which was conflicting with `frame: false`.
+
+### Added
+- **Source Directory Map**: Added a comprehensive source directory tree to `CONTRIBUTING.md` so new contributors immediately understand the modular file structure and know where to place new components.
+
 ## [1.3.4] - 2026-05-16
 ### Added
 - **4K / 2K Resolution Support**: Extended the quality selector in Settings, VideoPreviewModal (the Preview button), and the download pipeline to support Ultra HD (2160p / 4K) and Quad HD (1440p / 2K) resolutions. yt-dlp format strings are updated to request the correct height, with automatic fallback to the next-closest quality if the site does not offer it.
