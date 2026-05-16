@@ -1,24 +1,24 @@
 # Changelog
 
 ## [1.3.5] - 2026-05-16
+
+### Added
+- **Branding Copy Document**: Created `docs/BRANDING_COPY.md` with 10 short descriptions, 10 extended descriptions, and 10 taglines for use in marketing materials.
+- **Branding Applied Everywhere**: Deployed chosen branding copy across all surfaces — README header/body, `package.json` description field (appears in `.deb` / NSIS / AppImage installer metadata), HelpModal header subtext (`"Your sauce. Your box. Your rules."`), and HelpContent "Getting Started" subtitle.
+- **Source Directory Map**: Added a comprehensive source directory tree to `CONTRIBUTING.md` so new contributors immediately understand the modular file structure and know where to place new components.
+
 ### Changed
-- **Modular Refactoring (HelpModal)**: Decomposed the 773-line `HelpModal.js` into a 191-line orchestrator. Extracted the massive switch-case content renderer into `src/components/Help/HelpContent.js` and shared styles into `src/components/Help/HelpStyles.js`.
+- **Modular Refactoring (HelpModal)**: Decomposed the 773-line `HelpModal.js` into a 191-line orchestrator. Extracted the switch-case content renderer into `src/components/Help/HelpContent.js` and shared styles into `src/components/Help/HelpStyles.js`.
 - **Modular Refactoring (DownloadTab)**: Decomposed the 666-line `DownloadTab.js` into a 270-line orchestrator. Extracted the URL input form into `DownloadInputForm.js`, the batch section into `BatchSection.js`, and the tips card into `HowToUseCard.js` under `src/components/tabs/Download/`.
 - **Modular Refactoring (QueueTab)**: Decomposed the 634-line `QueueTab.js` into a 184-line orchestrator. Extracted the download card renderer into `DownloadCard.js` and the empty state UI into `EmptyQueueState.js` under `src/components/tabs/Queue/`.
 
 ### Fixed
-- **Linux .deb Icon Missing**: Fixed a critical packaging issue where the application icon would not appear in Linux app menus (GNOME, Cinnamon, KDE, etc.) after installing the `.deb` package. Generated a complete set of XDG-compliant icon sizes (16x16 through 512x512) in `build/icons/` and updated the `electron-builder` Linux config to point to the icon directory rather than a single PNG file.
-- **Frameless Window Minimize Bug**: Fixed an issue where minimizing the app on Linux desktop environments caused the window to disappear entirely instead of minimizing to the taskbar. Added explicit `skipTaskbar: false` to the BrowserWindow config and removed the unsupported `titleBarStyle: 'hidden'` property on Linux, which was conflicting with `frame: false`.
+- **Linux .deb Icon Missing**: Fixed a critical packaging issue where the application icon would not appear in Linux app menus (GNOME, Cinnamon, KDE, etc.) after installing the `.deb` package. Generated a complete set of XDG-compliant icon sizes (16×16 through 512×512) in `build/icons/` and updated the `electron-builder` Linux config to point to the icon directory rather than a single PNG file. Also generated `build/icon.ico` (multi-size embedded) for Windows installers.
+- **Frameless Window Minimize Bug (Linux)**: Minimizing the app on Linux desktop environments caused the window to vanish entirely instead of minimizing to the taskbar. Removed the unsupported `titleBarStyle: 'hidden'` property on Linux (macOS-only, conflicts with `frame: false`) and added `skipTaskbar: false` explicitly to the BrowserWindow config.
+- **Linux Taskbar Icon Missing in Dev Mode**: Added `app.setIcon(nativeImage.createFromPath(...))` call after `createWindow()` on Linux. `BrowserWindow`'s `icon` option only sets the window decoration icon — `app.setIcon()` is the correct Electron API for the taskbar icon on Linux desktop environments.
+- **Logo Missing in Packaged Builds (.deb / AppImage)**: `source={{ uri: 'logo.png' }}` bare string URIs only resolve in dev mode where webpack-dev-server serves `public/` as static files. In packaged builds loading via `file://`, no server exists and paths resolve to nothing. Fixed by adding an `asset/inline` webpack rule for PNG/JPG/GIF/WebP/SVG files and importing `logo.png` directly as a JS module in `TitleBar.js`, `Sidebar.js`, `VideoThumbnail.js`, and `App.js`. Webpack now inlines images as base64 data URIs, working identically in all environments.
+- **Help Modal Sidebar Too Wide**: Force-locked the Help panel navigation sidebar to 160px using `flexGrow: 0`, `flexShrink: 0`, `minWidth`, and `maxWidth`. In React Native Web a plain `width` on a `ScrollView` is ignored — the component flexes to fill available space, making the nav panel dominate the layout.
 
-### Added
-- **Source Directory Map**: Added a comprehensive source directory tree to `CONTRIBUTING.md` so new contributors immediately understand the modular file structure and know where to place new components.
-- **Branding Copy Document**: Created `docs/BRANDING_COPY.md` with 10 short descriptions, 10 extended descriptions, and 10 taglines for use in marketing materials.
-- **Branding Applied Everywhere**: Deployed the chosen branding copy across all surfaces — README header/body, `package.json` description field (appears in `.deb` / NSIS / AppImage installer metadata), HelpModal header subtext, and HelpContent "Getting Started" subtitle.
-
-### Fixed
-- **Help Modal Sidebar Too Wide**: Force-locked the Help panel navigation sidebar to 160px using `flexGrow: 0`, `flexShrink: 0`, `minWidth`, and `maxWidth`. In React Native Web, a plain `width` on a `ScrollView` is insufficient — the component would flex to fill available space, making the nav panel dominate the modal layout.
-- **Linux Taskbar Icon Missing (Dev Mode)**: Added `app.setIcon(nativeImage.createFromPath(...))` call after `createWindow()` on Linux. The `BrowserWindow` `icon` option only sets the window decoration icon — `app.setIcon()` is the correct Electron API for the taskbar/dock icon on Linux desktop environments.
-- **Logo Missing in Packaged Builds (.deb / AppImage)**: The logo/icon images referenced via bare URI strings (`'logo.png'`) only resolved correctly in dev mode where webpack-dev-server serves `public/` as static files. In packaged builds loaded via `file://`, no server exists and those paths resolve to nothing. Fixed by adding a `asset/inline` webpack rule for PNG/JPG/GIF/WebP/SVG files and importing `logo.png` directly as a JS module in `TitleBar.js`, `Sidebar.js`, `VideoThumbnail.js`, and `App.js`. Webpack now inlines the image as a base64 data URI, which works identically in all environments.
 
 ## [1.3.4] - 2026-05-16
 ### Added
