@@ -10,7 +10,7 @@ import ImportModal from '../ImportModal';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
-export default function GalleryTab() {
+export default function GalleryTab({ onNavigate }) {
   const history = useStore(state => state.history);
   const settings = useStore(state => state.settings);
   const clearHistory = useStore(state => state.clearHistory);
@@ -360,9 +360,17 @@ export default function GalleryTab() {
               <Text style={styles.importButtonText}>📥 IMPORT VIDEOS</Text>
             </TouchableOpacity>
             
-            <Text style={[styles.emptyText, { marginTop: 16, fontSize: 14 }]}>
-              Or use the <Text style={{ color: theme.colors.primary, fontWeight: 'bold' }}>Download Tab</Text> to grab new videos from the web!
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
+              <Text style={[styles.emptyText, { fontSize: 14, marginBottom: 0 }]}>
+                Or use the 
+              </Text>
+              <TouchableOpacity onPress={() => onNavigate && onNavigate('download')}>
+                <Text style={{ color: theme.colors.primary, fontWeight: 'bold', fontSize: 14, marginHorizontal: 4 }}>Download Tab</Text>
+              </TouchableOpacity>
+              <Text style={[styles.emptyText, { fontSize: 14, marginBottom: 0 }]}>
+                to grab new videos from the web!
+              </Text>
+            </View>
           </View>
         ) : filteredHistory.length === 0 ? (
           <View style={styles.emptyState}>

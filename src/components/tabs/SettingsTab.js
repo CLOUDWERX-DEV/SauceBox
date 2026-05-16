@@ -8,7 +8,7 @@ import { theme } from '../../theme';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
-export default function SettingsTab() {
+export default function SettingsTab({ onNavigate }) {
   const settings = useStore(state => state.settings);
   const updateSettings = useStore(state => state.updateSettings);
   const history = useStore(state => state.history);
@@ -395,13 +395,38 @@ export default function SettingsTab() {
               <Text style={[styles.aboutValue, { fontSize: 12, color: theme.colors.primary }]}>{ytVersion}</Text>
             </View>
             <Text style={[styles.switchDesc, { marginBottom: 8 }]}>Custom path to yt-dlp binary (leave empty for system PATH)</Text>
-            <TextInput
-              style={styles.pathInput}
-              placeholder="e.g. /usr/local/bin/yt-dlp"
-              placeholderTextColor="#555"
-              value={settings.ytdlpPath}
-              onChangeText={(text) => updateSettings({ ytdlpPath: text })}
-            />
+            <View style={styles.pathContainer}>
+              <TextInput
+                style={[styles.pathInput, { flex: 1, backgroundColor: theme.colors.surfaceLight }]}
+                placeholder="e.g. /usr/local/bin/yt-dlp"
+                placeholderTextColor="#555"
+                value={settings.ytdlpPath}
+                onChangeText={(text) => updateSettings({ ytdlpPath: text })}
+              />
+              <TouchableOpacity 
+                style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16 }]}
+                onPress={async () => {
+                  try {
+                    const result = await ipcRenderer?.invoke('select-file', 'Select yt-dlp Executable');
+                    if (result) {
+                      updateSettings({ ytdlpPath: result });
+                    }
+                  } catch (e) {
+                    console.error('Failed to select file:', e);
+                  }
+                }}
+              >
+                <Text style={styles.browseButtonText}>Browse</Text>
+              </TouchableOpacity>
+              {settings.ytdlpPath && settings.ytdlpPath.trim() !== '' && (
+                <TouchableOpacity 
+                  style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16, backgroundColor: theme.colors.error }]}
+                  onPress={() => updateSettings({ ytdlpPath: '' })}
+                >
+                  <Text style={[styles.browseButtonText, { color: '#fff' }]}>Clear</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
 
           <View>
@@ -410,14 +435,71 @@ export default function SettingsTab() {
               <Text style={[styles.aboutValue, { fontSize: 12, color: theme.colors.primary }]}>{ffmpegVersion}</Text>
             </View>
             <Text style={[styles.switchDesc, { marginBottom: 8 }]}>Custom path to ffmpeg binary (leave empty for system PATH)</Text>
-            <TextInput
-              style={styles.pathInput}
-              placeholder="e.g. /usr/bin/ffmpeg"
-              placeholderTextColor="#555"
-              value={settings.ffmpegPath}
-              onChangeText={(text) => updateSettings({ ffmpegPath: text })}
-            />
+            <View style={styles.pathContainer}>
+              <TextInput
+                style={[styles.pathInput, { flex: 1, backgroundColor: theme.colors.surfaceLight }]}
+                placeholder="e.g. /usr/bin/ffmpeg"
+                placeholderTextColor="#555"
+                value={settings.ffmpegPath}
+                onChangeText={(text) => updateSettings({ ffmpegPath: text })}
+              />
+              <TouchableOpacity 
+                style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16 }]}
+                onPress={async () => {
+                  try {
+                    const result = await ipcRenderer?.invoke('select-file', 'Select ffmpeg Executable');
+                    if (result) {
+                      updateSettings({ ffmpegPath: result });
+                    }
+                  } catch (e) {
+                    console.error('Failed to select file:', e);
+                  }
+                }}
+              >
+                <Text style={styles.browseButtonText}>Browse</Text>
+              </TouchableOpacity>
+              {settings.ffmpegPath && settings.ffmpegPath.trim() !== '' && (
+                <TouchableOpacity 
+                  style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16, backgroundColor: theme.colors.error }]}
+                  onPress={() => updateSettings({ ffmpegPath: '' })}
+                >
+                  <Text style={[styles.browseButtonText, { color: '#fff' }]}>Clear</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
+
+          {(ytVersion.includes('Not Found') || ffmpegVersion.includes('Not Found')) && (
+            <View style={{ marginTop: 24, padding: 16, backgroundColor: `${theme.colors.error}20`, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.error }}>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: theme.colors.error, marginBottom: 8 }}>⚠️ Core Dependencies Missing!</Text>
+              <Text style={{ fontSize: 14, color: theme.colors.text, marginBottom: 16, lineHeight: 20 }}>
+                SauceBox requires both <Text style={{ color: theme.colors.primary, fontWeight: 'bold' }}>yt-dlp</Text> and <Text style={{ color: theme.colors.primary, fontWeight: 'bold' }}>ffmpeg</Text> to download videos, generate thumbnails, and extract clips. They are completely free and open-source tools.
+              </Text>
+
+              <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.primary, marginBottom: 4 }}>How to Install on Windows:</Text>
+              <View style={{ marginBottom: 12, paddingLeft: 8 }}>
+                <Text style={{ fontSize: 13, color: theme.colors.textSecondary }}>• The easiest way is using <Text style={{ color: theme.colors.primary }}>winget</Text> in PowerShell.</Text>
+                <Text style={{ fontSize: 13, color: theme.colors.textSecondary }}>• Open PowerShell and run: <Text style={{ fontFamily: 'monospace', backgroundColor: theme.colors.surfaceLight, padding: 2, borderRadius: 4 }}>winget install yt-dlp ffmpeg</Text></Text>
+                <Text style={{ fontSize: 13, color: theme.colors.textSecondary }}>• Alternatively, download the executables manually, put them in a folder, and set their custom paths above.</Text>
+              </View>
+
+              <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.primary, marginBottom: 4 }}>How to Install on macOS:</Text>
+              <View style={{ marginBottom: 12, paddingLeft: 8 }}>
+                <Text style={{ fontSize: 13, color: theme.colors.textSecondary }}>• The easiest way is using <Text style={{ color: theme.colors.primary }}>Homebrew</Text>.</Text>
+                <Text style={{ fontSize: 13, color: theme.colors.textSecondary }}>• Open Terminal and run: <Text style={{ fontFamily: 'monospace', backgroundColor: theme.colors.surfaceLight, padding: 2, borderRadius: 4 }}>brew install yt-dlp ffmpeg</Text></Text>
+              </View>
+
+              <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.primary, marginBottom: 4 }}>How to Install on Linux:</Text>
+              <View style={{ marginBottom: 12, paddingLeft: 8 }}>
+                <Text style={{ fontSize: 13, color: theme.colors.textSecondary, marginBottom: 4 }}>• Ubuntu/Debian: <Text style={{ fontFamily: 'monospace', backgroundColor: theme.colors.surfaceLight, padding: 2, borderRadius: 4 }}>sudo apt install ffmpeg yt-dlp</Text></Text>
+                <Text style={{ fontSize: 13, color: theme.colors.textSecondary }}>• Arch: <Text style={{ fontFamily: 'monospace', backgroundColor: theme.colors.surfaceLight, padding: 2, borderRadius: 4 }}>sudo pacman -S yt-dlp ffmpeg</Text></Text>
+              </View>
+              
+              <Text style={{ fontSize: 13, color: theme.colors.text, marginTop: 8, fontStyle: 'italic' }}>
+                Once installed globally, restart SauceBox or hit "Clear" on empty paths above to auto-detect them.
+              </Text>
+            </View>
+          )}
 
           <View style={{ marginTop: 24, paddingTop: 24, borderTopWidth: 1, borderTopColor: theme.colors.border }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -463,7 +545,6 @@ export default function SettingsTab() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>🧹 Maintenance & Cleanup</Text>
         <View style={styles.card}>
-          <Text style={styles.label}>Keep your massive collection healthy and optimized.</Text>
           
           <View style={[styles.switchRow, { marginTop: 16 }]}>
             <View style={styles.switchInfo}>

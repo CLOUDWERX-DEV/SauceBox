@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
 import { useStore } from '../store';
 import { theme } from '../theme';
 
@@ -45,22 +45,6 @@ export default function Sidebar({ activeTab, onTabChange }) {
           });
         }
       }
-    } else {
-      const sites = [
-        'https://www.pornhub.com/video/random',
-        'https://spankbang.com/s/random/',
-        'https://www.eporner.com/',
-        'https://www.xvideos.com/'
-      ];
-      const randomSite = sites[Math.floor(Math.random() * sites.length)];
-      openExternal(randomSite);
-      const notificationsEnabled = useStore.getState().settings?.systemNotifications !== false;
-      if (window.Notification && notificationsEnabled) {
-        new Notification('🎲 Time to stock up!', {
-          body: `Opening ${new URL(randomSite).hostname} for you...`,
-          icon: 'logo.png'
-        });
-      }
     }
   };
 
@@ -79,10 +63,10 @@ export default function Sidebar({ activeTab, onTabChange }) {
           <Text style={{ color: '#ffffff' }}>Sauce</Text>
           <Text style={{ color: theme.colors.primary }}>Box</Text>
         </Text>
-        <Text style={styles.logoSubtext}>Feeling Lucky? 🎲</Text>
+        {history.length > 0 && <Text style={styles.logoSubtext}>Feeling Lucky? 🎲</Text>}
       </TouchableOpacity>
 
-      <View style={styles.tabsContainer}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.tabsContentContainer}>
         {tabs.map((tab) => {
           const badgeCount = getBadgeCount(tab.id);
           return (
@@ -109,7 +93,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
             </TouchableOpacity>
           );
         })}
-      </View>
+      </ScrollView>
       
       <View style={styles.footer}>
         <View style={styles.statsCard}>
@@ -172,11 +156,11 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginTop: 4,
   },
-  tabsContainer: {
-    flex: 1,
+  tabsContentContainer: {
     gap: 8,
     paddingHorizontal: 16,
     paddingTop: 24,
+    paddingBottom: 24,
   },
   tab: {
     flexDirection: 'row',

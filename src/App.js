@@ -324,7 +324,7 @@ export default function App() {
       <TitleBar vaultEnabled={vaultEnabled} onLock={() => setIsUnlocked(false)} />
       <View style={styles.content}>
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        <MainContent activeTab={activeTab} />
+        <MainContent activeTab={activeTab} onNavigate={setActiveTab} />
       </View>
     </View>
   );

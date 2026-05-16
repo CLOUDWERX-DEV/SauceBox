@@ -1,7 +1,13 @@
 {
   "name": "saucebox",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "The Ultimate Local Video Downloader",
+  "author": {
+    "name": "CLOUDWERX LAB",
+    "email": "saucebox@cloudwerxlab.com",
+    "url": "http://cloudwerxlab.com"
+  },
+  "homepage": "https://github.com/CLOUDWERX-DEV/SauceBox",
   "main": "electron/main.js",
   "scripts": {
     "start": "webpack serve --mode development",
@@ -41,9 +47,10 @@
       "createDesktopShortcut": true
     },
     "linux": {
-      "target": ["AppImage", "deb", "rpm", "pacman", "tar.gz"],
+      "target": ["AppImage", "deb", "tar.gz"],
       "icon": "public/icon.png",
-      "category": "Video"
+      "category": "Video",
+      "maintainer": "CLOUDWERX LAB <saucebox@cloudwerxlab.com>"
     }
   },
   "dependencies": {

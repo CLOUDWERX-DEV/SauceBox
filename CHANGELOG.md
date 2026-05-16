@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.3] - 2026-05-16
+### Added
+- Browser Extension now sends URLs directly to the app when the toolbar icon is clicked.
+- System Binaries panel in Settings with auto-detection, browse buttons, and cross-platform installation guides for yt-dlp and ffmpeg.
+- Navigation links to the Download tab added to empty states in Queue and Gallery tabs.
+
+### Fixed
+- Help Modal layout issues by adding ScrollView wrappers for smaller window sizes.
+
+### Changed
+- Broadcast warning card updated with explicit server-side authentication security instructions.
+- Removed redundant UI text from the Settings tab maintenance section.
+
 ## [1.3.2] - 2026-05-14
 ### Added
 - Added a warning card to the Broadcast Tab to explicitly explain the network sharing implications of the current download directory.
@@ -8,6 +21,7 @@
 ### Fixed
 - Fixed an issue where copying the server URL to the clipboard on the Broadcast Tab threw a "Document is not focused" runtime error by adding a robust invisible-input fallback mechanism.
 - Corrected the branding color scheme of the "SauceBox" text in the main TitleBar and Sidebar to reflect pure white and primary orange.
+- Resolved `electron-builder` Linux compilation failures by adding missing `homepage`, `author` (email), and `linux.maintainer` fields to `package.json`, and removing unsupported `rpm` and `pacman` targets.
 
 ## [1.3.1] - 2026-05-14
 ### Fixed

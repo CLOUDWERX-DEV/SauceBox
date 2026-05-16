@@ -3,8 +3,11 @@
   "name": "SauceBox Companion",
   "version": "1.0.0",
   "description": "Send videos directly to your SauceBox desktop app.",
-  "permissions": ["contextMenus"],
+  "permissions": ["contextMenus", "activeTab"],
   "host_permissions": ["http://127.0.0.1:13337/"],
+  "action": {
+    "default_title": "Send to SauceBox"
+  },
   "icons": {
     "48": "icon.png",
     "128": "icon.png"

@@ -325,10 +325,13 @@ export default function BroadcastTab() {
       </View>
 
       <View style={styles.warningCard}>
-        <Text style={styles.warningCardTitle}>⚠️ Heads up!</Text>
+        <Text style={styles.warningCardTitle}>⚠️ Network Security Warning</Text>
         <Text style={styles.warningCardText}>
           The folder currently set as your download path ({settings.downloadPath || 'your downloads folder'}) will be fully shared over the network. 
-          Anyone with this server URL can access and play the media inside. Please make sure you are on a trusted network and only sharing what you intend to!
+          Anyone with this server URL can access and play the media inside.
+        </Text>
+        <Text style={[styles.warningCardText, { marginTop: 8, fontWeight: 'bold' }]}>
+          For improved security on untrusted networks, please enable "Require Authentication" in the Security section below and set a strong password. This ensures only authorized users can access your media streams.
         </Text>
       </View>
 

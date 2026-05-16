@@ -8,7 +8,7 @@ import ConfirmModal from '../ConfirmModal';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
-export default function QueueTab() {
+export default function QueueTab({ onNavigate }) {
   const downloads = useStore(state => state.downloads);
   const settings  = useStore(state => state.settings);
   const updateDownload = useStore(state => state.updateDownload);
@@ -271,7 +271,13 @@ export default function QueueTab() {
           <Text style={styles.emptyIcon}>📭</Text>
           <Text style={styles.emptyTitle}>Queue is Empty</Text>
           <Text style={styles.emptyText}>Add some downloads to get started!</Text>
-          <Text style={styles.emptyHint}>Head over to the Download tab to add videos</Text>
+          
+          <TouchableOpacity 
+            style={[styles.clearButton, { marginTop: 24, backgroundColor: theme.colors.primary, borderColor: theme.colors.primary }]} 
+            onPress={() => onNavigate && onNavigate('download')}
+          >
+            <Text style={[styles.clearButtonText, { color: '#000', fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase' }]}>Go to Download Tab</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <View style={styles.sectionsContainer}>

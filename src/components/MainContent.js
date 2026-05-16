@@ -5,19 +5,19 @@ import GalleryTab from './tabs/GalleryTab';
 import SettingsTab from './tabs/SettingsTab';
 import BroadcastTab from './tabs/BroadcastTab';
 
-export default function MainContent({ activeTab }) {
+export default function MainContent({ activeTab, onNavigate }) {
   const renderContent = () => {
     switch (activeTab) {
       case 'download':
         return <DownloadTab />;
       case 'queue':
-        return <QueueTab />;
+        return <QueueTab onNavigate={onNavigate} />;
       case 'history':
-        return <GalleryTab />;
+        return <GalleryTab onNavigate={onNavigate} />;
       case 'broadcast':
         return <BroadcastTab />;
       case 'settings':
-        return <SettingsTab />;
+        return <SettingsTab onNavigate={onNavigate} />;
       default:
         return <DownloadTab />;
     }
