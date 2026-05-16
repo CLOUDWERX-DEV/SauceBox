@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
 import { useStore } from '../store';
 import { theme } from '../theme';
+import logoSrc from '../../public/logo.png';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 const openExternal = (url) => ipcRenderer?.invoke('open-external', url);
@@ -41,7 +42,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
         if (window.Notification && notificationsEnabled) {
           new Notification('🎲 Random Local Sauce!', {
             body: `Enjoy: ${randomVideo.title}`,
-            icon: 'logo.png'
+            icon: logoSrc
           });
         }
       }
@@ -56,7 +57,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
         activeOpacity={0.7}
       >
         <Image 
-          source={{ uri: 'logo.png' }} 
+          source={{ uri: logoSrc }} 
           style={[styles.logo, isRotating && styles.logoRotating]} 
         />
         <Text style={styles.logoText}>

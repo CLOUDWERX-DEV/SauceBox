@@ -85,6 +85,12 @@ module.exports = (env, argv) => {
           test: /\.css$/,
           use: ['style-loader', 'css-loader'],
         },
+        {
+          // Inline images as base64 data URIs so they work in packaged
+          // Electron builds (file:// protocol, no static file server).
+          test: /\.(png|jpg|jpeg|gif|webp|svg)$/i,
+          type: 'asset/inline',
+        },
       ],
     },
 

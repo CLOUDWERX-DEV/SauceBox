@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { theme } from '../theme';
 import { useStore } from '../store';
+import logoSrc from '../../public/logo.png';
 import HelpModal from './HelpModal';
 import packageJson from '../../package.json';
 
@@ -20,7 +21,7 @@ export default function TitleBar({ vaultEnabled, onLock }) {
     <>
       <View style={styles.titleBar}>
         <View style={styles.titleSection}>
-          <Image source={{ uri: 'logo.png' }} style={styles.logo} />
+          <Image source={{ uri: logoSrc }} style={styles.logo} />
           <Text style={styles.title}>
             <Text style={{ color: '#ffffff' }}>Sauce</Text>
             <Text style={{ color: theme.colors.primary }}>Box</Text>

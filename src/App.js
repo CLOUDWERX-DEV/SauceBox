@@ -4,6 +4,7 @@ import TitleBar from './components/TitleBar';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import AppLock from './components/AppLock';
+import logoSrc from '../public/logo.png';
 
 import { useStore } from './store';
 
@@ -165,7 +166,7 @@ export default function App() {
             if (canNotify() && window.Notification) {
               new Notification('Download Complete', {
                 body: `${download.title} has finished downloading.`,
-                icon: 'logo.png'
+                icon: logoSrc
               });
             }
 
@@ -176,7 +177,7 @@ export default function App() {
             if (canNotify() && window.Notification) {
               new Notification('Download Failed', {
                 body: `${download.title} failed to download.`,
-                icon: 'logo.png'
+                icon: logoSrc
               });
             }
           }
