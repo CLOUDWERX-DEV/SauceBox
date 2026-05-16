@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut, session } = require('electron');
+const { app, BrowserWindow, globalShortcut, session, nativeImage } = require('electron');
 const path = require('path');
 const state = require('./state');
 
@@ -49,6 +49,15 @@ function createWindow() {
 if (app) {
   app.whenReady().then(() => {
     createWindow();
+
+    // On Linux, app.setIcon() is required to show the icon in the taskbar.
+    // BrowserWindow's `icon` option only sets the window decoration icon.
+    if (process.platform === 'linux') {
+      try {
+        const iconPath = path.join(__dirname, '../build/icons/256x256.png');
+        app.setIcon(nativeImage.createFromPath(iconPath));
+      } catch (_) { /* non-fatal — icon just won't show if file is missing */ }
+    }
     
     // Start local HTTP Server for Chrome Extension
     startExtensionServer();
