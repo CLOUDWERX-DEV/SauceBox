@@ -177,5 +177,11 @@ export const downloadStyles = StyleSheet.create({
     fontSize: 14,
     color: theme.colors.textSecondary,
     lineHeight: '22px',
+  },
+  link: {
+    color: theme.colors.primary,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
+    cursor: 'pointer',
   }
 });

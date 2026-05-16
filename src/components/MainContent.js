@@ -9,7 +9,7 @@ export default function MainContent({ activeTab, onNavigate }) {
   const renderContent = () => {
     switch (activeTab) {
       case 'download':
-        return <DownloadTab />;
+        return <DownloadTab onNavigate={onNavigate} />;
       case 'queue':
         return <QueueTab onNavigate={onNavigate} />;
       case 'history':

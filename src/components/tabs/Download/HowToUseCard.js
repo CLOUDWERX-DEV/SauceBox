@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { downloadStyles as styles } from './DownloadStyles';
 
-export default function HowToUseCard() {
+export default function HowToUseCard({ onNavigate }) {
   return (
     <View style={styles.tipsCard}>
       <Text style={styles.tipsTitle}>📖 How to Use SauceBox</Text>
@@ -21,11 +21,31 @@ export default function HowToUseCard() {
         </View>
         <View style={styles.tipItem}>
           <View style={styles.stepCircle}><Text style={styles.stepNumber}>4</Text></View>
-          <Text style={styles.tip}>Monitor progress in the Queue, or manage concurrent downloads in Settings.</Text>
+          <Text style={styles.tip}>
+            Monitor progress in the{' '}
+            <Text style={styles.link} onPress={() => onNavigate && onNavigate('queue')}>
+              Queue
+            </Text>
+            , or manage concurrent downloads in{' '}
+            <Text style={styles.link} onPress={() => onNavigate && onNavigate('settings')}>
+              Settings
+            </Text>
+            .
+          </Text>
         </View>
         <View style={styles.tipItem}>
           <View style={styles.stepCircle}><Text style={styles.stepNumber}>5</Text></View>
-          <Text style={styles.tip}>Head to the Gallery to play locally, cast to your VR headset, or trim scenes!</Text>
+          <Text style={styles.tip}>
+            Head to the{' '}
+            <Text style={styles.link} onPress={() => onNavigate && onNavigate('history')}>
+              Gallery
+            </Text>{' '}
+            to play locally,{' '}
+            <Text style={styles.link} onPress={() => onNavigate && onNavigate('broadcast')}>
+              cast
+            </Text>{' '}
+            to your VR headset, or trim scenes!
+          </Text>
         </View>
         <View style={styles.tipItem}>
           <View style={styles.stepCircle}><Text style={styles.stepNumber}>🧩</Text></View>

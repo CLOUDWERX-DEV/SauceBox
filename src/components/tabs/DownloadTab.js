@@ -12,7 +12,7 @@ import HowToUseCard from './Download/HowToUseCard';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
-export default function DownloadTab() {
+export default function DownloadTab({ onNavigate }) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('');
@@ -292,7 +292,7 @@ export default function DownloadTab() {
           </View>
 
           <View style={styles.bottomCardsContainer}>
-            <HowToUseCard />
+            <HowToUseCard onNavigate={onNavigate} />
           </View>
         </div>
       </div>
