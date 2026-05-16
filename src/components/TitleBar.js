@@ -183,11 +183,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   helpButton: {
-    width: 32,
-    height: 32,
+    width: 24,
+    height: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 16,
+    borderRadius: 12,
     backgroundColor: `${theme.colors.primary}20`,
     borderWidth: 1,
     borderColor: theme.colors.primary,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   },
   helpButtonText: {
     color: theme.colors.primary,
-    fontSize: 18,
+    fontSize: 13,
     fontWeight: '800',
   }
 });
