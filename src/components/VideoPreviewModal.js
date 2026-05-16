@@ -2,9 +2,10 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
 import { theme } from '../theme';
 
-// Standard quality levels we allow the user to pick from
 const STANDARD_QUALITIES = [
   { label: 'Best', value: 'best', desc: 'Highest quality the site offers' },
+  { label: '4K',   value: '2160', desc: 'Ultra HD (2160p)' },
+  { label: '2K',   value: '1440', desc: 'Quad HD (1440p)' },
   { label: '1080p', value: '1080', desc: 'Full HD' },
   { label: '720p',  value: '720',  desc: 'HD' },
   { label: '480p',  value: '480',  desc: 'SD' },

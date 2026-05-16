@@ -660,7 +660,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   sidebar: {
-    width: 260,
+    width: 220,
     backgroundColor: 'rgba(0,0,0,0.2)',
     borderRightWidth: 1,
     borderRightColor: theme.colors.border,
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 16,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     position: 'relative',
     transition: 'all 0.2s',
   },

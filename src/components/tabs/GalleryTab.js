@@ -29,6 +29,13 @@ export default function GalleryTab({ onNavigate }) {
   const [newTagText, setNewTagText] = useState('');
   const [editingVideo, setEditingVideo] = useState(null);
   const [importVisible, setImportVisible] = useState(false);
+
+  const formatResolutionBadge = (res) => {
+    if (!res) return '';
+    if (res.includes('2160')) return '4K';
+    if (res.includes('1440')) return '2K';
+    return res;
+  };
   const [clearConfirmVisible, setClearConfirmVisible] = useState(false);
   const [clearDiskToo, setClearDiskToo] = useState(false);
   const [deleteConfirmItem, setDeleteConfirmItem] = useState(null); // item pending delete
@@ -440,7 +447,7 @@ export default function GalleryTab({ onNavigate }) {
                     {item.resolution && (
                       <>
                         <Text style={styles.historyMetaDot}>•</Text>
-                        <Text style={styles.historyMetaText}>{item.resolution}</Text>
+                        <Text style={styles.historyMetaText}>{formatResolutionBadge(item.resolution)}</Text>
                       </>
                     )}
                     {item.filesize && (

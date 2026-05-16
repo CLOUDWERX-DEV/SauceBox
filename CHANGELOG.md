@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.4] - 2026-05-16
+### Added
+- **4K / 2K Resolution Support**: Extended the quality selector in Settings, VideoPreviewModal (the Preview button), and the download pipeline to support Ultra HD (2160p / 4K) and Quad HD (1440p / 2K) resolutions. yt-dlp format strings are updated to request the correct height, with automatic fallback to the next-closest quality if the site does not offer it.
+- **Internet Exposure Mode**: Added a new "Expose Server to the Internet" toggle in the Broadcast tab's Security section. When enabled, the app detects the user's public IP (via ipify), displays a second QR code card styled in a red danger theme, and shows the external URL alongside the local-network URL. A native confirmation dialog warns the user of the security implications before enabling.
+
+### Fixed
+- **Help Modal sidebar width**: Reduced the sidebar from 260px to 220px and tightened horizontal padding to prevent layout overflow on small windows.
+
+### Changed
+- **Quality resolution badges**: Gallery, Queue, and live download cards now display human-readable badges ("4K", "2K") instead of raw resolution strings like "2160p" / "1440p".
+- **Settings quality description**: Added an explanatory note above the quality selector explaining the fallback behaviour when a site does not offer the selected resolution.
+- **Broadcast Security section renamed**: Renamed "Security" to "Security & Exposure" to reflect the new internet-facing options.
+
 ## [1.3.3] - 2026-05-16
 ### Added
 - Browser Extension now sends URLs directly to the app when the toolbar icon is clicked.

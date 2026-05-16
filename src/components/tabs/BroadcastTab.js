@@ -36,7 +36,9 @@ export default function BroadcastTab() {
   const [password, setPassword] = useState(settings.broadcastPassword || '');
   const [dlnaEnabled, setDlnaEnabled] = useState(settings.broadcastDlna !== false);
   const [transcodeEnabled, setTranscodeEnabled] = useState(settings.broadcastTranscode || false);
+  const [exposeInternetEnabled, setExposeInternetEnabled] = useState(settings.broadcastExposeInternet || false);
   const [localIp, setLocalIp] = useState('127.0.0.1');
+  const [externalIp, setExternalIp] = useState(null);
 
   useEffect(() => {
     updateSettings({
@@ -47,9 +49,10 @@ export default function BroadcastTab() {
       broadcastPassword: password,
       broadcastDlna: dlnaEnabled,
       broadcastTranscode: transcodeEnabled,
+      broadcastExposeInternet: exposeInternetEnabled,
       broadcastPlaylist: playlist.map(v => v.id)
     });
-  }, [port, serverName, authEnabled, username, password, dlnaEnabled, transcodeEnabled, playlist]);
+  }, [port, serverName, authEnabled, username, password, dlnaEnabled, transcodeEnabled, exposeInternetEnabled, playlist]);
 
   useEffect(() => {
     // Restore playlist from settings
@@ -61,6 +64,17 @@ export default function BroadcastTab() {
 
   useEffect(() => {
     ipcRenderer?.invoke('get-local-ip').then(ip => setLocalIp(ip));
+    
+    const fetchExternalIp = async () => {
+      try {
+        const res = await fetch('https://api.ipify.org?format=json');
+        const data = await res.json();
+        if (data.ip) setExternalIp(data.ip);
+      } catch (err) {
+        console.error('Failed to fetch external IP:', err);
+      }
+    };
+    fetchExternalIp();
     
     // If the component remounts, check if the global serverStatus says we are running.
     if (serverStatus?.running) {
@@ -353,23 +367,67 @@ export default function BroadcastTab() {
       </View>
 
       {serverRunning && (
-        <View style={styles.activeInfoCard}>
-          <View style={styles.activeInfoQr}>
-            <QRCode value={`http://${localIp}:${port}`} size={120} bgColor={`${theme.colors.primary}10`} fgColor={theme.colors.text} />
-            <Text style={styles.qrTextSmall}>Scan to Connect</Text>
+        <View style={{ gap: 24, marginBottom: 32 }}>
+          <View style={styles.activeInfoCard}>
+            <View style={styles.activeInfoQr}>
+              <QRCode value={`http://${localIp}:${port}`} size={120} bgColor={`${theme.colors.primary}10`} fgColor={theme.colors.text} />
+              <Text style={styles.qrTextSmall}>Scan to Connect</Text>
+            </View>
+            <View style={styles.activeInfoDetails}>
+              <Text style={styles.activeLabel}>Local Network Server:</Text>
+              <View style={styles.ipContainer}>
+                <Text style={styles.ipText}>http://{localIp}:{port}</Text>
+                <TouchableOpacity 
+                  style={styles.copyButton}
+                  onPress={() => {
+                    const copyUrl = `http://${localIp}:${port}`;
+                    if (navigator.clipboard && window.isSecureContext) {
+                      navigator.clipboard.writeText(copyUrl)
+                        .then(() => alert('Copied to clipboard!'))
+                        .catch(err => {
+                          const el = document.createElement('textarea');
+                          el.value = copyUrl;
+                          document.body.appendChild(el);
+                          el.select();
+                          document.execCommand('copy');
+                          document.body.removeChild(el);
+                          alert('Copied to clipboard!');
+                        });
+                    } else {
+                      const el = document.createElement('textarea');
+                      el.value = copyUrl;
+                      document.body.appendChild(el);
+                      el.select();
+                      document.execCommand('copy');
+                      document.body.removeChild(el);
+                      alert('Copied to clipboard!');
+                    }
+                  }}
+                >
+                  <Text style={styles.copyButtonText}>Copy URL</Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.hintText}>Make sure your TV or VR Headset is on the same WiFi network.</Text>
+            </View>
           </View>
-          <View style={styles.activeInfoDetails}>
-            <Text style={styles.activeLabel}>Connect your devices to:</Text>
-            <View style={styles.ipContainer}>
-              <Text style={styles.ipText}>http://{localIp}:{port}</Text>
-              <TouchableOpacity 
-                style={styles.copyButton}
-                onPress={() => {
-                  const copyUrl = `http://${localIp}:${port}`;
-                  if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(copyUrl)
-                      .then(() => alert('Copied to clipboard!'))
-                      .catch(err => {
+
+          {exposeInternetEnabled && externalIp && (
+            <View style={[styles.activeInfoCard, { borderColor: theme.colors.error, backgroundColor: `${theme.colors.error}10` }]}>
+              <View style={[styles.activeInfoQr, { borderColor: theme.colors.error }]}>
+                <QRCode value={`http://${externalIp}:${port}`} size={120} bgColor={`${theme.colors.error}10`} fgColor={theme.colors.text} />
+                <Text style={[styles.qrTextSmall, { color: theme.colors.error }]}>Scan to Connect</Text>
+              </View>
+              <View style={styles.activeInfoDetails}>
+                <Text style={styles.activeLabel}>Public Internet Server:</Text>
+                <View style={[styles.ipContainer, { borderColor: theme.colors.error }]}>
+                  <Text style={[styles.ipText, { color: theme.colors.error }]}>http://{externalIp}:{port}</Text>
+                  <TouchableOpacity 
+                    style={styles.copyButton}
+                    onPress={() => {
+                      const copyUrl = `http://${externalIp}:${port}`;
+                      if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(copyUrl).then(() => alert('Copied to clipboard!')).catch(err => alert('Failed to copy.'));
+                      } else {
                         const el = document.createElement('textarea');
                         el.value = copyUrl;
                         document.body.appendChild(el);
@@ -377,23 +435,16 @@ export default function BroadcastTab() {
                         document.execCommand('copy');
                         document.body.removeChild(el);
                         alert('Copied to clipboard!');
-                      });
-                  } else {
-                    const el = document.createElement('textarea');
-                    el.value = copyUrl;
-                    document.body.appendChild(el);
-                    el.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(el);
-                    alert('Copied to clipboard!');
-                  }
-                }}
-              >
-                <Text style={styles.copyButtonText}>Copy URL</Text>
-              </TouchableOpacity>
+                      }
+                    }}
+                  >
+                    <Text style={styles.copyButtonText}>Copy URL</Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.hintText}>Warning: This requires Port Forwarding on your router to work.</Text>
+              </View>
             </View>
-            <Text style={styles.hintText}>Make sure your TV or VR Headset is on the same WiFi network.</Text>
-          </View>
+          )}
         </View>
       )}
 
@@ -444,9 +495,29 @@ export default function BroadcastTab() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🔒 Security</Text>
+        <Text style={styles.sectionTitle}>🔒 Security & Exposure</Text>
         <View style={styles.card}>
           <View style={styles.switchRow}>
+            <View style={styles.switchInfo}>
+              <Text style={styles.switchLabel}>Expose Server to the Internet</Text>
+              <Text style={styles.switchDesc}>Show your public IP address to access the server from anywhere. Requires port forwarding on your router.</Text>
+            </View>
+            <Switch
+              value={exposeInternetEnabled}
+              onValueChange={(val) => {
+                if (val) {
+                  const confirm = window.confirm("WARNING: Exposing your media server to the internet can be dangerous. Anyone with your public IP address and port can access your videos if port forwarding is enabled on your router. We HIGHLY recommend enabling 'Require Authentication' below before doing this.\n\nAre you sure you want to enable this feature?");
+                  if (!confirm) return;
+                }
+                setExposeInternetEnabled(val);
+              }}
+              disabled={serverRunning}
+              trackColor={{ false: theme.colors.surfaceLight, true: `${theme.colors.error}40` }}
+              thumbColor={exposeInternetEnabled ? theme.colors.error : theme.colors.textTertiary}
+            />
+          </View>
+
+          <View style={[styles.switchRow, { marginTop: 24, borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 24 }]}>
             <View style={styles.switchInfo}>
               <Text style={styles.switchLabel}>Require Authentication</Text>
               <Text style={styles.switchDesc}>Require a username and password to access the web interface</Text>

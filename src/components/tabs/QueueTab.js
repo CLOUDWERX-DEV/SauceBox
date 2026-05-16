@@ -18,6 +18,13 @@ export default function QueueTab({ onNavigate }) {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [clearConfirmVisible, setClearConfirmVisible] = useState(false);
 
+  const formatResolutionBadge = (res) => {
+    if (!res) return '';
+    if (res.includes('2160')) return '4K';
+    if (res.includes('1440')) return '2K';
+    return res;
+  };
+
   const formatDuration = (seconds) => {
     if (!seconds) return 'Unknown';
     const mins = Math.floor(seconds / 60);
@@ -180,7 +187,7 @@ export default function QueueTab({ onNavigate }) {
           </View>
           <Text style={styles.downloadMeta}>
             {formatDuration(download.duration)}
-            {download.resolution && ` • ${download.resolution}`}
+            {download.resolution && ` • ${formatResolutionBadge(download.resolution)}`}
             {download.filesize && ` • ${formatFileSize(download.filesize)}`}
           </Text>
           

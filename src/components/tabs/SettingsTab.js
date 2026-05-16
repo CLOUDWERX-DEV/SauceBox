@@ -170,6 +170,8 @@ export default function SettingsTab({ onNavigate }) {
 
   const qualityOptions = [
     { value: 'best', label: 'Best Quality', desc: 'Highest available quality', icon: '👑' },
+    { value: '2160', label: '4K (2160p)', desc: 'Ultra HD', icon: '💎' },
+    { value: '1440', label: '2K (1440p)', desc: 'Quad HD', icon: '✨' },
     { value: '1080', label: '1080p', desc: 'Full HD', icon: '🎬' },
     { value: '720',  label: '720p',  desc: 'HD',      icon: '📺' },
     { value: '480',  label: '480p',  desc: 'SD',       icon: '📱' },
@@ -233,6 +235,9 @@ export default function SettingsTab({ onNavigate }) {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>🎬 Video Quality</Text>
         <View style={styles.card}>
+          <Text style={{ color: theme.colors.textSecondary, marginBottom: 16, lineHeight: 20 }}>
+            SauceBox will attempt to download the exact resolution you select below. If the video site does not offer the selected resolution (or higher), SauceBox will automatically fallback to the closest available quality underneath it to ensure the download succeeds.
+          </Text>
           {qualityOptions.map((option) => (
             <TouchableOpacity
               key={option.value}
