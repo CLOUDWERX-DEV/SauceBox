@@ -13,9 +13,12 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [trimMode, setTrimMode] = useState(false);
-  const [startTime, setStartTime] = useState('00:00:00');
-  const [endTime, setEndTime] = useState('00:00:30');
+  const [startSec, setStartSec] = useState(0);
+  const [endSec, setEndSec] = useState(30);
+  const [durationSec, setDurationSec] = useState(0);
+  const [isDragging, setIsDragging] = useState(null); // 'start' or 'end'
   const [trimming, setTrimming] = useState(false);
+  const trimmerRef = useRef(null);
 
   // Clip options
   const [addToGallery, setAddToGallery] = useState(true);
@@ -32,8 +35,16 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
   const formatDuration = (seconds) => {
     if (!seconds) return 'Unknown';
     const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const formatHHMMSS = (seconds) => {
+    const s = Math.floor(seconds || 0);
+    const hrs = Math.floor(s / 3600);
+    const mins = Math.floor((s % 3600) / 60);
+    const secs = s % 60;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   const formatFileSize = (bytes) => {
@@ -65,6 +76,14 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
   const handleLoadedData = () => {
     setLoading(false);
     if (videoRef.current) {
+      const d = videoRef.current.duration || 0;
+      setDurationSec(d);
+      if (endSec === 30 && d > 0 && d < 30) {
+        setEndSec(d);
+      } else if (endSec === 30 && d > 0) {
+        setEndSec(Math.min(30, d));
+      }
+
       videoRef.current.play().catch(err => {
         console.error('Playback error:', err);
         setError('Failed to play video');
@@ -96,21 +115,45 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
     }
   };
 
-  // Parse HH:MM:SS or plain seconds into seconds number
-  const parseTime = (str) => {
-    if (!str) return 0;
-    const parts = str.split(':').map(Number);
-    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
-    if (parts.length === 2) return parts[0] * 60 + parts[1];
-    return parts[0] || 0;
-  };
+  // Live scrubbing logic
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handlePointerMove = (e) => {
+      if (!trimmerRef.current) return;
+      const rect = trimmerRef.current.getBoundingClientRect();
+      let percent = (e.clientX - rect.left) / rect.width;
+      percent = Math.max(0, Math.min(1, percent));
+      
+      const newSec = percent * durationSec;
+      
+      if (isDragging === 'start') {
+        const validStart = Math.min(newSec, endSec - 1);
+        setStartSec(validStart);
+        if (videoRef.current) videoRef.current.currentTime = validStart;
+      } else {
+        const validEnd = Math.max(newSec, startSec + 1);
+        setEndSec(validEnd);
+        if (videoRef.current) videoRef.current.currentTime = validEnd;
+      }
+    };
+
+    const handlePointerUp = () => {
+      setIsDragging(null);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+  }, [isDragging, durationSec, startSec, endSec]);
 
   const handleSaveClip = async () => {
-    if (!startTime || !endTime) return alert('Enter valid start and end times');
-    const startSec = parseTime(startTime);
-    const endSec = parseTime(endTime);
     if (endSec <= startSec) return alert('End time must be after start time');
-    const durationSec = endSec - startSec;
+    const durationClipSec = endSec - startSec;
 
     try {
       setTrimming(true);
@@ -119,8 +162,8 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
       await ipcRenderer?.invoke('trim-video', {
         inputPath: videoPath,
         outputPath: newPath,
-        startTime,
-        duration: durationSec.toString(),
+        startTime: formatHHMMSS(startSec),
+        duration: durationClipSec.toString(),
       });
 
       // Generate a fresh thumbnail for the clip from its actual frames
@@ -141,7 +184,7 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
           timestamp: Date.now(),
           path: newPath,
           title: `${videoTitle || 'Clip'} (clip)`,
-          duration: durationSec,
+          duration: durationClipSec,
           filesize: null,
           thumbnail: clipThumbnail,
           tags: [...(originalItem?.tags || [])],
@@ -209,33 +252,69 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
               </View>
             </View>
 
-            {trimMode && (
-              <View style={styles.trimPanel}>
-                <View style={styles.trimInputsRow}>
-                  <View style={styles.trimInputGroup}>
-                    <Text style={styles.trimLabel}>Start (HH:MM:SS)</Text>
-                    <input
-                      style={styles.trimInput}
-                      value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                    />
+            {trimMode && (() => {
+              const startPercent = durationSec > 0 ? (startSec / durationSec) * 100 : 0;
+              const endPercent = durationSec > 0 ? (endSec / durationSec) * 100 : 100;
+              
+              return (
+                <View style={styles.trimPanel}>
+                  {/* Visual Scrubber Track */}
+                  <View style={styles.trimmerTrackContainer} ref={trimmerRef}>
+                    <View style={styles.trimmerBackground} />
+                    <View style={[styles.trimmerHighlight, { left: `${startPercent}%`, width: `${endPercent - startPercent}%` }]} />
+                    
+                    <View 
+                      style={[styles.trimmerHandle, { left: `${startPercent}%` }]} 
+                      onPointerDown={(e) => { e.preventDefault(); setIsDragging('start'); }}
+                    >
+                      <View style={styles.trimmerHandleKnob} />
+                    </View>
+                    
+                    <View 
+                      style={[styles.trimmerHandle, { left: `${endPercent}%` }]} 
+                      onPointerDown={(e) => { e.preventDefault(); setIsDragging('end'); }}
+                    >
+                      <View style={styles.trimmerHandleKnob} />
+                    </View>
                   </View>
-                  <View style={styles.trimInputGroup}>
-                    <Text style={styles.trimLabel}>End (HH:MM:SS)</Text>
-                    <input
-                      style={styles.trimInput}
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                    />
+
+                  <View style={styles.trimInputsRow}>
+                    <TouchableOpacity 
+                      style={styles.setCurrentButton} 
+                      onPress={() => {
+                        const cur = videoRef.current?.currentTime || 0;
+                        setStartSec(Math.min(cur, endSec - 1));
+                      }}
+                    >
+                      <Text style={styles.setCurrentButtonText}>[ Set Start</Text>
+                    </TouchableOpacity>
+
+                    <View style={styles.timeDisplay}>
+                      <Text style={styles.trimTimeText}>{formatHHMMSS(startSec)}</Text>
+                      <Text style={styles.trimTimeDivider}> — </Text>
+                      <Text style={styles.trimTimeText}>{formatHHMMSS(endSec)}</Text>
+                    </View>
+
+                    <TouchableOpacity 
+                      style={styles.setCurrentButton} 
+                      onPress={() => {
+                        const cur = videoRef.current?.currentTime || 0;
+                        setEndSec(Math.max(cur, startSec + 1));
+                      }}
+                    >
+                      <Text style={styles.setCurrentButtonText}>Set End ]</Text>
+                    </TouchableOpacity>
+                    
+                    <View style={{ flex: 1 }} />
+
+                    <TouchableOpacity
+                      style={[styles.saveClipButton, trimming && { opacity: 0.5 }]}
+                      onPress={handleSaveClip}
+                      disabled={trimming}
+                    >
+                      <Text style={styles.saveClipButtonText}>{trimming ? '✂️ Clipping...' : '💾 Save Clip'}</Text>
+                    </TouchableOpacity>
                   </View>
-                  <TouchableOpacity
-                    style={[styles.saveClipButton, trimming && { opacity: 0.5 }]}
-                    onPress={handleSaveClip}
-                    disabled={trimming}
-                  >
-                    <Text style={styles.saveClipButtonText}>{trimming ? '✂️ Clipping...' : '💾 Save Clip'}</Text>
-                  </TouchableOpacity>
-                </View>
 
                 {/* Clip options */}
                 <View style={styles.clipOptions}>
@@ -268,8 +347,9 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
                     </Text>
                   </TouchableOpacity>
                 </View>
-              </View>
-            )}
+                </View>
+              );
+            })()}
 
             <View style={styles.videoContainer}>
               {loading && (
@@ -433,24 +513,82 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     gap: 20,
   },
-  trimInputGroup: {
-    flexDirection: 'column',
-    gap: 4,
+  trimmerTrackContainer: {
+    height: 40,
+    width: '100%',
+    position: 'relative',
+    justifyContent: 'center',
+    marginBottom: 8,
+    cursor: 'pointer',
   },
-  trimLabel: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
+  trimmerBackground: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 8,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 4,
+  },
+  trimmerHighlight: {
+    position: 'absolute',
+    height: 8,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 4,
+  },
+  trimmerHandle: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 24,
+    marginLeft: -12, // Center the handle over the exact percentage
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+    cursor: 'ew-resize',
+  },
+  trimmerHandleKnob: {
+    width: 8,
+    height: 24,
+    backgroundColor: '#fff',
+    borderRadius: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  setCurrentButton: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    cursor: 'pointer',
+  },
+  setCurrentButtonText: {
+    color: '#fff',
+    fontSize: 13,
     fontWeight: '600',
   },
-  trimInput: {
-    backgroundColor: theme.colors.surface,
-    border: `1px solid ${theme.colors.border}`,
+  timeDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 6,
-    color: theme.colors.text,
-    padding: '8px 12px',
+  },
+  trimTimeText: {
+    color: theme.colors.primary,
+    fontSize: 16,
+    fontWeight: '700',
+    fontFamily: 'monospace',
+  },
+  trimTimeDivider: {
+    color: theme.colors.textSecondary,
     fontSize: 14,
-    width: 140,
-    outline: 'none',
+    marginHorizontal: 8,
   },
   saveClipButton: {
     backgroundColor: theme.colors.primary,
