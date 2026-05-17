@@ -118,33 +118,41 @@ export default function GalleryCard({
         <View style={styles.metaBadgeGrid}>
           {/* Row 1: Duration + Resolution */}
           <View style={styles.metaBadgeRow}>
-            <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
-              <Text style={styles.metaBadgeIcon}>⏱️</Text>
-              <Text style={styles.metaBadgeText} numberOfLines={1}>
-                {formatDuration(item.duration)}
-              </Text>
-            </View>
-            <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
-              <Text style={styles.metaBadgeIcon}>📺</Text>
-              <Text style={styles.metaBadgeText} numberOfLines={1}>
-                {item.resolution ? formatResolutionBadge(item.resolution) : '—'}
-              </Text>
-            </View>
+            <Tooltip content="Duration" position="top">
+              <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+                <Text style={styles.metaBadgeIcon}>⏱️</Text>
+                <Text style={styles.metaBadgeText} numberOfLines={1}>
+                  {formatDuration(item.duration)}
+                </Text>
+              </View>
+            </Tooltip>
+            <Tooltip content="Resolution" position="top">
+              <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+                <Text style={styles.metaBadgeIcon}>📺</Text>
+                <Text style={styles.metaBadgeText} numberOfLines={1}>
+                  {item.resolution ? formatResolutionBadge(item.resolution) : '—'}
+                </Text>
+              </View>
+            </Tooltip>
           </View>
           {/* Row 2: Filesize + Age */}
           <View style={styles.metaBadgeRow}>
-            <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
-              <Text style={styles.metaBadgeIcon}>💾</Text>
-              <Text style={styles.metaBadgeText} numberOfLines={1}>
-                {item.filesize ? formatFileSize(item.filesize) : '—'}
-              </Text>
-            </View>
-            <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
-              <Text style={styles.metaBadgeIcon}>🕒</Text>
-              <Text style={styles.metaBadgeText} numberOfLines={1}>
-                {item.timestamp ? formatDate(item.timestamp) : '—'}
-              </Text>
-            </View>
+            <Tooltip content="File Size" position="top">
+              <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+                <Text style={styles.metaBadgeIcon}>💾</Text>
+                <Text style={styles.metaBadgeText} numberOfLines={1}>
+                  {item.filesize ? formatFileSize(item.filesize) : '—'}
+                </Text>
+              </View>
+            </Tooltip>
+            <Tooltip content="Date Added" position="top">
+              <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+                <Text style={styles.metaBadgeIcon}>🕒</Text>
+                <Text style={styles.metaBadgeText} numberOfLines={1}>
+                  {item.timestamp ? formatDate(item.timestamp) : '—'}
+                </Text>
+              </View>
+            </Tooltip>
           </View>
         </View>
         

@@ -110,41 +110,49 @@ export default function DownloadCard({
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4, marginBottom: 12, flexWrap: 'wrap' }}>
             {/* Duration Badge */}
-            <View style={styles.metaBadge}>
-              <Text style={styles.metaBadgeIcon}>⏱️</Text>
-              <Text style={styles.metaBadgeText}>
-                {formatDuration(download.duration)}
-              </Text>
-            </View>
+            <Tooltip content="Duration" position={index === 0 ? "bottom" : "top"}>
+              <View style={styles.metaBadge}>
+                <Text style={styles.metaBadgeIcon}>⏱️</Text>
+                <Text style={styles.metaBadgeText}>
+                  {formatDuration(download.duration)}
+                </Text>
+              </View>
+            </Tooltip>
 
             {/* Resolution Badge */}
             {download.resolution && (
-              <View style={styles.metaBadge}>
-                <Text style={styles.metaBadgeIcon}>📺</Text>
-                <Text style={styles.metaBadgeText}>
-                  {formatResolutionBadge(download.resolution)}
-                </Text>
-              </View>
+              <Tooltip content="Resolution" position={index === 0 ? "bottom" : "top"}>
+                <View style={styles.metaBadge}>
+                  <Text style={styles.metaBadgeIcon}>📺</Text>
+                  <Text style={styles.metaBadgeText}>
+                    {formatResolutionBadge(download.resolution)}
+                  </Text>
+                </View>
+              </Tooltip>
             )}
 
             {/* File Size Badge */}
             {download.filesize && (
-              <View style={styles.metaBadge}>
-                <Text style={styles.metaBadgeIcon}>💾</Text>
-                <Text style={styles.metaBadgeText}>
-                  {formatFileSize(download.filesize)}
-                </Text>
-              </View>
+              <Tooltip content="File Size" position={index === 0 ? "bottom" : "top"}>
+                <View style={styles.metaBadge}>
+                  <Text style={styles.metaBadgeIcon}>💾</Text>
+                  <Text style={styles.metaBadgeText}>
+                    {formatFileSize(download.filesize)}
+                  </Text>
+                </View>
+              </Tooltip>
             )}
 
             {/* Age Badge - use download.id which is Date.now() at queue time */}
             {download.id && formatDate(download.id) && (
-              <View style={styles.metaBadge}>
-                <Text style={styles.metaBadgeIcon}>🕒</Text>
-                <Text style={styles.metaBadgeText}>
-                  {formatDate(download.id)}
-                </Text>
-              </View>
+              <Tooltip content="Queued" position={index === 0 ? "bottom" : "top"}>
+                <View style={styles.metaBadge}>
+                  <Text style={styles.metaBadgeIcon}>🕒</Text>
+                  <Text style={styles.metaBadgeText}>
+                    {formatDate(download.id)}
+                  </Text>
+                </View>
+              </Tooltip>
             )}
           </View>
           

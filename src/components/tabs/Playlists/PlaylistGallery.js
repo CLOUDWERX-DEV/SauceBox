@@ -280,33 +280,41 @@ export default function PlaylistGallery({
                   <View style={styles.metaBadgeGrid}>
                     {/* Row 1: Video count + Duration */}
                     <View style={styles.metaBadgeRow}>
-                      <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
-                        <Text style={styles.metaBadgeIcon}>🎬</Text>
-                        <Text style={styles.metaBadgeText} numberOfLines={1}>
-                          {stats.count} videos
-                        </Text>
-                      </View>
-                      <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
-                        <Text style={styles.metaBadgeIcon}>⏱️</Text>
-                        <Text style={styles.metaBadgeText} numberOfLines={1}>
-                          {formatDuration(stats.totalDuration) || '—'}
-                        </Text>
-                      </View>
+                      <Tooltip content="Video Count" position="top">
+                        <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+                          <Text style={styles.metaBadgeIcon}>🎬</Text>
+                          <Text style={styles.metaBadgeText} numberOfLines={1}>
+                            {stats.count} videos
+                          </Text>
+                        </View>
+                      </Tooltip>
+                      <Tooltip content="Total Duration" position="top">
+                        <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+                          <Text style={styles.metaBadgeIcon}>⏱️</Text>
+                          <Text style={styles.metaBadgeText} numberOfLines={1}>
+                            {formatDuration(stats.totalDuration) || '—'}
+                          </Text>
+                        </View>
+                      </Tooltip>
                     </View>
                     {/* Row 2: Filesize + Created */}
                     <View style={styles.metaBadgeRow}>
-                      <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
-                        <Text style={styles.metaBadgeIcon}>💾</Text>
-                        <Text style={styles.metaBadgeText} numberOfLines={1}>
-                          {stats.totalSize > 0 ? formatSize(stats.totalSize) : '—'}
-                        </Text>
-                      </View>
-                      <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
-                        <Text style={styles.metaBadgeIcon}>🕒</Text>
-                        <Text style={styles.metaBadgeText} numberOfLines={1}>
-                          {formatDate(playlist.createdAt) || '—'}
-                        </Text>
-                      </View>
+                      <Tooltip content="Total Size" position="top">
+                        <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+                          <Text style={styles.metaBadgeIcon}>💾</Text>
+                          <Text style={styles.metaBadgeText} numberOfLines={1}>
+                            {stats.totalSize > 0 ? formatSize(stats.totalSize) : '—'}
+                          </Text>
+                        </View>
+                      </Tooltip>
+                      <Tooltip content="Date Created" position="top">
+                        <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+                          <Text style={styles.metaBadgeIcon}>🕒</Text>
+                          <Text style={styles.metaBadgeText} numberOfLines={1}>
+                            {formatDate(playlist.createdAt) || '—'}
+                          </Text>
+                        </View>
+                      </Tooltip>
                     </View>
                   </View>
                   <View style={styles.tagsContainer}>
