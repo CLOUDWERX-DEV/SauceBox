@@ -29,7 +29,7 @@ SauceBox is built from the ground up to handle, archive, and organize adult medi
 ## 🚀 Core Features
 
 *   ⚡ **Multi-Threaded Download Manager** — Paste single URLs or bulk lists to fetch ultra-high-quality media (up to 4K/2160p). Features a dynamic queue manager to monitor active network streams and track completed items.
-*   🎬 **Native Playback & Visual Video Trimmer** — Play offline files instantly in-app, or use the interactive visual timeline trimmer to extract highlight clips losslessly in milliseconds without re-encoding via FFmpeg.
+*   🎬 **GPU-Accelerated Native Playback & Visual Video Trimmer** — Play offline files instantly in the native GPU-accelerated player, or use the interactive visual timeline trimmer to extract highlight clips losslessly in milliseconds without re-encoding via FFmpeg.
 *   🗂️ **Curated Playlists & External Handoff** — Curate custom collections inside a safe drafting workspace. Support auto-advance sequenced playback or delegate the entire playlist queue to external media players (VLC/MPV).
 *   🔒 **Vault Security & Deep Stealth Mode** — Lock the application interface behind a secure 4-digit PIN screen on startup. Smash the global Stealth Hotkey (`Ctrl + Shift + H`) to instantly hide the app from the taskbar, pause active downloads, and mute audio.
 *   🌐 **"Send to SauceBox" Extension** — Dispatch video URLs directly to your local download queue in one click using the companion Manifest V3 browser extension.
