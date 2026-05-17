@@ -16,7 +16,7 @@ export default function QueueTab({ onNavigate }) {
   const updateDownload = useStore(state => state.updateDownload);
   const removeDownload = useStore(state => state.removeDownload);
   const clearQueue = useStore(state => state.clearQueue);
-  const [clearConfirmVisible, setClearConfirmVisible] = useState(false);
+  const [clearActiveConfirmVisible, setClearActiveConfirmVisible] = useState(false);
 
   const formatResolutionBadge = (res) => {
     if (!res) return '';
@@ -116,6 +116,28 @@ export default function QueueTab({ onNavigate }) {
   const activeDownloads = downloads.filter(d => d.status !== 'completed');
   const completedDownloads = downloads.filter(d => d.status === 'completed');
 
+  const handleClearActive = () => {
+    activeDownloads.forEach(async (d) => {
+      if (d.status === 'downloading') {
+        try {
+          await ipcRenderer?.invoke('pause-download', d.id);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    });
+    useStore.setState({
+      downloads: downloads.filter(d => d.status === 'completed')
+    });
+    setClearActiveConfirmVisible(false);
+  };
+
+  const handleClearCompleted = () => {
+    useStore.setState({
+      downloads: downloads.filter(d => d.status !== 'completed')
+    });
+  };
+
   return (
     <>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -124,15 +146,9 @@ export default function QueueTab({ onNavigate }) {
             <Text style={styles.title}>Download Queue</Text>
             <Text style={styles.subtitle}>
               Monitor, pause, and manage your active download streams ⏳
-              {downloads.filter(d => d.status !== 'completed').length > 0 && 
-                ` • ${downloads.filter(d => d.status !== 'completed').length} active 🔥`}
+              {activeDownloads.length > 0 && ` • ${activeDownloads.length} active 🔥`}
             </Text>
           </View>
-          {downloads.length > 0 && (
-            <TouchableOpacity style={styles.clearButton} onPress={() => setClearConfirmVisible(true)}>
-              <Text style={styles.clearButtonText}>🗑️ Clear Queue</Text>
-            </TouchableOpacity>
-          )}
         </View>
 
         {downloads.length === 0 ? (
@@ -141,7 +157,25 @@ export default function QueueTab({ onNavigate }) {
           <View style={styles.sectionsContainer}>
             {activeDownloads.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>⏳ Active Downloads</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottomWidth: 1, borderBottomColor: theme.colors.border, paddingBottom: 8 }}>
+                  <Text style={{ fontSize: 20, fontWeight: '700', color: theme.colors.text }}>
+                    ⏳ Active Downloads ({activeDownloads.length})
+                  </Text>
+                  <TouchableOpacity 
+                    style={{
+                      backgroundColor: `${theme.colors.error}15`,
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderRadius: 6,
+                      borderWidth: 1,
+                      borderColor: `${theme.colors.error}40`,
+                      cursor: 'pointer',
+                    }} 
+                    onPress={() => setClearActiveConfirmVisible(true)}
+                  >
+                    <Text style={{ color: theme.colors.error, fontSize: 12, fontWeight: '600' }}>🗑️ Clear Active</Text>
+                  </TouchableOpacity>
+                </View>
                 <View style={styles.downloadsList}>
                   {activeDownloads.map((download) => (
                     <DownloadCard 
@@ -166,7 +200,25 @@ export default function QueueTab({ onNavigate }) {
 
             {completedDownloads.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>✅ Completed ({completedDownloads.length})</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottomWidth: 1, borderBottomColor: theme.colors.border, paddingBottom: 8 }}>
+                  <Text style={{ fontSize: 20, fontWeight: '700', color: theme.colors.text }}>
+                    ✅ Completed ({completedDownloads.length})
+                  </Text>
+                  <TouchableOpacity 
+                    style={{
+                      backgroundColor: `${theme.colors.primary}15`,
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderRadius: 6,
+                      borderWidth: 1,
+                      borderColor: `${theme.colors.primary}40`,
+                      cursor: 'pointer',
+                    }} 
+                    onPress={handleClearCompleted}
+                  >
+                    <Text style={{ color: theme.colors.primary, fontSize: 12, fontWeight: '600' }}>🗑️ Clear Completed</Text>
+                  </TouchableOpacity>
+                </View>
                 <View style={styles.downloadsList}>
                   {completedDownloads.map((download) => (
                     <DownloadCard 
@@ -193,15 +245,13 @@ export default function QueueTab({ onNavigate }) {
       </ScrollView>
 
       <ConfirmModal
-        visible={clearConfirmVisible}
-        title="Clear Queue?"
-        message="Are you sure you want to clear all downloads from the queue? Active downloads will be stopped and removed."
-        confirmText="Clear Queue"
-        onConfirm={() => {
-          clearQueue();
-          setClearConfirmVisible(false);
-        }}
-        onCancel={() => setClearConfirmVisible(false)}
+        visible={clearActiveConfirmVisible}
+        title="Clear Active Downloads?"
+        message="Are you sure you want to stop and remove all active and paused downloads? Completed downloads will NOT be affected."
+        confirmText="Clear Active"
+        confirmColor={theme.colors.error}
+        onConfirm={handleClearActive}
+        onCancel={() => setClearActiveConfirmVisible(false)}
       />
     </>
   );
