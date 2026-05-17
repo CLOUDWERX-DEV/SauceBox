@@ -166,7 +166,7 @@ export default function QueueTab({ onNavigate }) {
 
             {completedDownloads.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>✅ Completed</Text>
+                <Text style={styles.sectionTitle}>✅ Completed ({completedDownloads.length})</Text>
                 <View style={styles.downloadsList}>
                   {completedDownloads.map((download) => (
                     <DownloadCard 
