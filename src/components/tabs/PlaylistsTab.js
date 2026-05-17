@@ -15,9 +15,8 @@ export default function PlaylistsTab() {
 
   const setQuickCastVideo = useStore(state => state.setQuickCastVideo);
 
-  const [activePlaylistId, setActivePlaylistId] = useState(null);
-
-  const activePlaylist = playlists.find(p => p.id === activePlaylistId);
+  // Maintain local editing state so edits aren't written to the global store until saved explicitly
+  const [editingPlaylist, setEditingPlaylist] = useState(null);
 
   const handleQuickCast = (playlist) => {
     const items = (playlist.items || [])
@@ -32,18 +31,16 @@ export default function PlaylistsTab() {
   };
 
   const handleCreate = () => {
-    const newPlaylist = {
+    // Open a fresh draft playlist. It is not saved to the store until they click "Save & Return"
+    setEditingPlaylist({
+      id: 'new-' + Date.now(),
       name: 'New Playlist',
       items: [],
       coverImage: null,
-    };
-    addPlaylist(newPlaylist);
-    // Open the newly created playlist for editing
-    // The ID is set by the store (Date.now()), so grab the latest one
-    setTimeout(() => {
-      const latest = useStore.getState().playlists[0];
-      if (latest) setActivePlaylistId(latest.id);
-    }, 50);
+      tags: [],
+      rating: 0,
+      isNew: true
+    });
   };
 
   const handlePlayVideo = async (video) => {
@@ -101,36 +98,55 @@ export default function PlaylistsTab() {
   };
 
   // View A: Playlist Gallery (no active playlist selected)
-  if (!activePlaylist) {
+  if (!editingPlaylist) {
     return (
       <PlaylistGallery
         playlists={playlists}
         history={history}
-        onOpen={(id) => setActivePlaylistId(id)}
+        onOpen={(id) => {
+          const playlist = playlists.find(p => p.id === id);
+          if (playlist) setEditingPlaylist({ ...playlist });
+        }}
         onCreate={handleCreate}
         onUpdatePlaylist={updatePlaylist}
         onPlay={(playlist) => handlePlayAll(playlist.items)}
         onQuickCast={handleQuickCast}
         onDelete={(id) => {
           deletePlaylist(id);
-          if (activePlaylistId === id) setActivePlaylistId(null);
         }}
       />
     );
   }
 
-  // View B: Playlist Editor (a playlist is selected)
+  // View B: Playlist Editor (a playlist draft is active)
   return (
     <PlaylistEditor
-      playlist={activePlaylist}
+      playlist={editingPlaylist}
       history={history}
-      onUpdatePlaylist={updatePlaylist}
-      onBack={() => setActivePlaylistId(null)}
+      onSave={(updated) => {
+        if (updated.isNew || (typeof updated.id === 'string' && updated.id.startsWith('new-'))) {
+          // Add to the global gallery store now that they hit save
+          const { isNew, ...cleanPlaylist } = updated;
+          addPlaylist({
+            ...cleanPlaylist,
+            id: Date.now().toString()
+          });
+        } else {
+          // Update the existing playlist in the store
+          updatePlaylist(updated.id, updated);
+        }
+        setEditingPlaylist(null);
+      }}
+      onBack={() => setEditingPlaylist(null)}
       onPlayAll={handlePlayAll}
       onPlayVideo={handlePlayVideo}
       onDelete={(id) => {
-        deletePlaylist(id);
-        setActivePlaylistId(null);
+        if (typeof id === 'string' && id.startsWith('new-')) {
+          setEditingPlaylist(null);
+        } else {
+          deletePlaylist(id);
+          setEditingPlaylist(null);
+        }
       }}
     />
   );

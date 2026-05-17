@@ -9,7 +9,7 @@ const { ipcRenderer } = window.require ? window.require('electron') : { ipcRende
 export default function PlaylistEditor({
   playlist,
   history,
-  onUpdatePlaylist,
+  onSave,
   onBack,
   onPlayAll,
   onPlayVideo,
@@ -22,29 +22,29 @@ export default function PlaylistEditor({
   const [coverModalVisible, setCoverModalVisible] = useState(false);
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
 
-  // Snapshot the playlist state at mount so Discard can revert to it
-  const initialSnapshot = useRef({
-    name: playlist.name,
-    items: [...(playlist.items || [])],
-    coverImage: playlist.coverImage,
-    tags: [...(playlist.tags || [])],
-    rating: playlist.rating,
-  });
+  const [draftPlaylist, setDraftPlaylist] = useState({ ...playlist });
+
+  const updateDraft = (fields) => {
+    setDraftPlaylist(prev => ({
+      ...prev,
+      ...fields
+    }));
+  };
 
   const handleCustomCover = async () => {
     if (!ipcRenderer) return;
     const filePath = await ipcRenderer.invoke('select-file', 'Select Custom Cover Image');
     if (filePath) {
-      onUpdatePlaylist(playlist.id, { coverImage: `file://${filePath}` });
+      updateDraft({ coverImage: `file://${filePath}` });
     }
   };
 
   // Resolve video IDs to actual history objects
   const playlistItems = useMemo(() => {
-    return (playlist.items || [])
+    return (draftPlaylist.items || [])
       .map(id => history.find(h => h.id === id))
       .filter(Boolean);
-  }, [playlist.items, history]);
+  }, [draftPlaylist.items, history]);
 
   // Compute stats
   const totalDuration = playlistItems.reduce((sum, v) => sum + (v.duration || 0), 0);
@@ -92,47 +92,47 @@ export default function PlaylistEditor({
     return vids;
   }, [history, searchQuery, sortBy]);
 
-  const isInPlaylist = (videoId) => (playlist.items || []).includes(videoId);
+  const isInPlaylist = (videoId) => (draftPlaylist.items || []).includes(videoId);
 
   const handleAddToPlaylist = (videoId) => {
     if (!isInPlaylist(videoId)) {
-      onUpdatePlaylist(playlist.id, {
-        items: [...(playlist.items || []), videoId]
+      updateDraft({
+        items: [...(draftPlaylist.items || []), videoId]
       });
     }
   };
 
   const handleRemoveFromPlaylist = (videoId) => {
-    onUpdatePlaylist(playlist.id, {
-      items: (playlist.items || []).filter(id => id !== videoId)
+    updateDraft({
+      items: (draftPlaylist.items || []).filter(id => id !== videoId)
     });
   };
 
   const handleMoveUp = (index) => {
     if (index === 0) return;
-    const items = [...(playlist.items || [])];
+    const items = [...(draftPlaylist.items || [])];
     const temp = items[index - 1];
     items[index - 1] = items[index];
     items[index] = temp;
-    onUpdatePlaylist(playlist.id, { items });
+    updateDraft({ items });
   };
 
   const handleMoveDown = (index) => {
-    const items = [...(playlist.items || [])];
+    const items = [...(draftPlaylist.items || [])];
     if (index === items.length - 1) return;
     const temp = items[index + 1];
     items[index + 1] = items[index];
     items[index] = temp;
-    onUpdatePlaylist(playlist.id, { items });
+    updateDraft({ items });
   };
 
   const handleShuffle = () => {
-    const shuffled = [...(playlist.items || [])].sort(() => Math.random() - 0.5);
-    onUpdatePlaylist(playlist.id, { items: shuffled });
+    const shuffled = [...(draftPlaylist.items || [])].sort(() => Math.random() - 0.5);
+    updateDraft({ items: shuffled });
   };
 
   const handleClearPlaylist = () => {
-    onUpdatePlaylist(playlist.id, { items: [] });
+    updateDraft({ items: [] });
   };
 
   // Drag and drop reordering
@@ -159,10 +159,10 @@ export default function PlaylistEditor({
     e.preventDefault();
     setDragOverIndex(null);
     if (draggedIndex === null || draggedIndex === dropIndex) return;
-    const items = [...(playlist.items || [])];
+    const items = [...(draftPlaylist.items || [])];
     const [moved] = items.splice(draggedIndex, 1);
     items.splice(dropIndex, 0, moved);
-    onUpdatePlaylist(playlist.id, { items });
+    updateDraft({ items });
     setDraggedIndex(null);
   };
 
@@ -194,9 +194,9 @@ export default function PlaylistEditor({
               {playlistItems.map((video, idx) => (
                 <TouchableOpacity 
                   key={idx}
-                  style={{ width: 120, height: 75, borderRadius: 8, overflow: 'hidden', borderWidth: 2, borderColor: playlist.coverImage === video.thumbnail ? theme.colors.primary : 'transparent', cursor: 'pointer' }}
+                  style={{ width: 120, height: 75, borderRadius: 8, overflow: 'hidden', borderWidth: 2, borderColor: draftPlaylist.coverImage === video.thumbnail ? theme.colors.primary : 'transparent', cursor: 'pointer' }}
                   onPress={() => {
-                    onUpdatePlaylist(playlist.id, { coverImage: video.thumbnail });
+                    updateDraft({ coverImage: video.thumbnail });
                     setCoverModalVisible(false);
                   }}
                 >
@@ -250,18 +250,7 @@ export default function PlaylistEditor({
               backgroundColor: theme.colors.surfaceLight, borderWidth: 1,
               borderColor: theme.colors.border, cursor: 'pointer',
             }}
-            onPress={() => {
-              // Revert every field back to the snapshot
-              const snap = initialSnapshot.current;
-              onUpdatePlaylist(playlist.id, {
-                name: snap.name,
-                items: snap.items,
-                coverImage: snap.coverImage,
-                tags: snap.tags,
-                rating: snap.rating,
-              });
-              onBack();
-            }}
+            onPress={onBack}
           >
             <Text style={{ color: theme.colors.textSecondary, fontWeight: '700', fontSize: 13 }}>↩ Discard</Text>
           </TouchableOpacity>
@@ -270,20 +259,20 @@ export default function PlaylistEditor({
           <TouchableOpacity
             style={{
               paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8,
-              backgroundColor: (playlist.items || []).length === 0 ? theme.colors.surfaceLight : theme.colors.primary,
+              backgroundColor: (draftPlaylist.items || []).length === 0 ? theme.colors.surfaceLight : theme.colors.primary,
               borderWidth: 1, borderColor: theme.colors.border,
-              cursor: (playlist.items || []).length === 0 ? 'not-allowed' : 'pointer',
-              opacity: (playlist.items || []).length === 0 ? 0.5 : 1,
+              cursor: (draftPlaylist.items || []).length === 0 ? 'not-allowed' : 'pointer',
+              opacity: (draftPlaylist.items || []).length === 0 ? 0.5 : 1,
             }}
             onPress={() => {
-              if ((playlist.items || []).length === 0) {
+              if ((draftPlaylist.items || []).length === 0) {
                 alert('Add at least one video before saving your playlist.');
                 return;
               }
-              onBack();
+              onSave(draftPlaylist);
             }}
           >
-            <Text style={{ color: (playlist.items || []).length === 0 ? theme.colors.textSecondary : '#000', fontWeight: '700', fontSize: 13 }}>💾 Save &amp; Return</Text>
+            <Text style={{ color: (draftPlaylist.items || []).length === 0 ? theme.colors.textSecondary : '#000', fontWeight: '700', fontSize: 13 }}>💾 Save &amp; Return</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -422,8 +411,8 @@ export default function PlaylistEditor({
               <Text style={{ fontSize: 16, marginRight: 8 }}>✏️</Text>
               <TextInput
                 style={[styles.nameInput, { flex: 1, borderWidth: 0, backgroundColor: 'transparent', padding: 10 }]}
-                value={playlist.name || ''}
-                onChangeText={(text) => onUpdatePlaylist(playlist.id, { name: text })}
+                value={draftPlaylist.name || ''}
+                onChangeText={(text) => updateDraft({ name: text })}
                 placeholder="Playlist Name..."
                 placeholderTextColor="#555"
               />
@@ -481,10 +470,10 @@ export default function PlaylistEditor({
                   onEndEditing={(e) => {
                     const newIndex = parseInt(e.nativeEvent.text, 10) - 1;
                     if (!isNaN(newIndex) && newIndex >= 0 && newIndex < playlistItems.length) {
-                      const newP = [...(playlist.items || [])];
+                      const newP = [...(draftPlaylist.items || [])];
                       const [movedItem] = newP.splice(index, 1);
                       newP.splice(newIndex, 0, movedItem);
-                      onUpdatePlaylist(playlist.id, { items: newP });
+                      updateDraft({ items: newP });
                     }
                   }}
                 />
