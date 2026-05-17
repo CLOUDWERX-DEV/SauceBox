@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   section: { marginBottom: 32 },
   sectionTitle: { fontSize: 18, fontWeight: '600', color: theme.colors.primary, marginBottom: 16 },
   subtitle: { fontSize: 16, color: theme.colors.textSecondary, fontStyle: 'italic' },
-  playlistContainer: { flexDirection: 'row', gap: 24, height: 600, marginTop: 16 },
+  playlistContainer: { flexDirection: 'row', gap: 24, height: 650, marginTop: 16 },
   playlistColumnLeft: {
     flex: 1,
     backgroundColor: theme.colors.surface,
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   playlistColumnRight: {
-    width: 420,
+    flex: 1,
     backgroundColor: theme.colors.surface,
     borderRadius: 12,
     borderWidth: 1,

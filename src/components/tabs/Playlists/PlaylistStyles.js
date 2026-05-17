@@ -260,7 +260,9 @@ export const styles = StyleSheet.create({
   editorContainer: {
     flexDirection: 'row',
     gap: 24,
-    height: 650,
+    flex: 1,
+    height: 'calc(100vh - 180px)',
+    minHeight: 500,
   },
   editorLeft: {
     flex: 1,
@@ -273,7 +275,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   editorRight: {
-    width: 420,
+    flex: 1,
     backgroundColor: theme.colors.surface,
     borderRadius: 16,
     borderWidth: 1,
