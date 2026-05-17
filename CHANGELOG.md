@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.5.0] - 2026-05-16
+
+### Added
+- **Visual Video Trimmer**: Completely overhauled the clipping tool in the Video Player. Removed the clunky manual time-input fields and replaced them with a premium, fully interactive dual-slider scrubbing track. Users can now grab the `Start` and `End` handles and visually scrub the video frame-by-frame to see exactly where their cuts will be placed.
+- **Quick-Cut Snapping**: Added `[ Set Start` and `Set End ]` buttons to the trimmer UI, allowing users to instantly snap the trim handles to the exact millisecond of the player's current playback position.
+
+### Fixed
+- **Clip Metadata Precision Bug**: Fixed a bug where clipped video durations were saving raw floating-point decimals to the database (e.g. `01:35.68021241830064s`), causing severe UI overflow. The UI metadata is now cleanly rounded, while the raw exact floating-point precision is secretly passed directly to the FFmpeg engine to guarantee frame-perfect video cuts.
+
 ## [1.4.0] - 2026-05-16
 
 ### Added
