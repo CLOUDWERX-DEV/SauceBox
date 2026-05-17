@@ -261,8 +261,6 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 24,
     flex: 1,
-    height: 'calc(100vh - 210px)',
-    minHeight: 450,
   },
   editorLeft: {
     flex: 1,

@@ -222,9 +222,9 @@ export default function PlaylistEditor({
   );
 
   return (
-    <View style={{ flex: 1, padding: 32, paddingBottom: 32 }}>
+    <View style={{ height: '100%', padding: 32, paddingBottom: 32, overflow: 'hidden' }}>
       {/* Header */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24, justifyContent: 'space-between' }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24, justifyContent: 'space-between', flexShrink: 0 }}>
         <Text style={{ fontSize: 24, fontWeight: '700', color: theme.colors.text }}>Edit Playlist</Text>
 
         {/* Right side button group */}
