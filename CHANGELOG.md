@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.9] - 2026-05-16
+
+### Fixed
+- **Sweet Spot Spacing Refinement**: Adjusted spacing in `DownloadStyles.js` to find the absolute "Goldilocks" sweet spot. Restored spacious premium paddings, titles, and margins while targeting precisely the `batchSection` bottom margin (reduced by 20px) and `content` padding-bottom (reduced by 12px) to save exactly 32px of vertical height. This perfectly eliminates the 1-10px scrollbar at default dimensions while ensuring zero dead space at the bottom of the screen.
+
 ## [1.3.8] - 2026-05-16
 
 ### Fixed
