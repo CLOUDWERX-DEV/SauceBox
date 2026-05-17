@@ -53,19 +53,19 @@ SauceBox natively integrates with `yt-dlp` to fetch and extract media from over 
 
 ## 📦 Setup & Installation
 
-SauceBox is fully cross-platform, supporting Windows, Linux, and macOS.
+SauceBox supports Windows and Linux natively, with macOS support coming very soon!
 
 ### 💿 Method A: Installing Pre-Compiled Releases (For General Users)
 
-Download the latest native installers for your operating system from our GitHub **Releases** page:
+Download the latest native installers for Windows and Linux from our GitHub **Releases** page:
 *   **Windows:** Download the standard `.exe` installer (NSIS executable) or the standalone portable executable.
-*   **macOS:** Download the `.dmg` disk image.
 *   **Linux:** Download the `.deb` package (Debian/Ubuntu) or the standalone `.AppImage` bundle.
     *   *Note for AppImage users:* Make the AppImage executable before launching:
         ```bash
         chmod +x SauceBox-*.AppImage
         ./SauceBox-*.AppImage
         ```
+*   **macOS:** *Coming very soon!* We do not currently publish pre-compiled macOS installers due to Apple Silicon hardware testing and developer licensing requirements. If you want to accelerate official macOS builds, please consider supporting development via a [donation](https://buymeacoffee.com/cloudwerxl3)! In the meantime, advanced users can compile and run from source (see below).
 
 ### 💻 Method B: Compiling & Running from Source (For Developers & Enthusiasts)
 
