@@ -357,7 +357,7 @@ export default function PlaylistEditor({
             </View>
           </View>
 
-          <ScrollView style={{ flex: 1 }}>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
             {filteredVideos.map(video => {
               const added = isInPlaylist(video.id);
               return (
@@ -390,7 +390,7 @@ export default function PlaylistEditor({
             })}
             {history.length === 0 ? (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyStateIcon}>🎬</Text>
+                <Text style={styles.emptyStateIcon}>🍿</Text>
                 <Text style={styles.emptyStateText}>Library is Empty</Text>
                 <Text style={styles.emptyStateSubText}>
                   Download or import videos to get started

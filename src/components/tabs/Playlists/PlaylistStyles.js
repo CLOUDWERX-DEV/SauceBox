@@ -536,7 +536,7 @@ export const styles = StyleSheet.create({
   },
   emptyStateIcon: {
     fontSize: 48,
-    opacity: 0.5,
+    marginBottom: 8,
   },
   emptyStateText: {
     fontSize: 16,

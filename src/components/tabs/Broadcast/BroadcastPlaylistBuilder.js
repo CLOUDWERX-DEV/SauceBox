@@ -93,7 +93,7 @@ export default function BroadcastPlaylistBuilder({
             </View>
           </View>
 
-          <ScrollView style={{ flex: 1 }}>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
             {filteredVideos.map(item => (
               <View key={item.id} style={styles.videoRow}>
                 <View style={{ width: 80, height: 45, marginRight: 12, position: 'relative' }}>
@@ -126,7 +126,7 @@ export default function BroadcastPlaylistBuilder({
             ))}
             {history.length === 0 ? (
               <View style={styles.emptyPlaylistState}>
-                <Text style={styles.emptyPlaylistIcon}>🎬</Text>
+                <Text style={styles.emptyPlaylistIcon}>🍿</Text>
                 <Text style={styles.emptyPlaylistTitle}>Library is Empty</Text>
                 <Text style={styles.emptyPlaylistSub}>Download or import videos to get started</Text>
               </View>
