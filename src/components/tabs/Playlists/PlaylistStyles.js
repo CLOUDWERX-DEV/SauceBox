@@ -36,7 +36,6 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: theme.colors.surface,
     borderRadius: 16,
-    overflow: 'hidden',
     borderWidth: 1,
     borderColor: theme.colors.border,
     cursor: 'default',
