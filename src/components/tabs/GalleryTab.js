@@ -59,7 +59,19 @@ export default function GalleryTab({ onNavigate }) {
       if (settings.customPlayerPath && settings.customPlayerPath.trim() !== '') {
         await ipcRenderer?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
       } else {
-        useStore.getState().setActiveBuiltinVideo({ ...item, path: videoPath });
+        // Map the filteredHistory into a playlist context with resolved fallback paths
+        const playlist = filteredHistory.map(h => {
+          if (h.path) return h;
+          const fallbackPath = `${settings.downloadPath}/${h.title}.mp4`;
+          return { ...h, path: fallbackPath };
+        });
+        const playlistIndex = filteredHistory.findIndex(h => h.id === item.id);
+        useStore.getState().setActiveBuiltinVideo({
+          ...item,
+          path: videoPath,
+          playlist,
+          playlistIndex: playlistIndex !== -1 ? playlistIndex : 0,
+        });
       }
     } catch (error) {
       console.error('Failed to find video:', error);

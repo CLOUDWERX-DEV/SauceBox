@@ -59,7 +59,23 @@ export default function PlaylistsTab() {
           customPlayerPath: settings.customPlayerPath,
         });
       } else {
-        useStore.getState().setActiveBuiltinVideo({ ...video, path: videoPath });
+        if (editingPlaylist && editingPlaylist.items) {
+          // Pre-resolve paths for all items in this playlist view
+          const playlist = editingPlaylist.items.map(v => {
+            if (v.path) return v;
+            const fallbackPath = `${settings.downloadPath}/${v.title}.mp4`;
+            return { ...v, path: fallbackPath };
+          });
+          const playlistIndex = editingPlaylist.items.findIndex(v => v.id === video.id);
+          useStore.getState().setActiveBuiltinVideo({
+            ...video,
+            path: videoPath,
+            playlist,
+            playlistIndex: playlistIndex !== -1 ? playlistIndex : 0,
+          });
+        } else {
+          useStore.getState().setActiveBuiltinVideo({ ...video, path: videoPath });
+        }
       }
     } catch (error) {
       console.error('Failed to play video:', error);
