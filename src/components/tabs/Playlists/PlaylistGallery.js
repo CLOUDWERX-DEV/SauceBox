@@ -317,8 +317,14 @@ export default function PlaylistGallery({
             <Text style={styles.emptyStateIcon}>🗂️</Text>
             <Text style={styles.emptyStateText}>No playlists yet</Text>
             <Text style={styles.emptyStateSubText}>
-              Click "New Playlist" above to create your first collection
+              Create your first playlist collection to get started!
             </Text>
+            <TouchableOpacity 
+              style={[styles.createPlaylistButton, { marginTop: 24 }]} 
+              onPress={onCreate}
+            >
+              <Text style={styles.createPlaylistButtonText}>➕ CREATE FIRST PLAYLIST</Text>
+            </TouchableOpacity>
           </View>
         )}
       </ScrollView>
