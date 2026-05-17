@@ -300,11 +300,11 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
 
                     {/* Playlist Name Badge */}
                     {originalItem?.playlistName && (
-                      <Tooltip content="Active Playlist Context" position="bottom">
+                      <Tooltip content={`Playlist: ${originalItem.playlistName}`} position="bottom">
                         <View style={[styles.metaBadge, { borderColor: '#FF8C0080', backgroundColor: '#FF8C0015' }]}>
                           <Text style={styles.metaBadgeIcon}>🎬</Text>
                           <Text style={[styles.metaBadgeText, { color: '#FF8C00', fontWeight: '700' }]}>
-                            Playlist: {originalItem.playlistName}
+                            Playlist: {originalItem.playlistName.length > 20 ? `${originalItem.playlistName.substring(0, 20)}...` : originalItem.playlistName}
                           </Text>
                         </View>
                       </Tooltip>
