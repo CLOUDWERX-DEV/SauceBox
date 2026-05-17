@@ -526,6 +526,76 @@ export const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
+  // Playlist Gallery Header & Stats
+  header: {
+    marginBottom: 32,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: theme.colors.text,
+    marginBottom: 4,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  statBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: `${theme.colors.primary}15`,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 6,
+    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+  },
+  statIcon: {
+    fontSize: 14,
+  },
+  statValue: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  statLabel: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  createPlaylistButton: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    cursor: 'pointer',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+    marginTop: 6,
+  },
+  createPlaylistButtonText: {
+    color: '#000',
+    fontSize: 15,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+
   // Empty state
   emptyState: {
     flex: 1,

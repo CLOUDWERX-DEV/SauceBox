@@ -1,10 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import VideoThumbnail from '../../VideoThumbnail';
 import ConfirmModal from '../../ConfirmModal';
 import { theme } from '../../../theme';
 import { styles } from './PlaylistStyles';
 import GalleryFilterBar from '../Gallery/GalleryFilterBar';
+
+const formatFileSize = (bytes) => {
+  const num = Number(bytes);
+  if (!num || isNaN(num)) return null;
+  const mb = num / (1024 * 1024);
+  const gb = num / (1024 * 1024 * 1024);
+  if (gb >= 1) return `${gb.toFixed(2)} GB`;
+  return `${mb.toFixed(2)} MB`;
+};
+
+const formatTotalDuration = (seconds) => {
+  const sec = Number(seconds);
+  if (!sec || isNaN(sec)) return null;
+  const days = Math.floor(sec / (24 * 3600));
+  const hours = Math.floor((sec % (24 * 3600)) / 3600);
+  const mins = Math.floor((sec % 3600) / 60);
+  
+  const parts = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0) parts.push(`${hours}h`);
+  if (mins > 0 || parts.length === 0) parts.push(`${mins}m`);
+  
+  return parts.join(' ');
+};
 
 export default function PlaylistGallery({
   playlists,
@@ -27,6 +51,23 @@ export default function PlaylistGallery({
   const [filterTags, setFilterTags] = useState([]);
 
   const allTags = Array.from(new Set(playlists.flatMap(p => p.tags || []))).sort();
+
+  // Compute global stats across ALL playlists (using unique video IDs to prevent double counting if the same video is in multiple playlists!)
+  const globalStats = useMemo(() => {
+    const allUniqueVideoIds = Array.from(new Set(playlists.flatMap(p => p.items || [])));
+    const uniqueVideos = allUniqueVideoIds
+      .map(id => history.find(h => h.id === id))
+      .filter(Boolean);
+      
+    const totalDuration = uniqueVideos.reduce((sum, v) => sum + (v.duration || 0), 0);
+    const totalSize = uniqueVideos.reduce((sum, v) => sum + (Number(v.filesize) || 0), 0);
+    
+    return {
+      totalPlaylists: playlists.length,
+      totalDuration,
+      totalSize,
+    };
+  }, [playlists, history]);
 
   const handleAddTag = (playlistId, tag) => {
     const playlist = playlists.find(p => p.id === playlistId);
@@ -109,14 +150,41 @@ export default function PlaylistGallery({
 
   return (
     <>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 32 }}>
-        <View style={{ marginBottom: 32 }}>
-          <Text style={{ fontSize: 32, fontWeight: '700', color: theme.colors.text, marginBottom: 8 }}>
-            Playlists
-          </Text>
-          <Text style={{ fontSize: 16, color: theme.colors.textSecondary, fontStyle: 'italic' }}>
-            Create and manage your personal video collections 🗂️
-          </Text>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 32, flexGrow: 1 }}>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.title}>Playlists</Text>
+            <View style={styles.statsContainer}>
+              <View style={styles.statBadge}>
+                <Text style={styles.statIcon}>🗂️</Text>
+                <Text style={styles.statValue}>
+                  {globalStats.totalPlaylists}
+                </Text>
+                <Text style={styles.statLabel}>
+                  {globalStats.totalPlaylists === 1 ? 'Playlist' : 'Playlists'}
+                </Text>
+              </View>
+
+              {globalStats.totalSize > 0 && (
+                <View style={styles.statBadge}>
+                  <Text style={styles.statIcon}>💾</Text>
+                  <Text style={styles.statValue}>{formatFileSize(globalStats.totalSize)}</Text>
+                  <Text style={styles.statLabel}>Storage</Text>
+                </View>
+              )}
+
+              {globalStats.totalDuration > 0 && (
+                <View style={styles.statBadge}>
+                  <Text style={styles.statIcon}>⏱️</Text>
+                  <Text style={styles.statValue}>{formatTotalDuration(globalStats.totalDuration)}</Text>
+                  <Text style={styles.statLabel}>Playtime</Text>
+                </View>
+              )}
+            </View>
+          </View>
+          <TouchableOpacity style={styles.createPlaylistButton} onPress={onCreate}>
+            <Text style={styles.createPlaylistButtonText}>➕ NEW PLAYLIST</Text>
+          </TouchableOpacity>
         </View>
 
         {playlists.length > 0 && (
@@ -131,10 +199,6 @@ export default function PlaylistGallery({
         )}
 
         <View style={styles.galleryGrid}>
-          <TouchableOpacity style={styles.createCard} onPress={onCreate}>
-            <Text style={styles.createCardIcon}>➕</Text>
-            <Text style={styles.createCardText}>New Playlist</Text>
-          </TouchableOpacity>
 
           {filteredPlaylists.map(playlist => {
             const stats = getPlaylistStats(playlist);
