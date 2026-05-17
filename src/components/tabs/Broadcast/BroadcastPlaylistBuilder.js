@@ -149,7 +149,7 @@ export default function BroadcastPlaylistBuilder({
             {totalSize > 0 && <Text style={styles.playlistMetaText}>💾 {formatSize(totalSize)}</Text>}
           </View>
           
-          <ScrollView style={styles.videoList}>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
             {playlist.map((item, index) => (
               <div 
                 key={item.id} 
@@ -214,7 +214,7 @@ export default function BroadcastPlaylistBuilder({
             ))}
             {playlist.length === 0 && (
               <View style={styles.emptyPlaylistState}>
-                <Text style={styles.emptyPlaylistIcon}>🎬</Text>
+                <Text style={styles.emptyPlaylistIcon}>📬</Text>
                 <Text style={styles.emptyPlaylistTitle}>Playlist is Empty</Text>
                 <Text style={styles.emptyPlaylistSub}>Add videos from the left panel to build your stream queue.</Text>
               </View>
