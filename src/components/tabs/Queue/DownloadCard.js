@@ -93,11 +93,35 @@ export default function DownloadCard({
               </Tooltip>
             </View>
           </View>
-          <Text style={styles.downloadMeta}>
-            {formatDuration(download.duration)}
-            {download.resolution && ` • ${formatResolutionBadge(download.resolution)}`}
-            {download.filesize && ` • ${formatFileSize(download.filesize)}`}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4, marginBottom: 12, flexWrap: 'wrap' }}>
+            {/* Duration Badge */}
+            <View style={styles.metaBadge}>
+              <Text style={styles.metaBadgeIcon}>⏱️</Text>
+              <Text style={styles.metaBadgeText}>
+                {formatDuration(download.duration)}
+              </Text>
+            </View>
+
+            {/* Resolution Badge */}
+            {download.resolution && (
+              <View style={styles.metaBadge}>
+                <Text style={styles.metaBadgeIcon}>📺</Text>
+                <Text style={styles.metaBadgeText}>
+                  {formatResolutionBadge(download.resolution)}
+                </Text>
+              </View>
+            )}
+
+            {/* File Size Badge */}
+            {download.filesize && (
+              <View style={styles.metaBadge}>
+                <Text style={styles.metaBadgeIcon}>💾</Text>
+                <Text style={styles.metaBadgeText}>
+                  {formatFileSize(download.filesize)}
+                </Text>
+              </View>
+            )}
+          </View>
           
           <View style={styles.progressSection}>
             {download.status !== 'completed' && (

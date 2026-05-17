@@ -210,6 +210,25 @@ export const queueStyles = StyleSheet.create({
     color: theme.colors.textTertiary,
     marginBottom: 16,
   },
+  metaBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    gap: 4,
+  },
+  metaBadgeIcon: {
+    fontSize: 11,
+  },
+  metaBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#ddd',
+  },
   progressSection: {
     gap: 8,
   },
