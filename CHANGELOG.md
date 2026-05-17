@@ -18,6 +18,8 @@
 - **Full-Bleed Spacing Alignment**: Removed the inner padding from the right-hand column container, wrapped the header section in a padded header with a bottom border, and placed bottom buttons inside a toolbar to allow draggable video cards to bleed fully to the edge of the panel container, matching the exact spacing of the PlaylistEditor.
 - **Empty State Alignment**: Aligned the Broadcast current playlist's empty state to use the mailbox emoji (`📬`) and styled placeholder text matching the PlaylistEditor.
 - **Middle Dot Character Alignment**: Replaced all bullet dot characters (`•`) between video duration and resolution/quality in both available and current playlist panels inside the Broadcast tab with the exact thin middle dot character (`·`) used in the PlaylistEditor.
+- **Available Videos Empty States Overhaul**: Aligned both the Broadcast playlist builder and the PlaylistEditor available videos lists to handle empty states elegantly. Showcases a premium `🎬` emoji and customized subtext when the gallery library is completely empty, and a `🔍` emoji when search filtering yields no results.
+- **Fix: Resolved ReferenceError**: Fixed an uncaught runtime error in `PlaylistEditor.js` where accessing `videos` was causing a crash when opening the editor with an empty gallery; corrected it to correctly reference the `history` prop.
 
 
 ## [1.5.0] - 2026-05-16

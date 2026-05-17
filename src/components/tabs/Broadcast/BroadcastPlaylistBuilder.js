@@ -29,6 +29,22 @@ export default function BroadcastPlaylistBuilder({
     return `${mb.toFixed(0)} MB`;
   };
 
+  const filteredVideos = history
+    .filter(h => !searchQuery || h.title.toLowerCase().includes(searchQuery.toLowerCase()) || (h.tags && h.tags.join(' ').toLowerCase().includes(searchQuery.toLowerCase())))
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'title':
+          return a.title.localeCompare(b.title);
+        case 'duration':
+          return (b.duration || 0) - (a.duration || 0);
+        case 'rating':
+          return (b.rating || 0) - (a.rating || 0);
+        case 'date':
+        default:
+          return b.timestamp - a.timestamp;
+      }
+    });
+
   const totalDuration = playlist.reduce((sum, v) => sum + (v.duration || 0), 0);
   const totalSize = playlist.reduce((sum, v) => sum + (Number(v.filesize) || 0), 0);
 
@@ -43,35 +59,32 @@ export default function BroadcastPlaylistBuilder({
           <View style={styles.panelHeader}>
             <View style={styles.panelHeaderRow}>
               <Text style={styles.panelTitle}>📚 Available Videos</Text>
-              <Text style={styles.panelSubtitle}>
-                {history.filter(h => !searchQuery || h.title.toLowerCase().includes(searchQuery.toLowerCase()) || (h.tags && h.tags.join(' ').toLowerCase().includes(searchQuery.toLowerCase()))).length} videos
-              </Text>
+              <Text style={styles.panelSubtitle}>{filteredVideos.length} videos</Text>
             </View>
-
-            {/* Styled search bar matching PlaylistEditor */}
-            <View style={styles.editorSearch}>
-              <Text style={styles.editorSearchIcon}>🔍</Text>
+            
+            {/* Search row */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: theme.colors.surfaceLight, borderRadius: 8, borderWidth: 1, borderColor: theme.colors.border, paddingHorizontal: 12, marginBottom: 8 }}>
+              <Text style={{ fontSize: 14, marginRight: 8 }}>🔍</Text>
               <TextInput
-                style={styles.editorSearchInput}
-                placeholder="Search videos..."
+                style={{ flex: 1, padding: 10, color: theme.colors.text, fontSize: 13, borderWidth: 0, outlineStyle: 'none', backgroundColor: 'transparent' }}
+                placeholder="Search by title or tags..."
                 placeholderTextColor="#555"
                 value={searchQuery}
                 onChangeText={setSearchQuery}
               />
             </View>
 
-            {/* Sort buttons — no SORT: label, matching PlaylistEditor */}
-            <View style={styles.sortRow}>
+            {/* Sort toolbar */}
+            <View style={{ flexDirection: 'row', gap: 6 }}>
               {['date', 'title', 'duration', 'rating'].map(sort => {
                 const labels = { date: '📅 Date', title: '🔤 Title', duration: '⏱️ Duration', rating: '★ Rating' };
-                const isActive = sortBy === sort;
                 return (
                   <TouchableOpacity
                     key={sort}
-                    style={[styles.sortButton, isActive && styles.sortButtonActive]}
+                    style={[styles.sortButton, sortBy === sort && styles.sortButtonActive]}
                     onPress={() => setSortBy(sort)}
                   >
-                    <Text style={[styles.sortButtonText, isActive && styles.sortButtonTextActive]}>
+                    <Text style={[styles.sortButtonText, sortBy === sort && styles.sortButtonTextActive]}>
                       {labels[sort]}
                     </Text>
                   </TouchableOpacity>
@@ -81,22 +94,7 @@ export default function BroadcastPlaylistBuilder({
           </View>
 
           <ScrollView style={{ flex: 1 }}>
-            {history
-              .filter(h => !searchQuery || h.title.toLowerCase().includes(searchQuery.toLowerCase()) || (h.tags && h.tags.join(' ').toLowerCase().includes(searchQuery.toLowerCase())))
-              .sort((a, b) => {
-                switch (sortBy) {
-                  case 'title':
-                    return a.title.localeCompare(b.title);
-                  case 'duration':
-                    return (b.duration || 0) - (a.duration || 0);
-                  case 'rating':
-                    return (b.rating || 0) - (a.rating || 0);
-                  case 'date':
-                  default:
-                    return b.timestamp - a.timestamp;
-                }
-              })
-              .map(item => (
+            {filteredVideos.map(item => (
               <View key={item.id} style={styles.videoRow}>
                 <View style={{ width: 80, height: 45, marginRight: 12, position: 'relative' }}>
                   <VideoThumbnail uri={item.thumbnail} style={{ width: '100%', height: '100%', borderRadius: 4 }} />
@@ -126,6 +124,19 @@ export default function BroadcastPlaylistBuilder({
                 </TouchableOpacity>
               </View>
             ))}
+            {history.length === 0 ? (
+              <View style={styles.emptyPlaylistState}>
+                <Text style={styles.emptyPlaylistIcon}>🎬</Text>
+                <Text style={styles.emptyPlaylistTitle}>Library is Empty</Text>
+                <Text style={styles.emptyPlaylistSub}>Download or import videos to get started</Text>
+              </View>
+            ) : filteredVideos.length === 0 ? (
+              <View style={styles.emptyPlaylistState}>
+                <Text style={styles.emptyPlaylistIcon}>🔍</Text>
+                <Text style={styles.emptyPlaylistTitle}>No Matches Found</Text>
+                <Text style={styles.emptyPlaylistSub}>Try adjusting your search query</Text>
+              </View>
+            ) : null}
           </ScrollView>
         </View>
         
@@ -324,31 +335,6 @@ const styles = StyleSheet.create({
   panelSubtitle: {
     fontSize: 12,
     color: theme.colors.textTertiary,
-  },
-  editorSearch: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.surfaceLight,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  editorSearchIcon: {
-    fontSize: 14,
-    marginRight: 8,
-  },
-  editorSearchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: theme.colors.text,
-    outlineStyle: 'none',
-  },
-  sortRow: {
-    flexDirection: 'row',
-    gap: 6,
-    flexWrap: 'wrap',
   },
   sortButton: {
     paddingHorizontal: 10,

@@ -388,11 +388,23 @@ export default function PlaylistEditor({
                 </View>
               );
             })}
-            {filteredVideos.length === 0 && (
+            {history.length === 0 ? (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyStateText}>No videos found</Text>
+                <Text style={styles.emptyStateIcon}>🎬</Text>
+                <Text style={styles.emptyStateText}>Library is Empty</Text>
+                <Text style={styles.emptyStateSubText}>
+                  Download or import videos to get started
+                </Text>
               </View>
-            )}
+            ) : filteredVideos.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyStateIcon}>🔍</Text>
+                <Text style={styles.emptyStateText}>No Matches Found</Text>
+                <Text style={styles.emptyStateSubText}>
+                  Try adjusting your search query or tag filters
+                </Text>
+              </View>
+            ) : null}
           </ScrollView>
         </View>
 
