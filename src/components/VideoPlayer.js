@@ -517,6 +517,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
     flexShrink: 0,
+    position: 'relative',
+    zIndex: 100,
   },
   titleSection: {
     flex: 1,
