@@ -85,7 +85,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
         {history.length > 0 && <Text style={styles.logoSubtext}>Feeling Lucky? 🎲</Text>}
       </TouchableOpacity>
 
-      <ScrollView style={{ flex: 1, overflowY: 'auto' }} contentContainerStyle={styles.tabsContentContainer}>
+      <View style={[{ flex: 1, overflowY: 'auto' }, styles.tabsContentContainer]}>
         {tabs.map((tab) => {
           const badgeCount = getBadgeCount(tab.id);
           return (
@@ -112,7 +112,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
+      </View>
       
       <View style={styles.footer}>
         <View style={styles.statsCard}>
@@ -152,15 +152,15 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   logoSection: {
-    padding: 24,
+    padding: 16,
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
   logo: {
-    width: 64,
-    height: 64,
-    marginBottom: 12,
+    width: 48,
+    height: 48,
+    marginBottom: 8,
     resizeMode: 'contain',
     transition: 'transform 0.5s ease-in-out',
   },
@@ -168,27 +168,27 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '360deg' }, { scale: 1.2 }],
   },
   logoText: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '800',
     color: theme.colors.primary,
     letterSpacing: 1,
   },
   logoSubtext: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textTertiary,
     fontStyle: 'italic',
-    marginTop: 4,
+    marginTop: 2,
   },
   tabsContentContainer: {
     gap: 8,
     paddingHorizontal: 16,
-    paddingTop: 24,
-    paddingBottom: 24,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
   tab: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: 12,
     borderRadius: 12,
     gap: 14,
     position: 'relative',
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     borderColor: `${theme.colors.primary}40`,
   },
   tabIcon: {
-    fontSize: 26,
+    fontSize: 24,
   },
   tabTextContainer: {
     flex: 1,
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tabLabel: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#999',
   },
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
   },
   tabSubtitle: {
-    fontSize: 11,
+    fontSize: 10,
     color: '#555',
     fontStyle: 'italic',
     marginTop: 2,
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   badgeText: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
     color: '#000',
   },
@@ -242,12 +242,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     width: 4,
-    height: 32,
+    height: 28,
     backgroundColor: theme.colors.primary,
     borderRadius: 2,
   },
   footer: {
-    padding: 20,
+    padding: 16,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
   },
