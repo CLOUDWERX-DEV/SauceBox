@@ -177,9 +177,10 @@ export default function QueueTab({ onNavigate }) {
                   </TouchableOpacity>
                 </View>
                 <View style={styles.downloadsList}>
-                  {activeDownloads.map((download) => (
+                  {activeDownloads.map((download, index) => (
                     <DownloadCard 
                       key={download.id}
+                      index={index}
                       download={download}
                       handlePlayVideo={handlePlayVideo}
                       handleOpenFolder={handleOpenFolder}
@@ -220,9 +221,10 @@ export default function QueueTab({ onNavigate }) {
                   </TouchableOpacity>
                 </View>
                 <View style={styles.downloadsList}>
-                  {completedDownloads.map((download) => (
+                  {completedDownloads.map((download, index) => (
                     <DownloadCard 
                       key={download.id}
+                      index={index}
                       download={download}
                       handlePlayVideo={handlePlayVideo}
                       handleOpenFolder={handleOpenFolder}

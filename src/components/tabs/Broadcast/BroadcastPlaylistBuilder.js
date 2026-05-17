@@ -220,13 +220,13 @@ export default function BroadcastPlaylistBuilder({
                   </Text>
                 </View>
                 <View style={[styles.rowControls, { alignItems: 'center' }]}>
-                  <Tooltip content="Move Up">
+                  <Tooltip content="Move Up" position={index === 0 ? "bottom" : "top"}>
                     <TouchableOpacity onPress={() => handleMoveUp(index)}><Text style={styles.controlIcon}>⬆️</Text></TouchableOpacity>
                   </Tooltip>
-                  <Tooltip content="Move Down">
+                  <Tooltip content="Move Down" position={index === 0 ? "bottom" : "top"}>
                     <TouchableOpacity onPress={() => handleMoveDown(index)}><Text style={styles.controlIcon}>⬇️</Text></TouchableOpacity>
                   </Tooltip>
-                  <Tooltip content="Remove">
+                  <Tooltip content="Remove" position={index === 0 ? "bottom" : "top"}>
                     <TouchableOpacity onPress={() => handleRemoveFromPlaylist(item.id)}><Text style={styles.controlIcon}>❌</Text></TouchableOpacity>
                   </Tooltip>
                 </View>

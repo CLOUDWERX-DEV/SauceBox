@@ -6,6 +6,7 @@ import { queueStyles as styles } from './QueueStyles';
 import Tooltip from '../../Tooltip';
 
 export default function DownloadCard({
+  index = 0,
   download,
   handlePlayVideo,
   handleOpenFolder,
@@ -73,7 +74,7 @@ export default function DownloadCard({
             </View>
             <View style={styles.headerButtons}>
               {download.status === 'completed' && (
-                <Tooltip content="Open Folder">
+                <Tooltip content="Open Folder" position={index === 0 ? "bottom" : "top"}>
                   <TouchableOpacity 
                     style={styles.folderButton}
                     onPress={() => handleOpenFolder(download)}
@@ -82,7 +83,7 @@ export default function DownloadCard({
                   </TouchableOpacity>
                 </Tooltip>
               )}
-              <Tooltip content="Remove">
+              <Tooltip content="Remove" position={index === 0 ? "bottom" : "top"}>
                 <TouchableOpacity 
                   style={styles.removeButton}
                   onPress={() => removeDownload(download.id)}

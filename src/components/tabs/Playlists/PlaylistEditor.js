@@ -496,13 +496,13 @@ export default function PlaylistEditor({
                   </Text>
                 </View>
                 <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-                  <Tooltip content="Move Up">
+                  <Tooltip content="Move Up" position={index === 0 ? "bottom" : "top"}>
                     <TouchableOpacity onPress={() => handleMoveUp(index)}><Text style={{ fontSize: 14, cursor: 'pointer' }}>⬆️</Text></TouchableOpacity>
                   </Tooltip>
-                  <Tooltip content="Move Down">
+                  <Tooltip content="Move Down" position={index === 0 ? "bottom" : "top"}>
                     <TouchableOpacity onPress={() => handleMoveDown(index)}><Text style={{ fontSize: 14, cursor: 'pointer' }}>⬇️</Text></TouchableOpacity>
                   </Tooltip>
-                  <Tooltip content="Remove">
+                  <Tooltip content="Remove" position={index === 0 ? "bottom" : "top"}>
                     <TouchableOpacity onPress={() => handleRemoveFromPlaylist(video.id)}><Text style={{ fontSize: 14, cursor: 'pointer' }}>❌</Text></TouchableOpacity>
                   </Tooltip>
                 </View>
