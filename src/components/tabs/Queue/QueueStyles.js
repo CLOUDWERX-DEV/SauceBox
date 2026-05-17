@@ -103,12 +103,12 @@ export const queueStyles = StyleSheet.create({
   },
   thumbnailContainer: {
     position: 'relative',
-    width: 192,
-    height: 108,
+    width: 240,
+    height: 135,
   },
   thumbnail: {
-    width: 192,
-    height: 108,
+    width: 240,
+    height: 135,
     borderRadius: 12,
     backgroundColor: theme.colors.surfaceLight,
     resizeMode: 'cover',
