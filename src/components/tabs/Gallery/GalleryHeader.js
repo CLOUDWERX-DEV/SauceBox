@@ -70,13 +70,15 @@ export default function GalleryHeader({
         </View>
       </View>
       <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center', marginTop: 6 }}>
-        <TouchableOpacity style={styles.importButton} onPress={onImport}>
-          <Text style={styles.importButtonText}>📥 IMPORT VIDEOS</Text>
-        </TouchableOpacity>
         {historyLength > 0 && (
-          <TouchableOpacity style={styles.clearButton} onPress={onClearAll}>
-            <Text style={styles.clearButtonText}>🗑️ Clear All</Text>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity style={styles.importButton} onPress={onImport}>
+              <Text style={styles.importButtonText}>📥 IMPORT VIDEOS</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.clearButton} onPress={onClearAll}>
+              <Text style={styles.clearButtonText}>🗑️ Clear All</Text>
+            </TouchableOpacity>
+          </>
         )}
       </View>
     </View>

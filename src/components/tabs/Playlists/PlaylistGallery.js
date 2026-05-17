@@ -182,9 +182,11 @@ export default function PlaylistGallery({
               )}
             </View>
           </View>
-          <TouchableOpacity style={styles.createPlaylistButton} onPress={onCreate}>
-            <Text style={styles.createPlaylistButtonText}>➕ NEW PLAYLIST</Text>
-          </TouchableOpacity>
+          {playlists.length > 0 && (
+            <TouchableOpacity style={styles.createPlaylistButton} onPress={onCreate}>
+              <Text style={styles.createPlaylistButtonText}>➕ NEW PLAYLIST</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {playlists.length > 0 && (
