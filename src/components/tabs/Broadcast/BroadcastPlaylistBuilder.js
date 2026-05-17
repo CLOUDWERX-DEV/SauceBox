@@ -193,31 +193,30 @@ export default function BroadcastPlaylistBuilder({
               <TextInput style={styles.textInputFull} value={playlistUrl} editable={false} />
             </View>
           )}
-
-          <View style={styles.liveMonitorCard}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <Text style={styles.columnTitle}>📡 Live Monitor Log</Text>
-              {broadcastLogs.length > 0 && (
-                <TouchableOpacity onPress={clearBroadcastLogs}><Text style={{ color: theme.colors.textTertiary, fontSize: 12 }}>Clear Logs</Text></TouchableOpacity>
-              )}
-            </View>
-            <ScrollView style={styles.logsList}>
-              {broadcastLogs.length === 0 ? (
-                <Text style={[styles.hintText, { marginTop: 10 }]}>No active connections right now.</Text>
-              ) : (
-                broadcastLogs.map((log, idx) => (
-                  <View key={idx} style={styles.logEntry}>
-                    <Text style={styles.logTime}>{new Date(log.time).toLocaleTimeString()}</Text>
-                    <Text style={{ flex: 1, color: theme.colors.primary, fontSize: 11, fontWeight: 'bold' }}>
-                      Device {log.ip} is currently streaming: <Text style={{ color: theme.colors.textSecondary, fontWeight: 'normal' }}>{log.file}</Text>
-                    </Text>
-                  </View>
-                ))
-              )}
-            </ScrollView>
-          </View>
-
         </View>
+      </View>
+
+      <View style={styles.liveMonitorCard}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <Text style={styles.columnTitle}>📡 Live Monitor Log</Text>
+          {broadcastLogs.length > 0 && (
+            <TouchableOpacity onPress={clearBroadcastLogs}><Text style={{ color: theme.colors.textTertiary, fontSize: 12 }}>Clear Logs</Text></TouchableOpacity>
+          )}
+        </View>
+        <ScrollView style={styles.logsList}>
+          {broadcastLogs.length === 0 ? (
+            <Text style={[styles.hintText, { marginTop: 10 }]}>No active connections right now.</Text>
+          ) : (
+            broadcastLogs.map((log, idx) => (
+              <View key={idx} style={styles.logEntry}>
+                <Text style={styles.logTime}>{new Date(log.time).toLocaleTimeString()}</Text>
+                <Text style={{ flex: 1, color: theme.colors.primary, fontSize: 11, fontWeight: 'bold' }}>
+                  Device {log.ip} is currently streaming: <Text style={{ color: theme.colors.textSecondary, fontWeight: 'normal' }}>{log.file}</Text>
+                </Text>
+              </View>
+            ))
+          )}
+        </ScrollView>
       </View>
     </View>
   );
@@ -286,7 +285,7 @@ const styles = StyleSheet.create({
   smallButton: { backgroundColor: theme.colors.surfaceLight, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: theme.colors.border },
   smallButtonText: { color: theme.colors.text, fontSize: 11, fontWeight: '600' },
   playlistUrlContainer: { marginTop: 16, backgroundColor: `${theme.colors.primary}10`, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: `${theme.colors.primary}40` },
-  liveMonitorCard: { marginTop: 24, backgroundColor: theme.colors.surface, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: theme.colors.border, flex: 1 },
+  liveMonitorCard: { marginTop: 24, backgroundColor: theme.colors.surface, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: theme.colors.border },
   logsList: { maxHeight: 150 },
   logEntry: { flexDirection: 'row', alignItems: 'center', marginBottom: 6, borderBottomWidth: 1, borderBottomColor: theme.colors.border, paddingBottom: 6 },
   logTime: { color: theme.colors.textTertiary, fontSize: 10, width: 70 },

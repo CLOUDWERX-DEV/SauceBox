@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.17] - 2026-05-16
+
+### Changed
+- **Playlist Builder Symmetrical Layout & Wider Live Monitor**: Shifted the Live Connection Monitor Card outside and directly underneath the Playlist Builder columns. This allows the "Available Videos" and "Current Playlist" cards to align symmetrically in height at exactly `600px`, providing maximum scrolling viewport space for the playlist selection lists while giving the Live Connection Log a full-width panoramic dashboard.
+
 ## [1.3.16] - 2026-05-16
 
 ### Added
