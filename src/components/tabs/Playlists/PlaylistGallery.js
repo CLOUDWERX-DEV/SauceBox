@@ -280,7 +280,7 @@ export default function PlaylistGallery({
                   <View style={styles.metaBadgeGrid}>
                     {/* Row 1: Video count + Duration */}
                     <View style={styles.metaBadgeRow}>
-                      <Tooltip content="Video Count" position="top">
+                      <Tooltip content="Video Count" position="top" style={[styles.metaBadgeFlex, { alignItems: 'stretch' }]}>
                         <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
                           <Text style={styles.metaBadgeIcon}>🎬</Text>
                           <Text style={styles.metaBadgeText} numberOfLines={1}>
@@ -288,7 +288,7 @@ export default function PlaylistGallery({
                           </Text>
                         </View>
                       </Tooltip>
-                      <Tooltip content="Total Duration" position="top">
+                      <Tooltip content="Total Duration" position="top" style={[styles.metaBadgeFlex, { alignItems: 'stretch' }]}>
                         <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
                           <Text style={styles.metaBadgeIcon}>⏱️</Text>
                           <Text style={styles.metaBadgeText} numberOfLines={1}>
@@ -299,7 +299,7 @@ export default function PlaylistGallery({
                     </View>
                     {/* Row 2: Filesize + Created */}
                     <View style={styles.metaBadgeRow}>
-                      <Tooltip content="Total Size" position="top">
+                      <Tooltip content="Total Size" position="top" style={[styles.metaBadgeFlex, { alignItems: 'stretch' }]}>
                         <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
                           <Text style={styles.metaBadgeIcon}>💾</Text>
                           <Text style={styles.metaBadgeText} numberOfLines={1}>
@@ -307,7 +307,7 @@ export default function PlaylistGallery({
                           </Text>
                         </View>
                       </Tooltip>
-                      <Tooltip content="Date Created" position="top">
+                      <Tooltip content="Date Created" position="top" style={[styles.metaBadgeFlex, { alignItems: 'stretch' }]}>
                         <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
                           <Text style={styles.metaBadgeIcon}>🕒</Text>
                           <Text style={styles.metaBadgeText} numberOfLines={1}>

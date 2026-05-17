@@ -118,7 +118,7 @@ export default function GalleryCard({
         <View style={styles.metaBadgeGrid}>
           {/* Row 1: Duration + Resolution */}
           <View style={styles.metaBadgeRow}>
-            <Tooltip content="Duration" position="top">
+            <Tooltip content="Duration" position="top" style={[styles.metaBadgeFlex, { alignItems: 'stretch' }]}>
               <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
                 <Text style={styles.metaBadgeIcon}>⏱️</Text>
                 <Text style={styles.metaBadgeText} numberOfLines={1}>
@@ -126,7 +126,7 @@ export default function GalleryCard({
                 </Text>
               </View>
             </Tooltip>
-            <Tooltip content="Resolution" position="top">
+            <Tooltip content="Resolution" position="top" style={[styles.metaBadgeFlex, { alignItems: 'stretch' }]}>
               <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
                 <Text style={styles.metaBadgeIcon}>📺</Text>
                 <Text style={styles.metaBadgeText} numberOfLines={1}>
@@ -137,7 +137,7 @@ export default function GalleryCard({
           </View>
           {/* Row 2: Filesize + Age */}
           <View style={styles.metaBadgeRow}>
-            <Tooltip content="File Size" position="top">
+            <Tooltip content="File Size" position="top" style={[styles.metaBadgeFlex, { alignItems: 'stretch' }]}>
               <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
                 <Text style={styles.metaBadgeIcon}>💾</Text>
                 <Text style={styles.metaBadgeText} numberOfLines={1}>
@@ -145,7 +145,7 @@ export default function GalleryCard({
                 </Text>
               </View>
             </Tooltip>
-            <Tooltip content="Date Added" position="top">
+            <Tooltip content="Date Added" position="top" style={[styles.metaBadgeFlex, { alignItems: 'stretch' }]}>
               <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
                 <Text style={styles.metaBadgeIcon}>🕒</Text>
                 <Text style={styles.metaBadgeText} numberOfLines={1}>

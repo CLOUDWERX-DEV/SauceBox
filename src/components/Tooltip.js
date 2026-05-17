@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../theme';
 
-export default function Tooltip({ children, content, position = 'top' }) {
+export default function Tooltip({ children, content, position = 'top', style }) {
   const [visible, setVisible] = useState(false);
 
   return (
     <View 
-      style={styles.container}
+      style={[styles.container, style]}
       onMouseEnter={() => setVisible(true)}
       onMouseLeave={() => setVisible(false)}
     >
