@@ -28,26 +28,12 @@ SauceBox is built from the ground up to handle, archive, and organize adult medi
 
 ## 🚀 Core Features
 
-*   🎬 **Native Playback & Visual Video Trimmer**
-    *   **In-App Player:** Play your offline archive directly inside the high-performance integrated player.
-    *   **Visual Trimmer:** Slice custom highlights without losing quality. Grab the dual-slider handles to drag frame-by-frame on a timeline scrubbing track with real-time video feedback, or snap handles instantly using `[ Set Start ]` and `[ Set End ]` buttons. Slices are saved as fresh standalone gallery cards using lossless FFmpeg extraction in milliseconds without re-encoding.
-*   🗂️ **Curated Playlists & Drafts System**
-    *   **Localized Draft States:** Add, remove, rename, set cover art, or drag-and-drop tracks to reorder in a localized scratch workspace. Changes are only saved when explicitly clicking the orange **Save & Return** button, keeping your library database unpolluted.
-    *   **Auto-Advance Playback:** Sequences automatically advance to the next video when the active one ends.
-    *   **External Player Support:** Enable an external player (e.g. VLC or MPV) in Settings, and SauceBox passes the entire sequence directly to your preferred video player.
-*   🔒 **Vault Security & Deep Stealth Mode**
-    *   **Vault PIN Lock:** Protect your offline collection behind a secure 4-digit PIN lock screen on startup.
-    *   **Panic Stealth Hotkey:** Hit the customizable global stealth hotkey (`Ctrl + Shift + H` by default) to instantly hide the application window from the desktop and OS taskbar, pause all active download streams, and mute any active video playback instantly.
-*   🌐 **"Send to SauceBox" Browser Extension**
-    *   **One-Click Dispatch:** Install the included companion Manifest V3 browser extension to right-click any video on supported tube sites or click the extension icon to instantly send target page URLs directly to your local SauceBox background queue.
-*   📡 **Media Server & VR Broadcast (Quick Cast)**
-    *   **Local Network Server:** Run the built-in Express-based media server to stream your gallery.
-    *   **TV & VR Streaming:** Generate dynamic M3U playlists with embedded cover art and `#EXTART` tags for players like Skybox VR.
-    *   **Quick Cast:** Single-click a QR code or connection URL on any video card to stream it instantly to your Smart TV, smartphone, or VR headset with real-time FFmpeg HLS transcoding.
-*   ⚙️ **Advanced Layout & System Configuration**
-    *   **Bandwidth Control:** Throttle download speeds (KB/s) to prevent network congestion.
-    *   **Atomic Storage Engine:** Writes state to human-readable `saucebox-settings.json` and `saucebox-gallery.json` files in your OS application data folder using crash-immune atomic writes.
-    *   **Safety Thresholds:** Prevent disk-full errors with free-space safety monitoring.
+*   🎬 **Native Playback & Visual Video Trimmer** — Play offline files instantly in-app, or use the interactive visual timeline trimmer to extract highlight clips losslessly in milliseconds without re-encoding via FFmpeg.
+*   🗂️ **Curated Playlists & External Handoff** — Curate custom collections inside a safe drafting workspace. Support auto-advance sequenced playback or delegate the entire playlist queue to external media players (VLC/MPV).
+*   🔒 **Vault Security & Deep Stealth Mode** — Lock the application interface behind a secure 4-digit PIN screen on startup. Smash the global Stealth Hotkey (`Ctrl + Shift + H`) to instantly hide the app from the taskbar, pause active downloads, and mute audio.
+*   🌐 **"Send to SauceBox" Extension** — Dispatch video URLs directly to your local download queue in one click using the companion Manifest V3 browser extension.
+*   📡 **Media Server & VR Broadcast** — Stream your local gallery to Smart TVs and VR headsets (e.g. Skybox VR) using a built-in Express server, featuring dynamic M3U playlists, cover art injection, and HLS Quick Cast transcoding.
+*   ⚙️ **System Configuration & Safeguards** — Limit download speeds to throttle bandwidth usage, configure network proxies to bypass ISP blocks, and prevent storage issues with automated free-space safety monitoring.
 
 ---
 
