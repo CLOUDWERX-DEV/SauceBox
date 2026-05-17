@@ -4,7 +4,7 @@ import { theme } from '../../../theme';
 export const downloadStyles = StyleSheet.create({
   content: {
     padding: 32,
-    paddingBottom: 48,
+    paddingBottom: 52,
   },
   card: {
     backgroundColor: theme.colors.surface,
@@ -88,7 +88,7 @@ export const downloadStyles = StyleSheet.create({
     borderWidth: 2,
     borderColor: `${theme.colors.primary}30`,
     borderStyle: 'dashed',
-    marginBottom: 12,
+    marginBottom: 24,
   },
   batchInfo: {
     marginBottom: 16,

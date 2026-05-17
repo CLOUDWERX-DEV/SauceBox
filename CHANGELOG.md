@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.3.11] - 2026-05-16
+
+### Fixed
+- **TitleBar Button Vertical Centering**: Added `alignItems: 'center'` to the controls style in `TitleBar.js`. This guarantees all title bar buttons (especially the smaller 24px orange Help button `?` and 32px standard window control actions) are perfectly vertically centered relative to the 40px height of the custom frameless title bar rather than sitting off-center near the top.
+
+## [1.3.10] - 2026-05-16
+
+### Fixed
+- **Goldilocks 16px Spacing Tuning**: Tuned the downloads tab spacings to save exactly 16px of vertical height compared to the original layout (setting `content.paddingBottom` to `52` and `batchSection.marginBottom` to `24`). This surgical adjustment perfectly consumes the empty space at the bottom of the viewport while remaining safely below the scrollbar overflow threshold.
+
 ## [1.3.9] - 2026-05-16
 
 ### Fixed

@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
   },
   controls: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
     WebkitAppRegion: 'no-drag',
     cursor: 'default',
