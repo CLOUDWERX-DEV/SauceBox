@@ -171,14 +171,12 @@ export default function PlaylistGallery({ playlists, history, onOpen, onCreate, 
                       </TouchableOpacity>
                     ))}
                     
-                    <View style={styles.playlistCardActionsBottom}>
-                      <TouchableOpacity
-                        style={styles.editButton}
-                        onPress={() => onOpen(playlist.id)}
-                      >
-                        <Text style={styles.editButtonText}>✏️ Edit</Text>
-                      </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity
+                      style={styles.editButton}
+                      onPress={() => onOpen(playlist.id)}
+                    >
+                      <Text style={styles.editButtonText}>✏️ Edit</Text>
+                    </TouchableOpacity>
                   </View>
 
                 </View>
