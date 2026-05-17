@@ -133,9 +133,16 @@ Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) in the root of the project to
 
 If you love using SauceBox and want to support our ongoing open-source development, server costs, and build infrastructure, please consider buying us a coffee!
 
-<a href="https://buymeacoffee.com/cloudwerxl3" target="_blank">
-  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
-</a>
+
+<p>
+  <a href="https://buymeacoffee.com/cloudwerxl3" target="_blank">
+    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="60" width="217" />
+  </a>
+  &nbsp;
+  <a href="https://github.com/sponsors/CLOUDWERX-DEV" target="_blank">
+    <img src="https://img.shields.io/badge/Sponsor%20on%20GitHub-%23EA4AAA?style=for-the-badge&logo=github-sponsors&logoColor=white" alt="Sponsor on GitHub" height="60" />
+  </a>
+</p>
 
 ---
 
