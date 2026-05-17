@@ -1,8 +1,0 @@
-
-### Added
-- **Playlist Editor M3U Support**: Added native `.m3u` Import and Export buttons directly to the Playlist Editor view. Users can now perfectly export their custom local playlists into universal M3U files with absolute paths, enabling immediate playback handoff to VLC, MPV, or other external media players, as well as importing external M3U files to instantly reconstruct saved collections.
-
-### Changed
-- **Playlist Editor UI Optimization**: Reduced the vertical height of the playlist cover art preview in the editor by 50% to maximize screen real-estate for managing large playlist arrays.
-- **Documentation Parity**: Updated `README.md` to accurately feature the Multi-Threaded Download Manager and explicitly mention GPU-accelerated video playback capabilities. Removed unused frontend dev-server instructions.
-
