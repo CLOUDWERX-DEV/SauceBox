@@ -444,7 +444,7 @@ export default function PlaylistEditor({
             </View>
           </View>
 
-          <ScrollView style={{ flex: 1 }}>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
             {playlistItems.map((video, index) => (
               <div
                 key={`${video.id}-${index}`}
