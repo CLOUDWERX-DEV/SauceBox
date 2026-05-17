@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import VideoThumbnail from '../../VideoThumbnail';
 import { theme } from '../../../theme';
+import Tooltip from '../../Tooltip';
 
 const formatDuration = (seconds) => {
   if (!seconds) return 'Unknown';
@@ -58,33 +59,39 @@ export default function GalleryCard({
   return (
     <View style={styles.historyCard}>
       <View style={styles.cardActions}>
-        <TouchableOpacity 
-          style={styles.folderButtonHistory}
-          onPress={(e) => {
-            e.stopPropagation();
-            onQuickCast(item);
-          }}
-        >
-          <Text style={[styles.folderButtonTextHistory, { fontSize: 10, color: theme.colors.primary }]}>📡</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.folderButtonHistory}
-          onPress={(e) => {
-            e.stopPropagation();
-            onOpenFolder(item);
-          }}
-        >
-          <Text style={styles.folderButtonTextHistory}>📁</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.deleteButton}
-          onPress={(e) => {
-            e.stopPropagation();
-            onDelete(item);
-          }}
-        >
-          <Text style={styles.deleteButtonText}>✕</Text>
-        </TouchableOpacity>
+        <Tooltip content="Quick Stream / VR Cast" position="bottom">
+          <TouchableOpacity 
+            style={styles.folderButtonHistory}
+            onPress={(e) => {
+              e.stopPropagation();
+              onQuickCast(item);
+            }}
+          >
+            <Text style={[styles.folderButtonTextHistory, { fontSize: 10, color: theme.colors.primary }]}>📡</Text>
+          </TouchableOpacity>
+        </Tooltip>
+        <Tooltip content="Open Download Folder" position="bottom">
+          <TouchableOpacity 
+            style={styles.folderButtonHistory}
+            onPress={(e) => {
+              e.stopPropagation();
+              onOpenFolder(item);
+            }}
+          >
+            <Text style={styles.folderButtonTextHistory}>📁</Text>
+          </TouchableOpacity>
+        </Tooltip>
+        <Tooltip content="Delete Video" position="bottom">
+          <TouchableOpacity 
+            style={styles.deleteButton}
+            onPress={(e) => {
+              e.stopPropagation();
+              onDelete(item);
+            }}
+          >
+            <Text style={styles.deleteButtonText}>✕</Text>
+          </TouchableOpacity>
+        </Tooltip>
       </View>
       <VideoThumbnail
         uri={item.thumbnail}
