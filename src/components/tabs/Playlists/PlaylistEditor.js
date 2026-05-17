@@ -222,7 +222,7 @@ export default function PlaylistEditor({
   );
 
   return (
-    <View style={{ flex: 1, padding: 32, paddingBottom: 60 }}>
+    <View style={{ flex: 1, padding: 32, paddingBottom: 32 }}>
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24, justifyContent: 'space-between' }}>
         <Text style={{ fontSize: 24, fontWeight: '700', color: theme.colors.text }}>Edit Playlist</Text>
