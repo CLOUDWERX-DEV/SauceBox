@@ -221,7 +221,7 @@ export default function BroadcastPlaylistBuilder({
             )}
           </ScrollView>
           
-          <View style={styles.playlistActions}>
+          <View style={[styles.playlistActions, { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 12, marginTop: 8 }]}>
             <TouchableOpacity style={styles.actionButton} onPress={handleShuffle} disabled={playlist.length === 0}>
               <Text style={styles.actionButtonText}>🔀 Shuffle</Text>
             </TouchableOpacity>
