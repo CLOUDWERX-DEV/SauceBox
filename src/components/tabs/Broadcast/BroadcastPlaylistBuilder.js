@@ -130,23 +130,25 @@ export default function BroadcastPlaylistBuilder({
         </View>
         
         <View style={styles.playlistColumnRight}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={styles.columnTitle}>Current Playlist</Text>
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              <TouchableOpacity style={styles.smallButton} onPress={() => document.getElementById('m3u-import').click()}>
-                <Text style={styles.smallButtonText}>📂 Import .m3u</Text>
-              </TouchableOpacity>
-              <input type="file" id="m3u-import" accept=".m3u" style={{ display: 'none' }} onChange={handleImportM3u} />
-              <TouchableOpacity style={styles.smallButton} onPress={handleExportM3u} disabled={playlist.length === 0}>
-                <Text style={styles.smallButtonText}>💾 Export .m3u</Text>
-              </TouchableOpacity>
+          <View style={styles.panelHeader}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.columnTitle}>Current Playlist</Text>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <TouchableOpacity style={styles.smallButton} onPress={() => document.getElementById('m3u-import').click()}>
+                  <Text style={styles.smallButtonText}>📂 Import .m3u</Text>
+                </TouchableOpacity>
+                <input type="file" id="m3u-import" accept=".m3u" style={{ display: 'none' }} onChange={handleImportM3u} />
+                <TouchableOpacity style={styles.smallButton} onPress={handleExportM3u} disabled={playlist.length === 0}>
+                  <Text style={styles.smallButtonText}>💾 Export .m3u</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-          
-          <View style={[styles.playlistMetaRow, { marginHorizontal: -16, paddingHorizontal: 16 }]}>
-            <Text style={styles.playlistMetaText}>🎬 {playlist.length} videos</Text>
-            <Text style={styles.playlistMetaText}>⏱️ {formatDuration(totalDuration)}</Text>
-            {totalSize > 0 && <Text style={styles.playlistMetaText}>💾 {formatSize(totalSize)}</Text>}
+            
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <Text style={styles.playlistMetaText}>🎬 {playlist.length} videos</Text>
+              <Text style={styles.playlistMetaText}>⏱️ {formatDuration(totalDuration)}</Text>
+              {totalSize > 0 && <Text style={styles.playlistMetaText}>💾 {formatSize(totalSize)}</Text>}
+            </View>
           </View>
           
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
@@ -221,8 +223,15 @@ export default function BroadcastPlaylistBuilder({
             )}
           </ScrollView>
           
-          <View style={{ height: 1, backgroundColor: theme.colors.border, marginHorizontal: -16, marginTop: 8 }} />
-          <View style={[styles.playlistActions, { paddingTop: 12 }]}>
+          <View style={{
+            flexDirection: 'row',
+            gap: 8,
+            padding: 12,
+            borderTopWidth: 1,
+            borderTopColor: theme.colors.border,
+            flexShrink: 0,
+            flexWrap: 'wrap',
+          }}>
             <TouchableOpacity style={styles.actionButton} onPress={handleShuffle} disabled={playlist.length === 0}>
               <Text style={styles.actionButtonText}>🔀 Shuffle</Text>
             </TouchableOpacity>
@@ -290,7 +299,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    padding: 16,
+    overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
   },

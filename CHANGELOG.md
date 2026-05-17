@@ -15,7 +15,7 @@
 - **Unified Added State Styling**: Refactored the "Added" status across both PlaylistEditor and Broadcast tab to show clean, bold orange text instead of a grey badge.
 - **Broadcast Playlist Items Refinement**: Reverted items in the current playlist list back to the premium card layout with exact borders, margins, padding, and drop shadow styles, mirroring the PlaylistEditor.
 - **Drag-and-Drop Parity**: Fully matched the drag-and-drop scale, opacity, border transitions, and dark-tinted highlight visual effects of the PlaylistEditor.
-- **Full-Bleed Separator Lines**: Integrated edge-to-edge separator lines for metadata and actions inside the Broadcast tab current playlist area using negative margins.
+- **Full-Bleed Spacing Alignment**: Removed the inner padding from the right-hand column container, wrapped the header section in a padded header with a bottom border, and placed bottom buttons inside a toolbar to allow draggable video cards to bleed fully to the edge of the panel container, matching the exact spacing of the PlaylistEditor.
 - **Empty State Alignment**: Aligned the Broadcast current playlist's empty state to use the mailbox emoji (`📬`) and styled placeholder text matching the PlaylistEditor.
 
 
