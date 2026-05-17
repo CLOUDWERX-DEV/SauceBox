@@ -7,6 +7,7 @@ import AppLock from './components/AppLock';
 import logoSrc from '../public/logo.png';
 
 import { useStore } from './store';
+import VideoPlayer from './components/VideoPlayer';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
@@ -20,6 +21,8 @@ export default function App() {
   const stealthHotkey = useStore(state => state.settings.stealthHotkey);
   const autoStartBroadcast = useStore(state => state.settings.autoStartBroadcast);
   const quickCastVideo = useStore(state => state.quickCastVideo);
+  const activeBuiltinVideo = useStore(state => state.activeBuiltinVideo);
+  const setActiveBuiltinVideo = useStore(state => state.setActiveBuiltinVideo);
   
   useEffect(() => {
     if (quickCastVideo) {
@@ -327,6 +330,13 @@ export default function App() {
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
         <MainContent activeTab={activeTab} onNavigate={setActiveTab} />
       </View>
+      <VideoPlayer 
+        visible={!!activeBuiltinVideo}
+        videoPath={activeBuiltinVideo?.path}
+        videoTitle={activeBuiltinVideo?.title}
+        originalItem={activeBuiltinVideo}
+        onClose={() => setActiveBuiltinVideo(null)}
+      />
     </View>
   );
 }

@@ -4,7 +4,6 @@ import QRCode from 'react-qr-code';
 import { theme } from '../../theme';
 import { useStore } from '../../store';
 import VideoThumbnail from '../VideoThumbnail';
-import VideoPlayer from '../VideoPlayer';
 import BroadcastWarningCard from './Broadcast/BroadcastWarningCard';
 import BroadcastStatusBanner from './Broadcast/BroadcastStatusBanner';
 import BroadcastServerInfo from './Broadcast/BroadcastServerInfo';
@@ -30,7 +29,25 @@ export default function BroadcastTab() {
   const [playlist, setPlaylist] = useState([]);
   const [playlistUrl, setPlaylistUrl] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [previewVideo, setPreviewVideo] = useState(null);
+  const handlePreviewVideo = async (item) => {
+    try {
+      let videoPath = item.path;
+      if (!videoPath) {
+        videoPath = await ipcRenderer?.invoke('get-video-path', {
+          filename: `${item.title}.mp4`,
+          downloadPath: settings.downloadPath,
+        });
+      }
+      if (settings.customPlayerPath && settings.customPlayerPath.trim() !== '') {
+        await ipcRenderer?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
+      } else {
+        useStore.getState().setActiveBuiltinVideo({ ...item, path: videoPath });
+      }
+    } catch (error) {
+      console.error('Failed to preview video:', error);
+      alert('Video file not found. The download may have failed or the file was moved.');
+    }
+  };
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
 
@@ -378,16 +395,8 @@ export default function BroadcastTab() {
         handleDragLeave={handleDragLeave} handleDrop={handleDrop} handleDragEnd={handleDragEnd}
         handleShuffle={handleShuffle} handleSaveStream={handleSaveStream} 
         handleExportM3u={handleExportM3u} handleImportM3u={handleImportM3u}
-        setPreviewVideo={setPreviewVideo} serverRunning={serverRunning} playlistUrl={playlistUrl}
+        setPreviewVideo={handlePreviewVideo} serverRunning={serverRunning} playlistUrl={playlistUrl}
         broadcastLogs={broadcastLogs} clearBroadcastLogs={clearBroadcastLogs}
-      />
-
-      <VideoPlayer 
-        visible={!!previewVideo}
-        videoPath={previewVideo?.path}
-        videoTitle={previewVideo?.title}
-        originalItem={previewVideo}
-        onClose={() => setPreviewVideo(null)}
       />
     </ScrollView>
   );

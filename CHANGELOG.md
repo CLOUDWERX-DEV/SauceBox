@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.14] - 2026-05-16
+
+### Changed
+- **Unified Video Player Architecture**: Centralized video playback by moving the built-in `<VideoPlayer>` overlay to the global `App.js` level and driving it through a unified Zustand store state (`activeBuiltinVideo` / `setActiveBuiltinVideo`). Cleaned up and removed redundant local `<VideoPlayer>` rendering and local states from `GalleryTab.js`, `QueueTab.js`, and `BroadcastTab.js`.
+- **Feeling Lucky Custom Player support**: Refactored the "Feeling Lucky" sidebar logo click function to now use the global built-in React player overlay by default, but seamlessly fallback to the user's custom player if one is set in the settings. Added robust filepath resolution for random videos before launch.
+
 ## [1.3.13] - 2026-05-16
 
 ### Added

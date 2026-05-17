@@ -29,22 +29,38 @@ export default function Sidebar({ activeTab, onTabChange }) {
     return 0;
   };
 
-  const handleFeelingLucky = () => {
+  const handleFeelingLucky = async () => {
     setIsRotating(true);
     setTimeout(() => setIsRotating(false), 500);
 
     if (history.length > 0) {
       const randomVideo = history[Math.floor(Math.random() * history.length)];
-      if (randomVideo.path) {
-        const customPlayerPath = useStore.getState().settings.customPlayerPath;
-        ipcRenderer?.invoke('open-video', { filepath: randomVideo.path, customPlayerPath });
-        const notificationsEnabled = useStore.getState().settings?.systemNotifications !== false;
-        if (window.Notification && notificationsEnabled) {
-          new Notification('🎲 Random Local Sauce!', {
-            body: `Enjoy: ${randomVideo.title}`,
-            icon: logoSrc
+      try {
+        const settings = useStore.getState().settings;
+        let videoPath = randomVideo.path;
+        if (!videoPath) {
+          videoPath = await ipcRenderer?.invoke('get-video-path', {
+            filename: `${randomVideo.title}.mp4`,
+            downloadPath: settings.downloadPath,
           });
         }
+        if (videoPath) {
+          if (settings.customPlayerPath && settings.customPlayerPath.trim() !== '') {
+            await ipcRenderer?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
+          } else {
+            useStore.getState().setActiveBuiltinVideo({ ...randomVideo, path: videoPath });
+          }
+          const notificationsEnabled = settings?.systemNotifications !== false;
+          if (window.Notification && notificationsEnabled) {
+            new Notification('🎲 Random Local Sauce!', {
+              body: `Enjoy: ${randomVideo.title}`,
+              icon: logoSrc
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Failed to play random video:', error);
+        alert('Video file not found. The download may have failed or the file was moved.');
       }
     }
   };

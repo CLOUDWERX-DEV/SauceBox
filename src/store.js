@@ -15,6 +15,8 @@ export const useStore = create(
       clearBroadcastLogs: () => set({ broadcastLogs: [] }),
       quickCastVideo: null,
       setQuickCastVideo: (video) => set({ quickCastVideo: video }),
+      activeBuiltinVideo: null,
+      setActiveBuiltinVideo: (video) => set({ activeBuiltinVideo: video }),
       settings: {
         downloadPath: '',
         quality: 'best',

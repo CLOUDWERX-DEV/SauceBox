@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useStore } from '../../store';
 import { theme } from '../../theme';
-import VideoPlayer from '../VideoPlayer';
 import ConfirmModal from '../ConfirmModal';
 
 import { queueStyles as styles } from './Queue/QueueStyles';
@@ -17,7 +16,6 @@ export default function QueueTab({ onNavigate }) {
   const updateDownload = useStore(state => state.updateDownload);
   const removeDownload = useStore(state => state.removeDownload);
   const clearQueue = useStore(state => state.clearQueue);
-  const [selectedVideo, setSelectedVideo] = useState(null);
   const [clearConfirmVisible, setClearConfirmVisible] = useState(false);
 
   const formatResolutionBadge = (res) => {
@@ -75,7 +73,7 @@ export default function QueueTab({ onNavigate }) {
       if (settings.customPlayerPath && settings.customPlayerPath.trim() !== '') {
         await ipcRenderer?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
       } else {
-        setSelectedVideo({ path: videoPath, title: download.title });
+        useStore.getState().setActiveBuiltinVideo({ path: videoPath, title: download.title });
       }
     } catch (error) {
       console.error('Failed to find video:', error);
@@ -193,13 +191,6 @@ export default function QueueTab({ onNavigate }) {
           </View>
         )}
       </ScrollView>
-
-      <VideoPlayer 
-        visible={!!selectedVideo}
-        videoPath={selectedVideo?.path}
-        videoTitle={selectedVideo?.title}
-        onClose={() => setSelectedVideo(null)}
-      />
 
       <ConfirmModal
         visible={clearConfirmVisible}

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { useStore } from '../../store';
 import { theme } from '../../theme';
-import VideoPlayer from '../VideoPlayer';
 import ConfirmModal from '../ConfirmModal';
 import EditVideoModal from '../EditVideoModal';
 import ImportModal from '../ImportModal';
@@ -33,7 +32,6 @@ export default function GalleryTab({ onNavigate }) {
   const removeTagFromHistory = useStore(state => state.removeTagFromHistory);
   const setQuickCastVideo = useStore(state => state.setQuickCastVideo);
   
-  const [selectedVideo, setSelectedVideo] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [filterResolution, setFilterResolution] = useState('all');
@@ -61,7 +59,7 @@ export default function GalleryTab({ onNavigate }) {
       if (settings.customPlayerPath && settings.customPlayerPath.trim() !== '') {
         await ipcRenderer?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
       } else {
-        setSelectedVideo({ ...item, path: videoPath });
+        useStore.getState().setActiveBuiltinVideo({ ...item, path: videoPath });
       }
     } catch (error) {
       console.error('Failed to find video:', error);
@@ -190,14 +188,6 @@ export default function GalleryTab({ onNavigate }) {
           </View>
         )}
       </ScrollView>
-
-      <VideoPlayer 
-        visible={!!selectedVideo}
-        videoPath={selectedVideo?.path}
-        videoTitle={selectedVideo?.title}
-        originalItem={selectedVideo}
-        onClose={() => setSelectedVideo(null)}
-      />
 
       <ConfirmModal
         visible={!!deleteConfirmItem}
