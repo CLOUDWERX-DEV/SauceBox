@@ -10,6 +10,7 @@
 - **Playback Navigation**: Added `[⏭ Next]` and `[⏮ Prev]` navigation buttons directly into the VideoPlayer UI.
 - **Auto-Advance Playback**: Implemented HTML5 `onEnded` detection in the VideoPlayer. When a clip or video finishes naturally, SauceBox will automatically load and play the next video in the active playlist.
 - **External Player Support**: Fully wired the Playlists ecosystem to the custom external video player handoff. Hitting "Play All" while using an external player (like VLC) passes the file paths correctly.
+- **Playlist UI Refinements**: Added a large quick-play button on playlist cards, a new "Save & Return" exit pattern in the editor, and a large custom cover art selector. Drag-and-drop was refined to perfectly match the Broadcast tab with manual numbering overrides and up/down quick keys. Left pane now displays video ratings.
 
 ## [1.5.0] - 2026-05-16
 
