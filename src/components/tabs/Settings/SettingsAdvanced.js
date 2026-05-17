@@ -29,9 +29,9 @@ export default function SettingsAdvanced() {
             <Text style={styles.switchLabel}>Safety Disk Threshold (GB)</Text>
             <Text style={styles.switchDesc}>Stop downloading if free space drops below this (0 to disable)</Text>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <TextInput
-              style={[styles.pathInput, { flex: 0, width: 60, textAlign: 'center', padding: 8 }]}
+              style={[styles.pathInput, { flex: 0, width: 100, textAlign: 'center' }]}
               value={settings.minFreeSpaceGB !== undefined ? settings.minFreeSpaceGB.toString() : '5'}
               onChangeText={(text) => {
                 const num = parseInt(text.replace(/[^0-9]/g, ''), 10);
@@ -39,7 +39,7 @@ export default function SettingsAdvanced() {
               }}
               keyboardType="numeric"
             />
-            <Text style={{ color: theme.colors.textSecondary, fontSize: 13, width: 25 }}>GB</Text>
+            <Text style={{ color: theme.colors.textSecondary, fontSize: 13, width: 80 }}>GB</Text>
           </View>
         </View>
 
@@ -113,9 +113,9 @@ export default function SettingsAdvanced() {
             <Text style={styles.switchLabel}>Concurrent Downloads</Text>
             <Text style={styles.switchDesc}>Maximum number of simultaneous downloads (0 = Unlimited)</Text>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <TextInput
-              style={[styles.pathInput, { flex: 0, width: 60, textAlign: 'center', padding: 8 }]}
+              style={[styles.pathInput, { flex: 0, width: 100, textAlign: 'center' }]}
               value={settings.maxConcurrentDownloads !== undefined ? settings.maxConcurrentDownloads.toString() : '0'}
               onChangeText={(text) => {
                 const num = parseInt(text.replace(/[^0-9]/g, ''), 10);
@@ -123,7 +123,7 @@ export default function SettingsAdvanced() {
               }}
               keyboardType="numeric"
             />
-            <Text style={{ color: theme.colors.textSecondary, fontSize: 13, width: 65 }}>
+            <Text style={{ color: theme.colors.textSecondary, fontSize: 13, width: 80 }}>
               {(!settings.maxConcurrentDownloads || settings.maxConcurrentDownloads === 0) ? 'Unlimited' : 'Videos'}
             </Text>
           </View>
@@ -134,9 +134,9 @@ export default function SettingsAdvanced() {
             <Text style={styles.switchLabel}>Speed Limit (KB/s)</Text>
             <Text style={styles.switchDesc}>Limit maximum download speed (0 = Unlimited)</Text>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <TextInput
-              style={[styles.pathInput, { flex: 0, width: 80, textAlign: 'center', padding: 8 }]}
+              style={[styles.pathInput, { flex: 0, width: 100, textAlign: 'center' }]}
               value={settings.downloadSpeedLimit !== undefined ? settings.downloadSpeedLimit.toString() : '0'}
               onChangeText={(text) => {
                 const num = parseInt(text.replace(/[^0-9]/g, ''), 10);
@@ -144,6 +144,9 @@ export default function SettingsAdvanced() {
               }}
               keyboardType="numeric"
             />
+            <Text style={{ color: theme.colors.textSecondary, fontSize: 13, width: 80 }}>
+              {(!settings.downloadSpeedLimit || settings.downloadSpeedLimit === 0) ? 'Unlimited' : 'KB/s'}
+            </Text>
           </View>
         </View>
 

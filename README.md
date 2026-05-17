@@ -91,6 +91,8 @@ SauceBox natively supports thousands of video platforms via `yt-dlp`. Here are t
 - **Stripchat** — `Stripchat`
 - **ThisVid** — `ThisVid`
 - **Xvideos** — Included under Pornhub extractors
+- **YouPorn** — `YouPorn`
+- **... and MANY more!** (Over 1,000+ online video networks supported natively)
 
 ---
 

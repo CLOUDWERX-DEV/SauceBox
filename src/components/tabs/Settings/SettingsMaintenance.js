@@ -220,6 +220,13 @@ const styles = StyleSheet.create({
   switchInfo: { flex: 1, marginRight: 16 },
   switchLabel: { fontSize: 15, fontWeight: '600', color: theme.colors.text, marginBottom: 4 },
   switchDesc: { fontSize: 13, color: theme.colors.textTertiary },
-  saveButton: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8, justifyContent: 'center', cursor: 'pointer' },
-  saveButtonText: { fontSize: 14, fontWeight: '600' }
+  saveButton: {
+    width: 150,
+    height: 40,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer'
+  },
+  saveButtonText: { fontSize: 14, fontWeight: '600', textAlign: 'center' }
 });

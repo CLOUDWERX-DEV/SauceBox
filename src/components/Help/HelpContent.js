@@ -430,6 +430,8 @@ export default function HelpContent({ activeTab, displayHotkey }) {
               <Text style={styles.bulletItem}><Text style={styles.highlight}>Stripchat</Text> — Stripchat</Text>
               <Text style={styles.bulletItem}><Text style={styles.highlight}>ThisVid</Text> — ThisVid</Text>
               <Text style={styles.bulletItem}><Text style={styles.highlight}>Xvideos</Text> — Included under Pornhub extractors</Text>
+              <Text style={styles.bulletItem}><Text style={styles.highlight}>YouPorn</Text> — YouPorn</Text>
+              <Text style={styles.bulletItem}><Text style={styles.highlight}>... and MANY more!</Text> (Over 1,000+ online video networks supported natively)</Text>
             </View>
           </View>
         </View>

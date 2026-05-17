@@ -3,6 +3,12 @@ import { View, Text, StyleSheet, TextInput, Switch, TouchableOpacity } from 'rea
 import { theme } from '../../../theme';
 import { useStore } from '../../../store';
 
+const formatHotkeyDisplay = (hotkey) => {
+  if (!hotkey) return 'Ctrl+Shift+H';
+  const isMac = typeof process !== 'undefined' && process.platform === 'darwin';
+  return hotkey.replace('CommandOrControl', isMac ? 'Cmd' : 'Ctrl');
+};
+
 export default function SettingsSecurityVault() {
   const settings = useStore(state => state.settings);
   const updateSettings = useStore(state => state.updateSettings);
@@ -174,16 +180,16 @@ export default function SettingsSecurityVault() {
             <Text style={styles.switchDesc}>Global shortcut to instantly hide the app</Text>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <View style={[styles.pathInput, { flex: 0, minWidth: 180, backgroundColor: isRecording ? `${theme.colors.primary}20` : theme.colors.surface, borderColor: isRecording ? theme.colors.primary : theme.colors.border }]}>
+            <View style={[styles.pathInput, { flex: 0, minWidth: 150, height: 40, justifyContent: 'center', paddingVertical: 0, paddingHorizontal: 12, backgroundColor: isRecording ? `${theme.colors.primary}20` : theme.colors.surface, borderColor: isRecording ? theme.colors.primary : theme.colors.border }]}>
               <Text style={{ color: isRecording ? theme.colors.primary : theme.colors.text, textAlign: 'center', fontWeight: '600' }}>
-                {isRecording ? 'Listening...' : (settings.stealthHotkey || 'CommandOrControl+Shift+H')}
+                {isRecording ? 'Listening...' : formatHotkeyDisplay(settings.stealthHotkey)}
               </Text>
             </View>
             <TouchableOpacity 
-              style={[styles.saveButton, { marginTop: 0, paddingHorizontal: 16, backgroundColor: isRecording ? theme.colors.error : theme.colors.primary }]}
+              style={[styles.saveButton, { marginTop: 0, backgroundColor: isRecording ? theme.colors.error : theme.colors.primary }]}
               onPress={() => setIsRecording(!isRecording)}
             >
-              <Text style={styles.saveButtonText}>{isRecording ? 'Cancel' : 'Record'}</Text>
+              <Text style={[styles.saveButtonText, { color: isRecording ? '#fff' : '#000' }]}>{isRecording ? 'Cancel' : 'Record'}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -227,8 +233,16 @@ const styles = StyleSheet.create({
   switchLabel: { fontSize: 15, fontWeight: '600', color: theme.colors.text, marginBottom: 4 },
   switchDesc: { fontSize: 13, color: theme.colors.textTertiary },
   pathInput: { flex: 1, backgroundColor: theme.colors.surfaceLight, borderRadius: 8, padding: 12, fontSize: 14, color: theme.colors.text, borderWidth: 1, borderColor: `${theme.colors.primary}30`, outlineStyle: 'none' },
-  saveButton: { backgroundColor: theme.colors.primary, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8, justifyContent: 'center', cursor: 'pointer' },
-  saveButtonText: { color: '#000', fontSize: 14, fontWeight: '600' },
+  saveButton: {
+    backgroundColor: theme.colors.primary,
+    width: 150,
+    height: 40,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer'
+  },
+  saveButtonText: { fontSize: 14, fontWeight: '600', textAlign: 'center' },
   resetInfoBox: { marginTop: 16, padding: 14, backgroundColor: `${theme.colors.primary}10`, borderRadius: 10, borderWidth: 1, borderColor: `${theme.colors.primary}30`, borderStyle: 'dashed' },
   resetInfoTitle: { fontSize: 12, fontWeight: '700', color: theme.colors.primary, marginBottom: 6 },
   resetInfoText: { fontSize: 12, color: theme.colors.textSecondary, lineHeight: 18 },

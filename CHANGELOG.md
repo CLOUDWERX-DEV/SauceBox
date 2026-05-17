@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.1] - 2026-05-17
+
+### Changed
+- **Maintenance & Cleanup Button Layout**: Fixed and overhauled the styling of all buttons in the "Maintenance & Cleanup" section under Settings. Replaced variable horizontal paddings with a clean, uniform fixed width of `150px` and aligned elements perfectly, establishing consistent, premium button sizing and typography across all rows.
+- **Stealth Mode Hotkey UI Alignment**: Aligned the "Record" button inside the Security & Vault settings section to match the standard `150px` width of other settings buttons. Added clean UI formatting to the hotkey string (converting verbose Electron symbols like `CommandOrControl` to a sleek, compact `Ctrl` or `Cmd` format) to prevent layout text wrapping.
+- **Advanced Numerical Settings Inputs Overhaul**: Refactored the numerical text inputs for "Safety Disk Threshold", "Concurrent Downloads", and "Speed Limit". Overhauled their width to a consistent `100px` and removed inline padding overrides so they match the height and styling of other input fields. Added uniform trailing labels with fixed-width layout styling (`width: 80px`), ensuring perfect vertical alignment on the right.
+- **Redesigned About Tab**: Completely overhauled the About section inside settings, turning it into a gorgeous premium dashboard. Added a bold, stylish logo header, brand tagline, and project description. Included a real-time library statistics grid showing total videos, total disk size, and combined playtime (natively compiled from the Zustand gallery state). Added organized sections for system specifications (OS, App version, local storage scheme) and core engine details (yt-dlp, FFmpeg, React Native + Electron). Integrated symmetrical resource buttons with primary/outlined styles for Buy Me A Coffee support, official site, company website, and GitHub repository.
+- **Help Modal Branding Upgrades**: Replaced the placeholder question mark icon in the top-left of the Help documentation modal with our official, webpack-inlined base64 SauceBox logo. Overhauled the header title's color formatting to display "Sauce" in white and "Box" in our primary orange brand color, matching the sidebar logo section's premium styling.
+- **Expanded Supported Sites Documentation**: Added YouPorn to the list of core explicitly tested and supported adult networks in both `README.md` and the Help panel documentation (`HelpContent.js`), and updated both references to prominently note the broader support for over 1,000+ online video networks.
+- **Core Engine Resource Linking**: Integrated external link actions on the `yt-dlp` and `FFmpeg` spec tags inside the Settings About dashboard. Clicking either key opens their official website or GitHub repository cleanly in the host browser.
+- **Database Storage Label Refinement**: Changed the system specification label for the database format inside the Settings About tab from "Split Physical JSON" to "JSON" for cleaner and sleeker information display.
+
 ## [1.6.0] - 2026-05-16
 
 ### Added

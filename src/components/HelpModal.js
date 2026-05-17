@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, Image } from 'react-native';
 import { theme } from '../theme';
 import { useStore } from '../store';
 import HelpContent from './Help/HelpContent';
+import logoSrc from '../../public/logo.png';
 
 export default function HelpModal({ visible, onClose }) {
   const [activeTab, setActiveTab] = useState('basics');
@@ -65,11 +66,17 @@ export default function HelpModal({ visible, onClose }) {
           
           <View style={styles.header}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <View style={styles.headerIconWrapper}>
-                <Text style={styles.headerIconText}>?</Text>
-              </View>
+              <Image 
+                source={{ uri: logoSrc }} 
+                style={styles.headerLogo} 
+                resizeMode="contain"
+              />
               <View>
-                <Text style={styles.title}>SauceBox Documentation</Text>
+                <Text style={styles.title}>
+                  <Text style={{ color: '#ffffff' }}>Sauce</Text>
+                  <Text style={{ color: theme.colors.primary }}>Box</Text>
+                  <Text style={{ color: '#ffffff' }}> Documentation</Text>
+                </Text>
                 <Text style={styles.headerSubtext}>Your sauce. Your box. Your rules.</Text>
               </View>
             </View>
@@ -143,18 +150,9 @@ const styles = StyleSheet.create({
     borderBottomColor: theme.colors.border,
     backgroundColor: theme.colors.surfaceLight,
   },
-  headerIconWrapper: {
+  headerLogo: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: theme.colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerIconText: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: '#000',
   },
   title: {
     fontSize: 24,
