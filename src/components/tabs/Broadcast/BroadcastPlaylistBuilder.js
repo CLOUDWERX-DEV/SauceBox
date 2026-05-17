@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { theme } from '../../../theme';
 import VideoThumbnail from '../../VideoThumbnail';
+import Tooltip from '../../Tooltip';
 
 export default function BroadcastPlaylistBuilder({
   history, playlist, setPlaylist, searchQuery, setSearchQuery,
@@ -218,10 +219,16 @@ export default function BroadcastPlaylistBuilder({
                     {item.duration ? Math.floor(item.duration / 60) + ':' + (item.duration % 60).toString().padStart(2, '0') : '??:??'} · {item.resolution || 'HD'}
                   </Text>
                 </View>
-                <View style={styles.rowControls}>
-                  <TouchableOpacity onPress={() => handleMoveUp(index)}><Text style={styles.controlIcon}>⬆️</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleMoveDown(index)}><Text style={styles.controlIcon}>⬇️</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleRemoveFromPlaylist(item.id)}><Text style={styles.controlIcon}>❌</Text></TouchableOpacity>
+                <View style={[styles.rowControls, { alignItems: 'center' }]}>
+                  <Tooltip content="Move Up">
+                    <TouchableOpacity onPress={() => handleMoveUp(index)}><Text style={styles.controlIcon}>⬆️</Text></TouchableOpacity>
+                  </Tooltip>
+                  <Tooltip content="Move Down">
+                    <TouchableOpacity onPress={() => handleMoveDown(index)}><Text style={styles.controlIcon}>⬇️</Text></TouchableOpacity>
+                  </Tooltip>
+                  <Tooltip content="Remove from Playlist">
+                    <TouchableOpacity onPress={() => handleRemoveFromPlaylist(item.id)}><Text style={styles.controlIcon}>❌</Text></TouchableOpacity>
+                  </Tooltip>
                 </View>
               </div>
             ))}

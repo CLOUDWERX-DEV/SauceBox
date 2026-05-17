@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal } from 'reac
 import VideoThumbnail from '../../VideoThumbnail';
 import { theme } from '../../../theme';
 import { styles } from './PlaylistStyles';
+import Tooltip from '../../Tooltip';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
@@ -489,15 +490,21 @@ export default function PlaylistEditor({
                   <Text style={{ fontSize: 13, fontWeight: '600', color: theme.colors.text }} numberOfLines={1}>
                     {video.title || 'Untitled'}
                   </Text>
-                  <Text style={{ fontSize: 11, color: theme.colors.textTertiary }}>
+            <Text style={{ fontSize: 11, color: theme.colors.textTertiary }}>
                     {formatDuration(video.duration)}
                     {video.resolution ? ` · ${video.resolution}` : ''}
                   </Text>
                 </View>
-                <View style={{ flexDirection: 'row', gap: 8 }}>
-                  <TouchableOpacity onPress={() => handleMoveUp(index)}><Text style={{ fontSize: 14, cursor: 'pointer' }}>⬆️</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleMoveDown(index)}><Text style={{ fontSize: 14, cursor: 'pointer' }}>⬇️</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleRemoveFromPlaylist(video.id)}><Text style={{ fontSize: 14, cursor: 'pointer' }}>❌</Text></TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+                  <Tooltip content="Move Up">
+                    <TouchableOpacity onPress={() => handleMoveUp(index)}><Text style={{ fontSize: 14, cursor: 'pointer' }}>⬆️</Text></TouchableOpacity>
+                  </Tooltip>
+                  <Tooltip content="Move Down">
+                    <TouchableOpacity onPress={() => handleMoveDown(index)}><Text style={{ fontSize: 14, cursor: 'pointer' }}>⬇️</Text></TouchableOpacity>
+                  </Tooltip>
+                  <Tooltip content="Remove from Playlist">
+                    <TouchableOpacity onPress={() => handleRemoveFromPlaylist(video.id)}><Text style={{ fontSize: 14, cursor: 'pointer' }}>❌</Text></TouchableOpacity>
+                  </Tooltip>
                 </View>
               </div>
             ))}

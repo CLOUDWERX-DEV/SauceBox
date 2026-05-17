@@ -5,6 +5,7 @@ import ConfirmModal from '../../ConfirmModal';
 import { theme } from '../../../theme';
 import { styles } from './PlaylistStyles';
 import GalleryFilterBar from '../Gallery/GalleryFilterBar';
+import Tooltip from '../../Tooltip';
 
 const formatFileSize = (bytes) => {
   const num = Number(bytes);
@@ -223,21 +224,25 @@ export default function PlaylistGallery({
               >
                 <View style={{ position: 'relative' }}>
                   <View style={styles.playlistCardActionsTop}>
-                    <TouchableOpacity 
-                      style={styles.folderButtonHistory}
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        if (onQuickCast) onQuickCast(playlist);
-                      }}
-                    >
-                      <Text style={[styles.folderButtonTextHistory, { fontSize: 10, color: theme.colors.primary }]}>📡</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                      style={styles.deleteButton}
-                      onPress={(e) => { e.stopPropagation(); setDeleteTarget(playlist); }}
-                    >
-                      <Text style={styles.deleteButtonText}>✕</Text>
-                    </TouchableOpacity>
+                    <Tooltip content="Quick Stream / VR Cast" position="bottom">
+                      <TouchableOpacity 
+                        style={styles.folderButtonHistory}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          if (onQuickCast) onQuickCast(playlist);
+                        }}
+                      >
+                        <Text style={[styles.folderButtonTextHistory, { fontSize: 10, color: theme.colors.primary }]}>📡</Text>
+                      </TouchableOpacity>
+                    </Tooltip>
+                    <Tooltip content="Delete Playlist" position="bottom">
+                      <TouchableOpacity 
+                        style={styles.deleteButton}
+                        onPress={(e) => { e.stopPropagation(); setDeleteTarget(playlist); }}
+                      >
+                        <Text style={styles.deleteButtonText}>✕</Text>
+                      </TouchableOpacity>
+                    </Tooltip>
                   </View>
                   <VideoThumbnail uri={cover} style={styles.playlistCardImage} />
                   <View style={styles.playlistCardOverlay}>
