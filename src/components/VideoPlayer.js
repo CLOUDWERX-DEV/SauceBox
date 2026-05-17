@@ -257,12 +257,45 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
                   {(currentPlaylistItem?.title || videoTitle || 'Unknown Video')}
                 </Text>
                 {(currentPlaylistItem || originalItem) && (
-                  <Text style={styles.subtitle} numberOfLines={1}>
-                    {formatDuration((currentPlaylistItem || originalItem).duration)}
-                    {(currentPlaylistItem || originalItem).resolution && ` • ${(currentPlaylistItem || originalItem).resolution}`}
-                    {(currentPlaylistItem || originalItem).filesize && ` • ${formatFileSize((currentPlaylistItem || originalItem).filesize)}`}
-                    {playlist && ` • Track ${playlistIndex + 1} of ${playlist.length}`}
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
+                    {/* Duration Badge */}
+                    <View style={styles.metaBadge}>
+                      <Text style={styles.metaBadgeIcon}>⏱️</Text>
+                      <Text style={styles.metaBadgeText}>
+                        {formatDuration((currentPlaylistItem || originalItem).duration)}
+                      </Text>
+                    </View>
+
+                    {/* Resolution Badge */}
+                    {(currentPlaylistItem || originalItem).resolution && (
+                      <View style={styles.metaBadge}>
+                        <Text style={styles.metaBadgeIcon}>📺</Text>
+                        <Text style={styles.metaBadgeText}>
+                          {(currentPlaylistItem || originalItem).resolution}
+                        </Text>
+                      </View>
+                    )}
+
+                    {/* File Size Badge */}
+                    {(currentPlaylistItem || originalItem).filesize && (
+                      <View style={styles.metaBadge}>
+                        <Text style={styles.metaBadgeIcon}>💾</Text>
+                        <Text style={styles.metaBadgeText}>
+                          {formatFileSize((currentPlaylistItem || originalItem).filesize)}
+                        </Text>
+                      </View>
+                    )}
+
+                    {/* Playlist Track Badge */}
+                    {playlist && (
+                      <View style={[styles.metaBadge, { borderColor: `${theme.colors.primary}40`, backgroundColor: `${theme.colors.primary}10` }]}>
+                        <Text style={styles.metaBadgeIcon}>🗂️</Text>
+                        <Text style={[styles.metaBadgeText, { color: theme.colors.primary }]}>
+                          Track {playlistIndex + 1} of {playlist.length}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
                 )}
               </View>
               <View style={styles.headerActions}>
@@ -500,6 +533,25 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: theme.colors.textSecondary,
+  },
+  metaBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    gap: 6,
+  },
+  metaBadgeIcon: {
+    fontSize: 12,
+  },
+  metaBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#ddd',
   },
   headerActions: {
     flexDirection: 'row',
