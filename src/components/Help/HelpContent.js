@@ -429,7 +429,7 @@ export default function HelpContent({ activeTab, displayHotkey }) {
             </Text>
             <View style={styles.bulletList}>
               <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Open Trimmer</Text>: Play a video in the built-in player and click the orange scissors <Text style={styles.highlight}>✂️ Clip</Text> icon to open the trimmer panel.</Text>
-              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Visual Dual-Slider Scrubbing</Text>: Grab the two orange handles below the timeline to visually adjust the Start and End cut positions. You'll get real-time seek previews as you drag the sliders.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Visual Dual-Slider Scrubbing</Text>: Grab the two white vertical pill handles on the timeline track to visually adjust the orange crop range representing your custom clip. You'll get real-time seek previews as you drag the sliders.</Text>
               <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Quick-Cut Snapping</Text>: While watching, click the <Text style={styles.highlight}>[ Set Start</Text> or <Text style={styles.highlight}>Set End ]</Text> buttons to snap the cut boundaries instantly to the player's active timestamp.</Text>
               <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Lossless FFmpeg Processing</Text>: Click <Text style={styles.highlight}>💾 Extract Clip</Text>. SauceBox will use ffmpeg to slice the video, automatically creating a standalone video card in your gallery. Your original file remains untouched!</Text>
             </View>
