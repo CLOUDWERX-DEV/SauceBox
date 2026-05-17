@@ -5,7 +5,16 @@ import ConfirmModal from '../../ConfirmModal';
 import { theme } from '../../../theme';
 import { styles } from './PlaylistStyles';
 
-export default function PlaylistGallery({ playlists, history, onOpen, onCreate, onPlay, onDelete, onUpdatePlaylist }) {
+export default function PlaylistGallery({
+  playlists,
+  history,
+  onOpen,
+  onCreate,
+  onPlay,
+  onDelete,
+  onUpdatePlaylist,
+  onQuickCast
+}) {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [editingTagId, setEditingTagId] = useState(null);
   const [newTagText, setNewTagText] = useState('');
@@ -94,6 +103,15 @@ export default function PlaylistGallery({ playlists, history, onOpen, onCreate, 
               >
                 <View style={{ position: 'relative' }}>
                   <View style={styles.playlistCardActionsTop}>
+                    <TouchableOpacity 
+                      style={styles.folderButtonHistory}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        if (onQuickCast) onQuickCast(playlist);
+                      }}
+                    >
+                      <Text style={[styles.folderButtonTextHistory, { fontSize: 10, color: theme.colors.primary }]}>📡</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity 
                       style={styles.deleteButton}
                       onPress={(e) => { e.stopPropagation(); setDeleteTarget(playlist); }}

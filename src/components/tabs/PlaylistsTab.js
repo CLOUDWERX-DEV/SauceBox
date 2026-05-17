@@ -13,9 +13,23 @@ export default function PlaylistsTab() {
   const deletePlaylist = useStore(state => state.deletePlaylist);
   const settings = useStore(state => state.settings);
 
+  const setQuickCastVideo = useStore(state => state.setQuickCastVideo);
+
   const [activePlaylistId, setActivePlaylistId] = useState(null);
 
   const activePlaylist = playlists.find(p => p.id === activePlaylistId);
+
+  const handleQuickCast = (playlist) => {
+    const items = (playlist.items || [])
+      .map(id => history.find(h => h.id === id))
+      .filter(Boolean);
+    
+    if (items.length > 0) {
+      setQuickCastVideo(items);
+    } else {
+      alert('Cannot cast an empty playlist. Add some videos first.');
+    }
+  };
 
   const handleCreate = () => {
     const newPlaylist = {
@@ -96,6 +110,7 @@ export default function PlaylistsTab() {
         onCreate={handleCreate}
         onUpdatePlaylist={updatePlaylist}
         onPlay={(playlist) => handlePlayAll(playlist.items)}
+        onQuickCast={handleQuickCast}
         onDelete={(id) => {
           deletePlaylist(id);
           if (activePlaylistId === id) setActivePlaylistId(null);

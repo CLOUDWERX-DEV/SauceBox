@@ -144,7 +144,7 @@ export default function BroadcastTab() {
 
   useEffect(() => {
     if (quickCastVideo) {
-      const newPlaylist = [quickCastVideo];
+      const newPlaylist = Array.isArray(quickCastVideo) ? quickCastVideo : [quickCastVideo];
       setPlaylist(newPlaylist);
       setQuickCastVideo(null); // clear it
       handleToggleServer(true).then(() => {
