@@ -11,6 +11,7 @@
 - **Expanded Supported Sites Documentation**: Added YouPorn to the list of core explicitly tested and supported adult networks in both `README.md` and the Help panel documentation (`HelpContent.js`), and updated both references to prominently note the broader support for over 1,000+ online video networks.
 - **Core Engine Resource Linking**: Integrated external link actions on the `yt-dlp` and `FFmpeg` spec tags inside the Settings About dashboard. Clicking either key opens their official website or GitHub repository cleanly in the host browser.
 - **Database Storage Label Refinement**: Changed the system specification label for the database format inside the Settings About tab from "Split Physical JSON" to "JSON" for cleaner and sleeker information display.
+- **Automated Release Script & Comprehensive Documentation**: Developed a highly automated, fully interactive release shell script (`release.sh`) in the project root to handle local compile, cross-compilation (Windows & Linux via Wine), tag validation, changelog parsing, and secure direct publication to GitHub Releases via `gh` CLI. Overhauled `docs/RELEASES.md` into an extensive cross-platform release engineering manual featuring detailed prerequisites, strategic guidance on minor vs major version cycles, and a step-by-step interactive manual.
 
 ## [1.6.0] - 2026-05-16
 
