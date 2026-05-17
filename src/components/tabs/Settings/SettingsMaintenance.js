@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { theme } from '../../../theme';
 import { useStore } from '../../../store';
+import ConfirmModal from '../../ConfirmModal';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
@@ -11,6 +12,16 @@ export default function SettingsMaintenance() {
   const removeFromHistory = useStore(state => state.removeFromHistory);
   const clearHistory = useStore(state => state.clearHistory);
   const resetSettings = useStore(state => state.resetSettings);
+
+  const [modalConfig, setModalConfig] = React.useState({ visible: false });
+
+  const showConfirm = (config) => {
+    setModalConfig({ ...config, visible: true });
+  };
+
+  const closeModal = () => {
+    setModalConfig({ visible: false });
+  };
 
   const handleBackup = async () => {
     try {
@@ -26,19 +37,32 @@ export default function SettingsMaintenance() {
   };
 
   const handleClearDatabase = () => {
-    const answer = window.prompt("🚨 DANGER ZONE 🚨\n\nThis will permanently wipe your entire SauceBox Gallery database (history, ratings, tags). Your physical video files on your hard drive will NOT be deleted, but SauceBox will forget everything about them.\n\nTo confirm, type 'NUKE' below:");
-    if (answer === 'NUKE') {
-      clearHistory();
-      alert("Database completely wiped.");
-    }
+    showConfirm({
+      title: "🚨 DANGER ZONE 🚨",
+      message: "This will permanently wipe your entire SauceBox Gallery database (history, ratings, tags). Your physical video files on your hard drive will NOT be deleted, but SauceBox will forget everything about them.",
+      confirmText: "Wipe Gallery",
+      confirmColor: theme.colors.error,
+      requireInputText: "NUKE",
+      onConfirm: () => {
+        clearHistory();
+        closeModal();
+        alert("Database completely wiped.");
+      }
+    });
   };
 
   const handleResetSettings = () => {
-    const confirm = window.confirm("Are you sure you want to reset ALL SauceBox settings back to their default values? Your Gallery and video files will NOT be affected.");
-    if (confirm) {
-      resetSettings();
-      alert("All settings have been reset to factory defaults.");
-    }
+    showConfirm({
+      title: "Reset Application Settings",
+      message: "Are you sure you want to reset ALL SauceBox settings back to their default values? Your Gallery and video files will NOT be affected.",
+      confirmText: "Reset Defaults",
+      confirmColor: theme.colors.primary,
+      onConfirm: () => {
+        resetSettings();
+        closeModal();
+        alert("All settings have been reset to factory defaults.");
+      }
+    });
   };
 
   const handleFindDuplicates = async () => {
@@ -78,14 +102,20 @@ export default function SettingsMaintenance() {
       const dbPaths = history.map(h => h.path).filter(Boolean);
       const missing = await ipcRenderer?.invoke('verify-database', dbPaths);
       if (missing && missing.length > 0) {
-        const confirm = window.confirm(`Found ${missing.length} entries in your Gallery where the file has been deleted manually from the disk.\n\nWould you like to automatically remove these broken entries from your Gallery now?`);
-        if (confirm) {
-          missing.forEach(missingPath => {
-            const item = history.find(h => h.path === missingPath);
-            if (item) removeFromHistory(item.id);
-          });
-          alert('Database cleaned successfully!');
-        }
+        showConfirm({
+          title: "Clean Database",
+          message: `Found ${missing.length} entries in your Gallery where the file has been deleted manually from the disk.\n\nWould you like to automatically remove these broken entries from your Gallery now?`,
+          confirmText: "Clean Entries",
+          confirmColor: theme.colors.error,
+          onConfirm: () => {
+            missing.forEach(missingPath => {
+              const item = history.find(h => h.path === missingPath);
+              if (item) removeFromHistory(item.id);
+            });
+            closeModal();
+            alert('Database cleaned successfully!');
+          }
+        });
       } else {
         alert('Database is perfect! All files in the Gallery exist on disk.');
       }
@@ -177,6 +207,7 @@ export default function SettingsMaintenance() {
           </TouchableOpacity>
         </View>
       </View>
+      <ConfirmModal {...modalConfig} onCancel={closeModal} />
     </View>
   );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { theme } from '../theme';
 
 export default function ConfirmModal({
@@ -14,8 +14,18 @@ export default function ConfirmModal({
   checkboxLabel = null,
   checkboxValue = false,
   onCheckboxChange = null,
+  // Optional text input confirmation
+  requireInputText = null,
 }) {
+  const [inputText, setInputText] = React.useState('');
+
+  React.useEffect(() => {
+    if (visible) setInputText('');
+  }, [visible]);
+
   if (!visible) return null;
+
+  const isConfirmDisabled = requireInputText ? inputText !== requireInputText : false;
 
   return (
     <Modal transparent={true} visible={visible} animationType="fade">
@@ -36,14 +46,35 @@ export default function ConfirmModal({
             </TouchableOpacity>
           )}
 
+          {requireInputText && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputPrompt}>
+                Type <Text style={styles.requireMatchText}>"{requireInputText}"</Text> to confirm:
+              </Text>
+              <TextInput
+                style={styles.input}
+                value={inputText}
+                onChangeText={setInputText}
+                placeholder={requireInputText}
+                placeholderTextColor={theme.colors.textTertiary}
+                autoCapitalize="none"
+              />
+            </View>
+          )}
+
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.confirmButton, { backgroundColor: confirmColor }]}
+              style={[
+                styles.confirmButton, 
+                { backgroundColor: confirmColor },
+                isConfirmDisabled && { opacity: 0.5 }
+              ]}
               onPress={onConfirm}
+              disabled={isConfirmDisabled}
             >
               <Text style={styles.confirmButtonText}>{confirmText}</Text>
             </TouchableOpacity>
@@ -141,4 +172,25 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '700',
   },
+  inputContainer: {
+    marginBottom: 24,
+  },
+  inputPrompt: {
+    color: theme.colors.text,
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  requireMatchText: {
+    color: theme.colors.error,
+    fontWeight: 'bold',
+  },
+  input: {
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 8,
+    padding: 12,
+    color: theme.colors.text,
+    fontSize: 14,
+  }
 });
