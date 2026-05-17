@@ -12,6 +12,10 @@
 ### Changed
 - **Zustand Storage Adapter**: Refactored `src/store.js` to utilize a custom asynchronous `createJSONStorage` adapter that natively invokes the newly built `load-state`, `save-state`, and `remove-state` IPC handlers in `electron/modules/storage.js`.
 - **Vault PIN Reset Instructions**: Updated the PIN reset guide in the Settings tab to point directly to `saucebox-settings.json`, explicitly warning the user NOT to delete `saucebox-gallery.json` to prevent catastrophic data loss.
+
+### Fixed
+- **Electron Prompt Crash**: Fixed a fatal crash (`prompt() is and will not be supported`) occurring when attempting to use native browser `window.prompt` or `window.confirm` dialogs in Electron. Completely refactored `SettingsMaintenance.js` to use a custom, non-blocking React Native `ConfirmModal` UI component.
+- **Strict Input Validation**: Upgraded the custom `ConfirmModal` component to optionally accept a `requireInputText` parameter, rendering a physical text input that securely disables the confirm button until the exact security phrase (e.g., "NUKE") is matched.
 ## [1.3.17] - 2026-05-16
 
 ### Changed
