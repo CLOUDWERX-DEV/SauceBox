@@ -5,7 +5,7 @@
 <h1 align="center">SauceBox</h1>
 
 <p align="center">
-  <strong>Download, organize, and stream adult content — all from one app! SauceBox.</strong><br/>
+  <strong>Download, organize, and stream adult content — all from one app!</strong><br/>
   <em>Your sauce. Your box. Your rules.</em><br/><br/>
   <a href="https://saucebox.app">saucebox.app</a>
 </p>
