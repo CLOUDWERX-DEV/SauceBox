@@ -147,6 +147,12 @@ If you love using this app, consider supporting its future development by buying
   <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
 </a>
 
+## 📄 License
+
+This project is licensed under the **GNU General Public License version 3 (GPL-3.0-only)**. 
+
+SauceBox is and will always remain 100% free and open-source software. You are free to redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation. For more details, see the official [LICENSE](LICENSE) file in the root of this repository.
+
 ---
 
 <p align="center">

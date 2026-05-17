@@ -92,6 +92,14 @@ export default function SettingsAbout() {
               <Text style={styles.aboutLabel}>Database Storage</Text>
               <Text style={styles.aboutValue}>JSON</Text>
             </View>
+            <View style={styles.aboutRow}>
+              <Text style={styles.aboutLabel}>Software License</Text>
+              <TouchableOpacity onPress={() => openExternal('https://github.com/CLOUDWERX-DEV/SauceBox/blob/main/LICENSE')}>
+                <Text style={[styles.aboutValue, { color: theme.colors.primary, textDecorationLine: 'underline', cursor: 'pointer' }]}>
+                  GNU GPL v3
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.infoCol}>
