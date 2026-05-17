@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/saucebox-main-ui.png" width="48%" alt="SauceBox Main UI" />
+  <img src="docs/assets/saucebox-main-ui.png" width="100%" alt="SauceBox Main UI" />
 </p>
 
 <p align="center">

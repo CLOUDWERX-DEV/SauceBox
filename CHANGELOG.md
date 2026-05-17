@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.12] - 2026-05-16
+
+### Changed
+- **README Screenshot Size**: Enlarged the primary application UI screenshot inside `README.md` from `width="48%"` to `width="100%"` to make it fully legible and visually outstanding on GitHub and central documentation portals.
+
 ## [1.3.11] - 2026-05-16
 
 ### Fixed
