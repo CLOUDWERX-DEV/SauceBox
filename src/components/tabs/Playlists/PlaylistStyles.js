@@ -1,0 +1,447 @@
+import { StyleSheet } from 'react-native';
+import { theme } from '../../../theme';
+
+export const styles = StyleSheet.create({
+  // Gallery View (View A)
+  galleryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 20,
+  },
+  createCard: {
+    width: 260,
+    height: 200,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: theme.colors.primary,
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+    gap: 12,
+  },
+  createCardIcon: {
+    fontSize: 48,
+    color: theme.colors.primary,
+  },
+  createCardText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.primary,
+  },
+  playlistCard: {
+    width: 260,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    cursor: 'default',
+    transition: 'transform 0.2s ease, border-color 0.2s ease',
+  },
+  playlistCardImage: {
+    width: '100%',
+    height: 150,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  playlistCardOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  playButtonLarge: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: theme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+  },
+  playIconLarge: {
+    fontSize: 24,
+    color: '#fff',
+    marginLeft: 4,
+  },
+  playlistCardBody: {
+    padding: 16,
+    gap: 8,
+  },
+  playlistCardName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.text,
+  },
+  playlistCardStats: {
+    flexDirection: 'row',
+    gap: 12,
+    flexWrap: 'wrap',
+  },
+  playlistCardStat: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
+  playlistCardActionsTop: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    flexDirection: 'row',
+    gap: 8,
+    zIndex: 10,
+  },
+  deleteButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+    borderWidth: 1,
+    borderColor: theme.colors.error,
+  },
+  deleteButtonText: {
+    color: theme.colors.error,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  playlistCardActionsBottom: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 4,
+    alignItems: 'center',
+  },
+  smallButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+    backgroundColor: theme.colors.surfaceLight,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    cursor: 'pointer',
+  },
+  smallButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
+  editButton: {
+    marginLeft: 'auto',
+    backgroundColor: theme.colors.surfaceLight,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    cursor: 'pointer',
+  },
+  editButtonText: {
+    color: theme.colors.textSecondary,
+    fontSize: 11,
+    fontWeight: '600',
+  },
+
+  // Editor View (View B) - Split pane
+  editorContainer: {
+    flexDirection: 'row',
+    gap: 24,
+    flex: 1,
+    minHeight: 600,
+  },
+  editorLeft: {
+    flex: 1,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  editorRight: {
+    width: 420,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  panelHeader: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    gap: 12,
+    flexShrink: 0,
+  },
+  panelHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  panelTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.primary,
+  },
+  panelSubtitle: {
+    fontSize: 12,
+    color: theme.colors.textTertiary,
+  },
+
+  // Search bar inside editor left pane
+  editorSearch: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surfaceLight,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  editorSearchIcon: {
+    fontSize: 14,
+    marginRight: 8,
+  },
+  editorSearchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: theme.colors.text,
+    outlineStyle: 'none',
+  },
+  sortRow: {
+    flexDirection: 'row',
+    gap: 6,
+    flexWrap: 'wrap',
+  },
+  sortButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    backgroundColor: theme.colors.surfaceLight,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    cursor: 'pointer',
+  },
+  sortButtonActive: {
+    backgroundColor: `${theme.colors.primary}20`,
+    borderColor: theme.colors.primary,
+  },
+  sortButtonText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
+  sortButtonTextActive: {
+    color: theme.colors.primary,
+  },
+
+  // Video list items (left pane)
+  videoListItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    cursor: 'pointer',
+  },
+  videoListThumb: {
+    width: 80,
+    height: 50,
+    borderRadius: 6,
+  },
+  videoListInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  videoListTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.text,
+    numberOfLines: 1,
+  },
+  videoListMeta: {
+    fontSize: 11,
+    color: theme.colors.textTertiary,
+  },
+  addButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    backgroundColor: `${theme.colors.primary}20`,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+    cursor: 'pointer',
+  },
+  addButtonText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.colors.primary,
+  },
+  addedBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    backgroundColor: theme.colors.surfaceLight,
+  },
+  addedBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: theme.colors.textTertiary,
+  },
+
+  // Playlist items (right pane)
+  playlistItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    gap: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  playlistItemDragOver: {
+    backgroundColor: `${theme.colors.primary}15`,
+    borderBottomColor: theme.colors.primary,
+  },
+  dragHandle: {
+    fontSize: 16,
+    color: theme.colors.textTertiary,
+    cursor: 'grab',
+    userSelect: 'none',
+  },
+  playlistItemIndex: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.textTertiary,
+    width: 24,
+    textAlign: 'center',
+  },
+  playlistItemThumb: {
+    width: 64,
+    height: 40,
+    borderRadius: 4,
+  },
+  playlistItemInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  playlistItemTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.text,
+  },
+  playlistItemMeta: {
+    fontSize: 11,
+    color: theme.colors.textTertiary,
+  },
+  removeButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: `${theme.colors.error}20`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+  },
+  removeButtonText: {
+    fontSize: 14,
+    color: theme.colors.error,
+    fontWeight: '700',
+  },
+
+  // Playlist header / name input
+  nameInput: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.text,
+    backgroundColor: theme.colors.surfaceLight,
+    borderRadius: 8,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    outlineStyle: 'none',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  statBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  statBadgeText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+  },
+
+  // Action toolbar
+  toolbar: {
+    flexDirection: 'row',
+    gap: 8,
+    padding: 12,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    flexShrink: 0,
+    flexWrap: 'wrap',
+  },
+  toolbarButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: theme.colors.surfaceLight,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    cursor: 'pointer',
+  },
+  toolbarButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: theme.colors.text,
+  },
+  toolbarButtonPrimary: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  toolbarButtonPrimaryText: {
+    color: '#000',
+    fontWeight: '700',
+  },
+
+  // Empty state
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+    gap: 12,
+  },
+  emptyStateIcon: {
+    fontSize: 48,
+    opacity: 0.5,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+  },
+  emptyStateSubText: {
+    fontSize: 13,
+    color: theme.colors.textTertiary,
+    textAlign: 'center',
+  },
+});
