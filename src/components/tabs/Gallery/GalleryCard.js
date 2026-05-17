@@ -114,26 +114,38 @@ export default function GalleryCard({
             👤 {item.uploader}
           </Text>
         )}
-        <View style={styles.historyMeta}>
-          <Text style={styles.historyMetaText}>
-            {formatDuration(item.duration)}
-          </Text>
-          {item.resolution && (
-            <>
-              <Text style={styles.historyMetaDot}>•</Text>
-              <Text style={styles.historyMetaText}>{formatResolutionBadge(item.resolution)}</Text>
-            </>
-          )}
-          {item.filesize && (
-            <>
-              <Text style={styles.historyMetaDot}>•</Text>
-              <Text style={styles.historyMetaText}>{formatFileSize(item.filesize)}</Text>
-            </>
-          )}
-          <Text style={styles.historyMetaDot}>•</Text>
-          <Text style={styles.historyMetaText}>
-            {formatDate(item.timestamp)}
-          </Text>
+        {/* Metadata badges — strict 2×2 grid so they never wrap oddly */}
+        <View style={styles.metaBadgeGrid}>
+          {/* Row 1: Duration + Resolution */}
+          <View style={styles.metaBadgeRow}>
+            <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+              <Text style={styles.metaBadgeIcon}>⏱️</Text>
+              <Text style={styles.metaBadgeText} numberOfLines={1}>
+                {formatDuration(item.duration)}
+              </Text>
+            </View>
+            <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+              <Text style={styles.metaBadgeIcon}>📺</Text>
+              <Text style={styles.metaBadgeText} numberOfLines={1}>
+                {item.resolution ? formatResolutionBadge(item.resolution) : '—'}
+              </Text>
+            </View>
+          </View>
+          {/* Row 2: Filesize + Age */}
+          <View style={styles.metaBadgeRow}>
+            <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+              <Text style={styles.metaBadgeIcon}>💾</Text>
+              <Text style={styles.metaBadgeText} numberOfLines={1}>
+                {item.filesize ? formatFileSize(item.filesize) : '—'}
+              </Text>
+            </View>
+            <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+              <Text style={styles.metaBadgeIcon}>🕒</Text>
+              <Text style={styles.metaBadgeText} numberOfLines={1}>
+                {item.timestamp ? formatDate(item.timestamp) : '—'}
+              </Text>
+            </View>
+          </View>
         </View>
         
         <View style={styles.tagsContainer}>
@@ -312,6 +324,40 @@ const styles = StyleSheet.create({
   historyMetaDot: {
     fontSize: 10,
     color: '#444',
+  },
+  metaBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 5,
+    gap: 3,
+  },
+  metaBadgeIcon: {
+    fontSize: 10,
+  },
+  metaBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#ccc',
+    flexShrink: 1,
+  },
+  metaBadgeGrid: {
+    flexDirection: 'column',
+    gap: 4,
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  metaBadgeRow: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  metaBadgeFlex: {
+    flex: 1,
+    minWidth: 0,
   },
   ratingContainer: {
     flexDirection: 'row',

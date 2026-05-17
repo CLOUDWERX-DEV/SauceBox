@@ -94,6 +94,40 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     color: theme.colors.textSecondary,
   },
+  metaBadgeGrid: {
+    flexDirection: 'column',
+    gap: 4,
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  metaBadgeRow: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  metaBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 5,
+    gap: 3,
+  },
+  metaBadgeFlex: {
+    flex: 1,
+    minWidth: 0,
+  },
+  metaBadgeIcon: {
+    fontSize: 10,
+  },
+  metaBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#ccc',
+    flexShrink: 1,
+  },
   playlistCardActionsTop: {
     position: 'absolute',
     top: 12,

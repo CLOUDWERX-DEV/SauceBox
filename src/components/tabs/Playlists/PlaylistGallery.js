@@ -31,6 +31,21 @@ const formatTotalDuration = (seconds) => {
   return parts.join(' ');
 };
 
+const formatDate = (timestamp) => {
+  if (!timestamp) return null;
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diff = now - date;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
+  return date.toLocaleDateString();
+};
+
 export default function PlaylistGallery({
   playlists,
   history,
@@ -261,12 +276,38 @@ export default function PlaylistGallery({
                   <Text style={styles.playlistCardName} numberOfLines={1}>
                     {playlist.name || 'Untitled Playlist'}
                   </Text>
-                  <View style={styles.playlistCardStats}>
-                    <Text style={styles.playlistCardStat}>🎬 {stats.count} videos</Text>
-                    <Text style={styles.playlistCardStat}>⏱️ {formatDuration(stats.totalDuration)}</Text>
-                    {stats.totalSize > 0 && (
-                      <Text style={styles.playlistCardStat}>💾 {formatSize(stats.totalSize)}</Text>
-                    )}
+                  {/* Metadata badges — strict 2×2 grid matching Gallery tab */}
+                  <View style={styles.metaBadgeGrid}>
+                    {/* Row 1: Video count + Duration */}
+                    <View style={styles.metaBadgeRow}>
+                      <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+                        <Text style={styles.metaBadgeIcon}>🎬</Text>
+                        <Text style={styles.metaBadgeText} numberOfLines={1}>
+                          {stats.count} videos
+                        </Text>
+                      </View>
+                      <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+                        <Text style={styles.metaBadgeIcon}>⏱️</Text>
+                        <Text style={styles.metaBadgeText} numberOfLines={1}>
+                          {formatDuration(stats.totalDuration) || '—'}
+                        </Text>
+                      </View>
+                    </View>
+                    {/* Row 2: Filesize + Created */}
+                    <View style={styles.metaBadgeRow}>
+                      <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+                        <Text style={styles.metaBadgeIcon}>💾</Text>
+                        <Text style={styles.metaBadgeText} numberOfLines={1}>
+                          {stats.totalSize > 0 ? formatSize(stats.totalSize) : '—'}
+                        </Text>
+                      </View>
+                      <View style={[styles.metaBadge, styles.metaBadgeFlex]}>
+                        <Text style={styles.metaBadgeIcon}>🕒</Text>
+                        <Text style={styles.metaBadgeText} numberOfLines={1}>
+                          {formatDate(playlist.createdAt) || '—'}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
                   <View style={styles.tagsContainer}>
                     {(playlist.tags || []).map(tag => (
