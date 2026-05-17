@@ -85,7 +85,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
         {history.length > 0 && <Text style={styles.logoSubtext}>Feeling Lucky? 🎲</Text>}
       </TouchableOpacity>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.tabsContentContainer}>
+      <ScrollView style={{ flex: 1, overflowY: 'auto' }} contentContainerStyle={styles.tabsContentContainer}>
         {tabs.map((tab) => {
           const badgeCount = getBadgeCount(tab.id);
           return (

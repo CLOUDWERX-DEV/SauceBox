@@ -196,6 +196,7 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: theme.colors.border,
     paddingVertical: 16,
+    overflowY: 'auto',
   },
   tabButton: {
     flexDirection: 'row',
