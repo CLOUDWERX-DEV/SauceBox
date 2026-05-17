@@ -94,6 +94,7 @@ export default function PlaylistsTab() {
         history={history}
         onOpen={(id) => setActivePlaylistId(id)}
         onCreate={handleCreate}
+        onUpdatePlaylist={updatePlaylist}
         onPlay={(playlist) => handlePlayAll(playlist.items)}
         onDelete={(id) => {
           deletePlaylist(id);

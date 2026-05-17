@@ -1,12 +1,32 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import VideoThumbnail from '../../VideoThumbnail';
 import ConfirmModal from '../../ConfirmModal';
 import { theme } from '../../../theme';
 import { styles } from './PlaylistStyles';
 
-export default function PlaylistGallery({ playlists, history, onOpen, onCreate, onPlay, onDelete }) {
-  const [deleteTarget, setDeleteTarget] = React.useState(null);
+export default function PlaylistGallery({ playlists, history, onOpen, onCreate, onPlay, onDelete, onUpdatePlaylist }) {
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [editingTagId, setEditingTagId] = useState(null);
+  const [newTagText, setNewTagText] = useState('');
+
+  const handleAddTag = (playlistId, tag) => {
+    const playlist = playlists.find(p => p.id === playlistId);
+    if (playlist && !(playlist.tags || []).includes(tag)) {
+      onUpdatePlaylist(playlistId, { tags: [...(playlist.tags || []), tag] });
+    }
+  };
+
+  const handleRemoveTag = (playlistId, tag) => {
+    const playlist = playlists.find(p => p.id === playlistId);
+    if (playlist) {
+      onUpdatePlaylist(playlistId, { tags: (playlist.tags || []).filter(t => t !== tag) });
+    }
+  };
+
+  const handleUpdateRating = (playlistId, rating) => {
+    onUpdatePlaylist(playlistId, { rating });
+  };
 
   const getPlaylistStats = (playlist) => {
     const items = (playlist.items || [])
@@ -105,14 +125,62 @@ export default function PlaylistGallery({ playlists, history, onOpen, onCreate, 
                       <Text style={styles.playlistCardStat}>💾 {formatSize(stats.totalSize)}</Text>
                     )}
                   </View>
-                  <View style={styles.playlistCardActionsBottom}>
-                    <TouchableOpacity
-                      style={styles.editButton}
-                      onPress={() => onOpen(playlist.id)}
-                    >
-                      <Text style={styles.editButtonText}>✏️ Edit</Text>
-                    </TouchableOpacity>
+                  <View style={styles.tagsContainer}>
+                    {(playlist.tags || []).map(tag => (
+                      <View key={tag} style={styles.tagBadge}>
+                        <Text style={styles.tagBadgeText}>{tag}</Text>
+                        <TouchableOpacity onPress={(e) => { e.stopPropagation(); handleRemoveTag(playlist.id, tag); }}>
+                          <Text style={styles.tagRemoveText}>✕</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                    {editingTagId === playlist.id ? (
+                      <TextInput 
+                        style={styles.tagInput}
+                        autoFocus
+                        value={newTagText}
+                        onChangeText={setNewTagText}
+                        onBlur={() => { setEditingTagId(null); setNewTagText(''); }}
+                        onSubmitEditing={() => {
+                          if (newTagText.trim()) handleAddTag(playlist.id, newTagText.trim());
+                          setEditingTagId(null);
+                          setNewTagText('');
+                        }}
+                      />
+                    ) : (
+                      <TouchableOpacity style={styles.addTagButton} onPress={(e) => { e.stopPropagation(); setEditingTagId(playlist.id); }}>
+                        <Text style={styles.addTagButtonText}>+ Tag</Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
+
+                  <View style={styles.ratingContainer}>
+                    <Text style={styles.ratingLabel}>Rate:</Text>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <TouchableOpacity
+                        key={star}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          handleUpdateRating(playlist.id, star);
+                        }}
+                        style={styles.starButton}
+                      >
+                        <Text style={star <= (playlist.rating || 0) ? styles.starFilled : styles.starEmpty}>
+                          {star <= (playlist.rating || 0) ? '★' : '★'}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                    
+                    <View style={styles.playlistCardActionsBottom}>
+                      <TouchableOpacity
+                        style={styles.editButton}
+                        onPress={() => onOpen(playlist.id)}
+                      >
+                        <Text style={styles.editButtonText}>✏️ Edit</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
                 </View>
               </View>
             );
