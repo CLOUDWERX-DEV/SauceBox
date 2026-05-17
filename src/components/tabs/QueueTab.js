@@ -122,11 +122,11 @@ export default function QueueTab({ onNavigate }) {
         <View style={styles.header}>
           <View>
             <Text style={styles.title}>Download Queue</Text>
-            <Text style={styles.subtitle}>
-              {downloads.filter(d => d.status !== 'completed').length === 0 
-                ? 'No downloads in queue' 
-                : `${downloads.filter(d => d.status !== 'completed').length} item(s) in queue 🔥`}
-            </Text>
+            {downloads.filter(d => d.status !== 'completed').length > 0 && (
+              <Text style={styles.subtitle}>
+                {downloads.filter(d => d.status !== 'completed').length} item(s) in queue 🔥
+              </Text>
+            )}
           </View>
           {downloads.length > 0 && (
             <TouchableOpacity style={styles.clearButton} onPress={() => setClearConfirmVisible(true)}>
