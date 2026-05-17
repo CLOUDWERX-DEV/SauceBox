@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { theme } from '../theme';
 import { useStore } from '../store';
 import EditVideoModal from './EditVideoModal';
+import Tooltip from './Tooltip';
 
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 
@@ -250,43 +251,51 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
                   {(currentPlaylistItem?.title || videoTitle || 'Unknown Video')}
                 </Text>
                 {(currentPlaylistItem || originalItem) && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6, flexWrap: 'wrap', position: 'relative', zIndex: 10 }}>
                     {/* Duration Badge */}
-                    <View style={styles.metaBadge}>
-                      <Text style={styles.metaBadgeIcon}>⏱️</Text>
-                      <Text style={styles.metaBadgeText}>
-                        {formatDuration((currentPlaylistItem || originalItem).duration)}
-                      </Text>
-                    </View>
-
+                    <Tooltip content="Duration" position="bottom">
+                      <View style={styles.metaBadge}>
+                        <Text style={styles.metaBadgeIcon}>⏱️</Text>
+                        <Text style={styles.metaBadgeText}>
+                          {formatDuration((currentPlaylistItem || originalItem).duration)}
+                        </Text>
+                      </View>
+                    </Tooltip>
+ 
                     {/* Resolution Badge */}
                     {(currentPlaylistItem || originalItem).resolution && (
-                      <View style={styles.metaBadge}>
-                        <Text style={styles.metaBadgeIcon}>📺</Text>
-                        <Text style={styles.metaBadgeText}>
-                          {(currentPlaylistItem || originalItem).resolution}
-                        </Text>
-                      </View>
+                      <Tooltip content="Resolution" position="bottom">
+                        <View style={styles.metaBadge}>
+                          <Text style={styles.metaBadgeIcon}>📺</Text>
+                          <Text style={styles.metaBadgeText}>
+                            {(currentPlaylistItem || originalItem).resolution}
+                          </Text>
+                        </View>
+                      </Tooltip>
                     )}
-
+ 
                     {/* File Size Badge */}
                     {(currentPlaylistItem || originalItem).filesize && (
-                      <View style={styles.metaBadge}>
-                        <Text style={styles.metaBadgeIcon}>💾</Text>
-                        <Text style={styles.metaBadgeText}>
-                          {formatFileSize((currentPlaylistItem || originalItem).filesize)}
-                        </Text>
-                      </View>
+                      <Tooltip content="File Size" position="bottom">
+                        <View style={styles.metaBadge}>
+                          <Text style={styles.metaBadgeIcon}>💾</Text>
+                          <Text style={styles.metaBadgeText}>
+                            {formatFileSize((currentPlaylistItem || originalItem).filesize)}
+                          </Text>
+                        </View>
+                      </Tooltip>
                     )}
-
+ 
                     {/* Playlist Track Badge */}
                     {playlist && (
-                      <View style={[styles.metaBadge, { borderColor: `${theme.colors.primary}40`, backgroundColor: `${theme.colors.primary}10` }]}>
-                        <Text style={styles.metaBadgeIcon}>🗂️</Text>
-                        <Text style={[styles.metaBadgeText, { color: theme.colors.primary }]}>
-                          Track {playlistIndex + 1} of {playlist.length}
-                        </Text>
-                      </View>
+                      <Tooltip content="Track Position in Playlist" position="bottom">
+                        <View style={[styles.metaBadge, { borderColor: `${theme.colors.primary}40`, backgroundColor: `${theme.colors.primary}10` }]}>
+                          <Text style={styles.metaBadgeIcon}>🗂️</Text>
+                          <Text style={[styles.metaBadgeText, { color: theme.colors.primary }]}>
+                            Track {playlistIndex + 1} of {playlist.length}
+                          </Text>
+                        </View>
+                      </Tooltip>
                     )}
                   </View>
                 )}
