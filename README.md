@@ -28,6 +28,9 @@ Paste a playlist URL and SauceBox instantly pulls all the metadata into a beauti
 ### 🗄️ Beautiful Video Gallery & Media Management 🏷️
 Your `Gallery` tab isn't just a log—it's a fully-fledged video manager. Search through your local archive, view rich metadata, sort your collection, and give videos a **Star Rating**. Use the **Smart Tagging** system to create your own categories (like "Favorites" or "Cinematic") and instantly filter your massive archive to find exactly what you're looking for.
 
+### 💾 Bulletproof Native Storage
+SauceBox doesn't rely on volatile browser caches. Your entire database—including Gallery History, Queues, Tags, Ratings, and Settings—is securely written directly to your operating system's native application data directory using atomic file writes. This guarantees your data survives app updates, prevents loss when caches are cleared, and makes backups as easy as copying a single `.json` file.
+
 ### 🎥 Robust Local Importing
 Already have a massive stash on your hard drive? Use the **Import** feature to ingest entire folders or specific files into your SauceBox Gallery. Choose between single-file wizard editing, bulk uniform metadata, or fully automated metadata scraping. SauceBox will use `ffmpeg` to instantly generate high-quality thumbnails, scrape true video durations, extract exact resolutions, and calculate real file sizes for everything you import.
 

@@ -1,5 +1,7 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+
+const { ipcRenderer } = window.require('electron');
 
 export const useStore = create(
   persist(
@@ -102,6 +104,17 @@ export const useStore = create(
     }),
     {
       name: 'saucebox-storage',
+      storage: createJSONStorage(() => ({
+        getItem: async (name) => {
+          return await ipcRenderer.invoke('load-state', name);
+        },
+        setItem: async (name, value) => {
+          await ipcRenderer.invoke('save-state', { name, value });
+        },
+        removeItem: async (name) => {
+          await ipcRenderer.invoke('remove-state', name);
+        }
+      }))
     }
   )
 );

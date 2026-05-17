@@ -21,28 +21,28 @@ export default function SettingsSecurityVault() {
 
       if (platform === 'win32') {
         const appData = process.env.APPDATA || path.join(home, 'AppData', 'Roaming');
-        const dir = path.join(appData, 'saucebox', 'Local Storage', 'leveldb');
+        const file = path.join(appData, 'SauceBox', 'saucebox-storage.json');
         return {
           os: 'Windows',
-          dir,
-          instruction: `Open File Explorer and delete the folder:\n${dir}`,
-          shortPath: `%APPDATA%\\saucebox\\Local Storage\\leveldb`,
+          file,
+          instruction: `Open File Explorer and delete the file:\n${file}`,
+          shortPath: `%APPDATA%\\SauceBox\\saucebox-storage.json`,
         };
       } else if (platform === 'darwin') {
-        const dir = path.join(home, 'Library', 'Application Support', 'saucebox', 'Local Storage', 'leveldb');
+        const file = path.join(home, 'Library', 'Application Support', 'SauceBox', 'saucebox-storage.json');
         return {
           os: 'macOS',
-          dir,
-          instruction: `Open Finder, press Cmd+Shift+G, paste the path, and delete the folder.`,
-          shortPath: `~/Library/Application Support/saucebox/Local Storage/leveldb`,
+          file,
+          instruction: `Open Finder, press Cmd+Shift+G, paste the path, and delete the file.`,
+          shortPath: `~/Library/Application Support/SauceBox/saucebox-storage.json`,
         };
       } else {
-        const dir = path.join(home, '.config', 'saucebox', 'Local Storage', 'leveldb');
+        const file = path.join(home, '.config', 'SauceBox', 'saucebox-storage.json');
         return {
           os: 'Linux',
-          dir,
-          instruction: `Open a terminal and run:\nrm -rf "${dir}"`,
-          shortPath: `~/.config/saucebox/Local Storage/leveldb`,
+          file,
+          instruction: `Open a terminal and run:\nrm "${file}"`,
+          shortPath: `~/.config/SauceBox/saucebox-storage.json`,
         };
       }
     } catch (e) {
@@ -142,7 +142,7 @@ export default function SettingsSecurityVault() {
               <View style={styles.resetInfoBox}>
                 <Text style={styles.resetInfoTitle}>🔑 Forgot your PIN?</Text>
                 <Text style={styles.resetInfoText}>
-                  Close SauceBox, then delete the Local Storage folder below. This resets ALL app data (gallery, settings, PIN).
+                  Close SauceBox, then delete the state file below. This resets ALL app data (gallery, settings, PIN).
                 </Text>
                 <View style={styles.resetPathBox}>
                   <Text style={styles.resetPathText}>
@@ -150,7 +150,7 @@ export default function SettingsSecurityVault() {
                   </Text>
                 </View>
                 {process.platform === 'win32' && (
-                  <Text style={styles.resetTip}>💡 Tip: Press Win+R, type %APPDATA%\saucebox and open the "Local Storage" folder.</Text>
+                  <Text style={styles.resetTip}>💡 Tip: Press Win+R, type %APPDATA%\SauceBox and delete saucebox-storage.json.</Text>
                 )}
                 {process.platform === 'darwin' && (
                   <Text style={styles.resetTip}>💡 Tip: In Finder press Cmd+Shift+G and paste the path above.</Text>
@@ -159,7 +159,7 @@ export default function SettingsSecurityVault() {
                   <Text style={styles.resetTip}>
                     {'💡 Tip: Run in terminal — '}
                     <Text style={{ fontFamily: 'monospace', color: theme.colors.primary }}>
-                      {`rm -rf "${pinResetInfo.dir}"`}
+                      {`rm "${pinResetInfo.file}"`}
                     </Text>
                   </Text>
                 )}
