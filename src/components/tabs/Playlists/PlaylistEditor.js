@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native';
 import VideoThumbnail from '../../VideoThumbnail';
 import { theme } from '../../../theme';
@@ -20,6 +20,16 @@ export default function PlaylistEditor({
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
   const [coverModalVisible, setCoverModalVisible] = useState(false);
+  const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
+
+  // Snapshot the playlist state at mount so Discard can revert to it
+  const initialSnapshot = useRef({
+    name: playlist.name,
+    items: [...(playlist.items || [])],
+    coverImage: playlist.coverImage,
+    tags: [...(playlist.tags || [])],
+    rating: playlist.rating,
+  });
 
   const handleCustomCover = async () => {
     if (!ipcRenderer) return;
@@ -212,46 +222,104 @@ export default function PlaylistEditor({
 
   return (
     <View style={{ flex: 1, padding: 32, paddingBottom: 60 }}>
-      {/* Back button & header */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 24, justifyContent: 'space-between' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
-          <Text style={{ fontSize: 24, fontWeight: '700', color: theme.colors.text }}>
-            Edit Playlist
-          </Text>
+      {/* Header */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24, justifyContent: 'space-between' }}>
+        <Text style={{ fontSize: 24, fontWeight: '700', color: theme.colors.text }}>Edit Playlist</Text>
+
+        {/* Right side button group */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          {/* Delete Playlist — danger zone, leftmost */}
+          <TouchableOpacity
+            style={{
+              paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8,
+              backgroundColor: 'transparent', borderWidth: 1,
+              borderColor: theme.colors.error, cursor: 'pointer',
+            }}
+            onPress={() => setConfirmDeleteVisible(true)}
+          >
+            <Text style={{ color: theme.colors.error, fontWeight: '700', fontSize: 13 }}>🗑 Delete Playlist</Text>
+          </TouchableOpacity>
+
+          {/* Separator */}
+          <View style={{ width: 1, height: 28, backgroundColor: theme.colors.border, marginHorizontal: 4 }} />
+
+          {/* Discard Changes */}
+          <TouchableOpacity
+            style={{
+              paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8,
+              backgroundColor: theme.colors.surfaceLight, borderWidth: 1,
+              borderColor: theme.colors.border, cursor: 'pointer',
+            }}
+            onPress={() => {
+              // Revert every field back to the snapshot
+              const snap = initialSnapshot.current;
+              onUpdatePlaylist(playlist.id, {
+                name: snap.name,
+                items: snap.items,
+                coverImage: snap.coverImage,
+                tags: snap.tags,
+                rating: snap.rating,
+              });
+              onBack();
+            }}
+          >
+            <Text style={{ color: theme.colors.textSecondary, fontWeight: '700', fontSize: 13 }}>↩ Discard</Text>
+          </TouchableOpacity>
+
+          {/* Save & Return */}
+          <TouchableOpacity
+            style={{
+              paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8,
+              backgroundColor: (playlist.items || []).length === 0 ? theme.colors.surfaceLight : theme.colors.primary,
+              borderWidth: 1, borderColor: theme.colors.border,
+              cursor: (playlist.items || []).length === 0 ? 'not-allowed' : 'pointer',
+              opacity: (playlist.items || []).length === 0 ? 0.5 : 1,
+            }}
+            onPress={() => {
+              if ((playlist.items || []).length === 0) {
+                alert('Add at least one video before saving your playlist.');
+                return;
+              }
+              onBack();
+            }}
+          >
+            <Text style={{ color: (playlist.items || []).length === 0 ? theme.colors.textSecondary : '#000', fontWeight: '700', fontSize: 13 }}>💾 Save &amp; Return</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={{
-            paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8,
-            backgroundColor: (playlist.items || []).length === 0 ? theme.colors.surfaceLight : theme.colors.primary,
-            borderWidth: 1,
-            borderColor: (playlist.items || []).length === 0 ? theme.colors.border : theme.colors.border,
-            cursor: (playlist.items || []).length === 0 ? 'not-allowed' : 'pointer',
-            opacity: (playlist.items || []).length === 0 ? 0.5 : 1,
-          }}
-          onPress={() => {
-            if ((playlist.items || []).length === 0) {
-              alert('Add at least one video before saving your playlist.');
-              return;
-            }
-            onBack();
-          }}
-        >
-          <Text style={{ color: (playlist.items || []).length === 0 ? theme.colors.textSecondary : '#000', fontWeight: '700', fontSize: 14 }}>💾 Save & Return</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8,
-            backgroundColor: 'transparent', borderWidth: 1,
-            borderColor: theme.colors.error, cursor: 'pointer',
-            marginLeft: 8,
-          }}
-          onPress={() => {
-            if (onDelete) onDelete(playlist.id);
-          }}
-        >
-          <Text style={{ color: theme.colors.error, fontWeight: '700', fontSize: 14 }}>🗑 Discard</Text>
-        </TouchableOpacity>
       </View>
+
+      {/* Confirm delete dialog */}
+      {confirmDeleteVisible && (
+        <View style={{
+          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 999,
+          justifyContent: 'center', alignItems: 'center',
+        }}>
+          <View style={{
+            backgroundColor: theme.colors.surface, borderRadius: 12, padding: 28,
+            width: 420, borderWidth: 1, borderColor: theme.colors.border,
+          }}>
+            <Text style={{ fontSize: 18, fontWeight: '700', color: theme.colors.text, marginBottom: 12 }}>🗑 Delete Playlist?</Text>
+            <Text style={{ fontSize: 14, color: theme.colors.textSecondary, marginBottom: 24 }}>
+              This will permanently remove &quot;{playlist.name || 'Untitled Playlist'}&quot; from your playlists. Your video files will NOT be affected.
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 12, justifyContent: 'flex-end' }}>
+              <TouchableOpacity
+                style={{ paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, backgroundColor: theme.colors.surfaceLight, borderWidth: 1, borderColor: theme.colors.border, cursor: 'pointer' }}
+                onPress={() => setConfirmDeleteVisible(false)}
+              >
+                <Text style={{ color: theme.colors.text, fontWeight: '600' }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, backgroundColor: theme.colors.error, cursor: 'pointer' }}
+                onPress={() => { if (onDelete) onDelete(playlist.id); }}
+              >
+                <Text style={{ color: '#fff', fontWeight: '700' }}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
 
       <View style={styles.editorContainer}>
         {/* LEFT PANE: Available Videos */}
