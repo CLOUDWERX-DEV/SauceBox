@@ -13,6 +13,7 @@ export default function PlaylistEditor({
   onBack,
   onPlayAll,
   onPlayVideo,
+  onDelete,
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('date');
@@ -221,12 +222,34 @@ export default function PlaylistEditor({
         <TouchableOpacity
           style={{
             paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8,
-            backgroundColor: theme.colors.primary, borderWidth: 1,
-            borderColor: theme.colors.border, cursor: 'pointer',
+            backgroundColor: (playlist.items || []).length === 0 ? theme.colors.surfaceLight : theme.colors.primary,
+            borderWidth: 1,
+            borderColor: (playlist.items || []).length === 0 ? theme.colors.border : theme.colors.border,
+            cursor: (playlist.items || []).length === 0 ? 'not-allowed' : 'pointer',
+            opacity: (playlist.items || []).length === 0 ? 0.5 : 1,
           }}
-          onPress={onBack}
+          onPress={() => {
+            if ((playlist.items || []).length === 0) {
+              alert('Add at least one video before saving your playlist.');
+              return;
+            }
+            onBack();
+          }}
         >
-          <Text style={{ color: '#000', fontWeight: '700', fontSize: 14 }}>💾 Save & Return</Text>
+          <Text style={{ color: (playlist.items || []).length === 0 ? theme.colors.textSecondary : '#000', fontWeight: '700', fontSize: 14 }}>💾 Save & Return</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8,
+            backgroundColor: 'transparent', borderWidth: 1,
+            borderColor: theme.colors.error, cursor: 'pointer',
+            marginLeft: 8,
+          }}
+          onPress={() => {
+            if (onDelete) onDelete(playlist.id);
+          }}
+        >
+          <Text style={{ color: theme.colors.error, fontWeight: '700', fontSize: 14 }}>🗑 Discard</Text>
         </TouchableOpacity>
       </View>
 

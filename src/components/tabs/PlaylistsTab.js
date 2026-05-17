@@ -128,6 +128,10 @@ export default function PlaylistsTab() {
       onBack={() => setActivePlaylistId(null)}
       onPlayAll={handlePlayAll}
       onPlayVideo={handlePlayVideo}
+      onDelete={(id) => {
+        deletePlaylist(id);
+        setActivePlaylistId(null);
+      }}
     />
   );
 }
