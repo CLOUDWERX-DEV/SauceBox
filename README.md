@@ -89,12 +89,22 @@ npm run dev
 
 ## 🧩 Installing the Browser Companion Extension
 
-1. Open Google Chrome, Brave, Edge, or any Chromium-based browser.
-2. Navigate to your browser's extension settings (e.g. `chrome://extensions/`).
-3. Enable **Developer mode** (top right corner toggle).
-4. Click **Load unpacked** in the top left and select the `chrome-extension/` directory located inside your SauceBox project folder.
+The "Send to SauceBox" extension allows you to dispatch video URLs directly to your local desktop queue in one click.
 
----
+### Step 1: Download the Extension Files
+If you installed SauceBox via an installer (`.exe`, `.deb`, etc.), you will need to download the extension directory from this repository:
+*   **Windows / Standard Users:** Go to the [Releases](https://github.com/CLOUDWERX-DEV/SauceBox/releases) page and download the `Source code (zip)` file for the latest release. Extract the ZIP file anywhere on your PC.
+*   **Linux / Mac / Advanced Users:** Clone the repository via terminal:
+    ```bash
+    git clone https://github.com/CLOUDWERX-DEV/SauceBox.git
+    ```
+
+### Step 2: Load into Your Browser
+1. Open Google Chrome, Brave, Edge, or any Chromium-based browser.
+2. Navigate to your browser's extension settings (e.g. `chrome://extensions/` or `brave://extensions/`).
+3. Enable **Developer mode** (usually a toggle in the top right corner).
+4. Click **Load unpacked** in the top left.
+5. Navigate to and select the `chrome-extension` directory located inside the SauceBox folder you downloaded/cloned.
 
 ## 🤝 Contributing & Developer Guidelines
 
