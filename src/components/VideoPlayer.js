@@ -104,14 +104,7 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
     setLoading(false);
   };
 
-  const handleOpenExternal = async () => {
-    try {
-      const customPlayerPath = useStore.getState().settings.customPlayerPath;
-      await ipcRenderer?.invoke('open-video', { filepath: videoPath, customPlayerPath });
-    } catch (error) {
-      console.error('Failed to open video:', error);
-    }
-  };
+
 
   const handleOpenFolder = async () => {
     try {
@@ -317,9 +310,7 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
                     </TouchableOpacity>
                   </>
                 )}
-                <TouchableOpacity style={styles.actionButton} onPress={handleOpenExternal}>
-                  <Text style={styles.actionButtonText}>🎬 Open Player</Text>
-                </TouchableOpacity>
+
                 <TouchableOpacity style={styles.actionButton} onPress={handleOpenFolder}>
                   <Text style={styles.actionButtonText}>📁 Open Folder</Text>
                 </TouchableOpacity>
@@ -442,9 +433,7 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
                 <View style={styles.errorContainer}>
                   <Text style={styles.errorIcon}>⚠️</Text>
                   <Text style={styles.errorText}>{error}</Text>
-                  <TouchableOpacity style={styles.externalButton} onPress={handleOpenExternal}>
-                    <Text style={styles.externalButtonText}>🎬 Open in External Player</Text>
-                  </TouchableOpacity>
+
                 </View>
               ) : (() => {
                 const safeSrc = videoPath
@@ -787,16 +776,5 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     maxWidth: 500,
   },
-  externalButton: {
-    backgroundColor: theme.colors.primary,
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 12,
-    cursor: 'pointer',
-  },
-  externalButtonText: {
-    color: '#000',
-    fontSize: 16,
-    fontWeight: '700',
-  },
+
 });
