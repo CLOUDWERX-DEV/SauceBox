@@ -6,6 +6,28 @@ import { theme } from '../../theme';
 const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
 const openExternal = (url) => ipcRenderer?.invoke('open-external', url);
 
+const handleCopyToClipboard = (text, label) => {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert(`${label || 'Text'} copied to clipboard!`))
+      .catch(() => alert('Failed to copy to clipboard.'));
+  } else {
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      alert(`${label || 'Text'} copied to clipboard!`);
+    } catch (e) {
+      alert('Failed to copy to clipboard.');
+    }
+  }
+};
+
 export default function HelpContent({ activeTab, displayHotkey }) {
   switch (activeTab) {
     case 'basics':
@@ -192,48 +214,153 @@ export default function HelpContent({ activeTab, displayHotkey }) {
     case 'extension':
       return (
         <View>
-          <Text style={styles.contentTitle}>Web Extension</Text>
-          <Text style={styles.contentSubtitle}>Send videos to SauceBox without leaving your browser.</Text>
+          <Text style={styles.contentTitle}>Web Extension & Integration</Text>
+          <Text style={styles.contentSubtitle}>Send videos directly to your SauceBox queue without ever leaving your browser. 🌐 🧩</Text>
 
+          {/* Quick Install Guide */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardIcon}>📥</Text>
               <Text style={styles.cardTitle}>How to Install (Chrome/Brave/Edge)</Text>
             </View>
             <Text style={styles.paragraph}>
-              SauceBox includes a companion browser extension. Since it's not on the Chrome Web Store, you need to load it manually in "Developer Mode".
+              SauceBox includes a companion Manifest V3 browser extension. Because it is securely self-hosted offline, you load it directly in your browser using <Text style={styles.highlight}>Developer Mode</Text>:
             </Text>
+            
             <View style={styles.bulletList}>
-              <Text style={styles.bulletItem}>1. Open your browser and go to <Text style={styles.code}>chrome://extensions</Text> (or brave://extensions, edge://extensions).</Text>
-              <Text style={styles.bulletItem}>2. Turn on the <Text style={styles.highlight}>Developer mode</Text> toggle in the top right corner.</Text>
+              <Text style={styles.bulletItem}>
+                1. Copy the extensions settings URL below for your browser, paste it into your browser search bar, and hit Enter:
+              </Text>
+              
+              {/* Copy URL Shortcuts Row */}
+              <View style={{ flexDirection: 'row', gap: 10, marginTop: 8, marginBottom: 16 }}>
+                <TouchableOpacity 
+                  style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.03)', padding: 10, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', alignItems: 'center', cursor: 'pointer' }}
+                  onPress={() => handleCopyToClipboard('chrome://extensions', 'Chrome URL')}
+                >
+                  <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>📋 Copy Chrome URL</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.03)', padding: 10, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', alignItems: 'center', cursor: 'pointer' }}
+                  onPress={() => handleCopyToClipboard('brave://extensions', 'Brave URL')}
+                >
+                  <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>📋 Copy Brave URL</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.03)', padding: 10, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', alignItems: 'center', cursor: 'pointer' }}
+                  onPress={() => handleCopyToClipboard('edge://extensions', 'Edge URL')}
+                >
+                  <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>📋 Copy Edge URL</Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.bulletItem}>2. Turn on the <Text style={styles.highlight}>Developer mode</Text> toggle switch in the top right corner.</Text>
               <Text style={styles.bulletItem}>3. Click the <Text style={styles.highlight}>Load unpacked</Text> button in the top left.</Text>
-              <Text style={styles.bulletItem}>4. Select the <Text style={styles.highlight}>chrome-extension</Text> folder located inside your main SauceBox application folder.</Text>
-              <Text style={styles.bulletItem}>5. The extension is now installed! You should see the SauceBox icon in your toolbar.</Text>
+              <Text style={styles.bulletItem}>4. Select the <Text style={styles.highlight}>chrome-extension</Text> folder inside your main SauceBox folder.</Text>
+              <Text style={styles.bulletItem}>5. The extension is now active! Right-click any video page or click the toolbar icon to queue.</Text>
             </View>
           </View>
 
+          {/* Quick Copy Script Snippets */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardIcon}>🖱️</Text>
-              <Text style={styles.cardTitle}>How to Use It</Text>
+              <Text style={styles.cardIcon}>💻</Text>
+              <Text style={styles.cardTitle}>Quick Extract Snippets (Desktop Copy)</Text>
             </View>
-            <Text style={styles.paragraph}>
-              Once installed, the extension runs silently in the background. Here's how to queue videos:
+            <Text style={[styles.paragraph, { marginBottom: 16 }]}>
+              Wanna make loading the unpacked extension incredibly easy? Copy and paste the matching command below into your system terminal to instantly extract the extension folder straight to your Desktop:
             </Text>
-            <View style={styles.bulletList}>
-              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Right-Click Context Menu:</Text> While watching a video on any supported site, right-click anywhere on the page and click <Text style={styles.highlight}>"Send to SauceBox"</Text>. The video URL will immediately be sent to your desktop app.</Text>
-              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Toolbar Icon:</Text> Click the SauceBox icon in your browser toolbar to send the current active tab's URL to the app.</Text>
+
+            {/* Bash / Linux / macOS */}
+            <View style={{ marginBottom: 14 }}>
+              <Text style={{ color: '#888', fontSize: 12, fontWeight: '700', marginBottom: 4 }}>Bash / Terminal (Linux & macOS)</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#000', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+                <Text style={{ flex: 1, fontFamily: 'monospace', paddingHorizontal: 12, paddingVertical: 10, color: theme.colors.primary, fontSize: 12 }}>
+                  cp -r chrome-extension ~/Desktop/SauceBox-Extension
+                </Text>
+                <TouchableOpacity 
+                  style={{ backgroundColor: `${theme.colors.primary}15`, paddingHorizontal: 14, paddingVertical: 10, borderLeftWidth: 1, borderLeftColor: 'rgba(255,255,255,0.1)', cursor: 'pointer' }}
+                  onPress={() => handleCopyToClipboard('cp -r chrome-extension ~/Desktop/SauceBox-Extension', 'Bash script')}
+                >
+                  <Text style={{ color: theme.colors.primary, fontSize: 11, fontWeight: '700' }}>📋 Copy</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* PowerShell */}
+            <View style={{ marginBottom: 14 }}>
+              <Text style={{ color: '#888', fontSize: 12, fontWeight: '700', marginBottom: 4 }}>Windows PowerShell</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#000', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+                <Text style={{ flex: 1, fontFamily: 'monospace', paddingHorizontal: 12, paddingVertical: 10, color: theme.colors.primary, fontSize: 12 }}>
+                  Copy-Item -Path ".\chrome-extension" -Destination "$HOME\Desktop\SauceBox-Extension" -Recurse
+                </Text>
+                <TouchableOpacity 
+                  style={{ backgroundColor: `${theme.colors.primary}15`, paddingHorizontal: 14, paddingVertical: 10, borderLeftWidth: 1, borderLeftColor: 'rgba(255,255,255,0.1)', cursor: 'pointer' }}
+                  onPress={() => handleCopyToClipboard('Copy-Item -Path ".\\chrome-extension" -Destination "$HOME\\Desktop\\SauceBox-Extension" -Recurse', 'PowerShell script')}
+                >
+                  <Text style={{ color: theme.colors.primary, fontSize: 11, fontWeight: '700' }}>📋 Copy</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* CMD Windows */}
+            <View>
+              <Text style={{ color: '#888', fontSize: 12, fontWeight: '700', marginBottom: 4 }}>Windows Command Prompt (CMD)</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#000', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+                <Text style={{ flex: 1, fontFamily: 'monospace', paddingHorizontal: 12, paddingVertical: 10, color: theme.colors.primary, fontSize: 12 }}>
+                  xcopy /E /I chrome-extension %USERPROFILE%\Desktop\SauceBox-Extension
+                </Text>
+                <TouchableOpacity 
+                  style={{ backgroundColor: `${theme.colors.primary}15`, paddingHorizontal: 14, paddingVertical: 10, borderLeftWidth: 1, borderLeftColor: 'rgba(255,255,255,0.1)', cursor: 'pointer' }}
+                  onPress={() => handleCopyToClipboard('xcopy /E /I chrome-extension %USERPROFILE%\\Desktop\\SauceBox-Extension', 'CMD script')}
+                >
+                  <Text style={{ color: theme.colors.primary, fontSize: 11, fontWeight: '700' }}>📋 Copy</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
 
+          {/* Under the Hood / Curl API testing */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardIcon}>⚠️</Text>
-              <Text style={styles.cardTitle}>Important Notes</Text>
+              <Text style={styles.cardIcon}>📡</Text>
+              <Text style={styles.cardTitle}>Integration CLI Testing (For Developers)</Text>
             </View>
-            <Text style={styles.paragraph}>
-              The SauceBox desktop app MUST be running (even if it's minimized or in Stealth mode) for the extension to work. It communicates locally over <Text style={styles.code}>localhost:13337</Text>. It does not send your data to the cloud.
+            <Text style={[styles.paragraph, { marginBottom: 16 }]}>
+              SauceBox runs an offline receiver at <Text style={styles.code}>localhost:13337</Text> to fetch extension requests. You can test and trigger integration directly from your terminal:
             </Text>
+
+            {/* Curl health check */}
+            <View style={{ marginBottom: 14 }}>
+              <Text style={{ color: '#888', fontSize: 12, fontWeight: '700', marginBottom: 4 }}>1. Check Background Server Connection Health</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#000', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+                <Text style={{ flex: 1, fontFamily: 'monospace', paddingHorizontal: 12, paddingVertical: 10, color: theme.colors.primary, fontSize: 12 }}>
+                  curl http://localhost:13337/health
+                </Text>
+                <TouchableOpacity 
+                  style={{ backgroundColor: `${theme.colors.primary}15`, paddingHorizontal: 14, paddingVertical: 10, borderLeftWidth: 1, borderLeftColor: 'rgba(255,255,255,0.1)', cursor: 'pointer' }}
+                  onPress={() => handleCopyToClipboard('curl http://localhost:13337/health', 'Health check command')}
+                >
+                  <Text style={{ color: theme.colors.primary, fontSize: 11, fontWeight: '700' }}>📋 Copy</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Curl enqueue */}
+            <View>
+              <Text style={{ color: '#888', fontSize: 12, fontWeight: '700', marginBottom: 4 }}>2. Remotely Enqueue Video Download URL</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#000', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+                <Text style={{ flex: 1, fontFamily: 'monospace', paddingHorizontal: 12, paddingVertical: 10, color: theme.colors.primary, fontSize: 11 }}>
+                  {"curl -X POST -H \"Content-Type: application/json\" -d '{\"url\":\"https://example.com/video\"}' http://localhost:13337/enqueue"}
+                </Text>
+                <TouchableOpacity 
+                  style={{ backgroundColor: `${theme.colors.primary}15`, paddingHorizontal: 14, paddingVertical: 10, borderLeftWidth: 1, borderLeftColor: 'rgba(255,255,255,0.1)', cursor: 'pointer' }}
+                  onPress={() => handleCopyToClipboard('curl -X POST -H "Content-Type: application/json" -d \'{"url":"https://example.com/video"}\' http://localhost:13337/enqueue', 'Enqueue command')}
+                >
+                  <Text style={{ color: theme.colors.primary, fontSize: 11, fontWeight: '700' }}>📋 Copy</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </View>
       );
