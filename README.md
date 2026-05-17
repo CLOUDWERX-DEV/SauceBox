@@ -84,8 +84,8 @@ npm install
     ```bash
     npm run dev
     ```
-*   **Accessing via a Web Browser:**
-    If you want to browse your collection or stream media on another device, start the media server in the **Broadcast** tab, and enter the local network address (`http://<your-local-ip>:<port>`) in any mobile, desktop, or headset web browser.
+*   **Accessing the React UI in a Web Browser (For UI Development):**
+    While `npm run dev` is running, you can view and debug the React frontend independently by opening your web browser to `http://localhost:8081`. *(Note: Native OS features like file system access, downloads, and the media server rely on Electron's IPC backend and will not function in a standard web browser).*
 
 ---
 
