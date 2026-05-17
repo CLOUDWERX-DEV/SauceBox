@@ -143,7 +143,7 @@ export default function BroadcastPlaylistBuilder({
             </View>
           </View>
           
-          <View style={styles.playlistMetaRow}>
+          <View style={[styles.playlistMetaRow, { marginHorizontal: -16, paddingHorizontal: 16 }]}>
             <Text style={styles.playlistMetaText}>🎬 {playlist.length} videos</Text>
             <Text style={styles.playlistMetaText}>⏱️ {formatDuration(totalDuration)}</Text>
             {totalSize > 0 && <Text style={styles.playlistMetaText}>💾 {formatSize(totalSize)}</Text>}
@@ -221,7 +221,8 @@ export default function BroadcastPlaylistBuilder({
             )}
           </ScrollView>
           
-          <View style={[styles.playlistActions, { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 12, marginTop: 8 }]}>
+          <View style={{ height: 1, backgroundColor: theme.colors.border, marginHorizontal: -16, marginTop: 8 }} />
+          <View style={[styles.playlistActions, { paddingTop: 12 }]}>
             <TouchableOpacity style={styles.actionButton} onPress={handleShuffle} disabled={playlist.length === 0}>
               <Text style={styles.actionButtonText}>🔀 Shuffle</Text>
             </TouchableOpacity>
