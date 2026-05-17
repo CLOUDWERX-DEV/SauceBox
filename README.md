@@ -79,13 +79,10 @@ cd SauceBox
 npm install
 ```
 
-#### 3. Run the Application
-*   **Running the Desktop Electron App:**
-    ```bash
-    npm run dev
-    ```
-*   **Accessing the React UI in a Web Browser (For UI Development):**
-    While `npm run dev` is running, you can view and debug the React frontend independently by opening your web browser to `http://localhost:8081`. *(Note: Native OS features like file system access, downloads, and the media server rely on Electron's IPC backend and will not function in a standard web browser).*
+#### 2. Run the Application
+```bash
+npm run dev
+```
 
 ---
 
