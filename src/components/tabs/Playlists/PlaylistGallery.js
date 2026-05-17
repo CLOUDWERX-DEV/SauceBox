@@ -38,9 +38,11 @@ export default function PlaylistGallery({
   onPlay,
   onDelete,
   onUpdatePlaylist,
-  onQuickCast
+  onQuickCast,
+  onClearAll
 }) {
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [clearConfirmVisible, setClearConfirmVisible] = useState(false);
   const [editingTagId, setEditingTagId] = useState(null);
   const [newTagText, setNewTagText] = useState('');
 
@@ -185,9 +187,14 @@ export default function PlaylistGallery({
             )}
           </View>
           {playlists.length > 0 && (
-            <TouchableOpacity style={styles.createPlaylistButton} onPress={onCreate}>
-              <Text style={styles.createPlaylistButtonText}>➕ NEW PLAYLIST</Text>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+              <TouchableOpacity style={styles.createPlaylistButton} onPress={onCreate}>
+                <Text style={styles.createPlaylistButtonText}>➕ NEW PLAYLIST</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.clearButton} onPress={() => setClearConfirmVisible(true)}>
+                <Text style={styles.clearButtonText}>🗑️ Clear All</Text>
+              </TouchableOpacity>
+            </View>
           )}
         </View>
 
@@ -344,6 +351,19 @@ export default function PlaylistGallery({
           setDeleteTarget(null);
         }}
         onCancel={() => setDeleteTarget(null)}
+      />
+
+      <ConfirmModal
+        visible={clearConfirmVisible}
+        title="Clear Playlists?"
+        message="Remove all playlists from your gallery? This cannot be undone. (Your video files will NOT be affected)"
+        confirmText="Clear Playlists"
+        confirmColor={theme.colors.error}
+        onConfirm={() => {
+          onClearAll();
+          setClearConfirmVisible(false);
+        }}
+        onCancel={() => setClearConfirmVisible(false)}
       />
     </>
   );

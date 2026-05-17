@@ -11,6 +11,7 @@ export default function PlaylistsTab() {
   const addPlaylist = useStore(state => state.addPlaylist);
   const updatePlaylist = useStore(state => state.updatePlaylist);
   const deletePlaylist = useStore(state => state.deletePlaylist);
+  const clearPlaylists = useStore(state => state.clearPlaylists);
   const settings = useStore(state => state.settings);
 
   const setQuickCastVideo = useStore(state => state.setQuickCastVideo);
@@ -114,6 +115,7 @@ export default function PlaylistsTab() {
         onDelete={(id) => {
           deletePlaylist(id);
         }}
+        onClearAll={clearPlaylists}
       />
     );
   }

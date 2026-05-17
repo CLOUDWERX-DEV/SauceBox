@@ -595,6 +595,21 @@ export const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
+  clearButton: {
+    backgroundColor: `${theme.colors.primary}20`,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    cursor: 'pointer',
+    borderWidth: 1,
+    borderColor: `${theme.colors.primary}40`,
+    marginTop: 6,
+  },
+  clearButtonText: {
+    color: theme.colors.primary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
 
   // Empty state
   emptyState: {

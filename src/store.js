@@ -116,6 +116,8 @@ export const useStore = create(
         playlists: state.playlists.filter(p => p.id !== id)
       })),
       
+      clearPlaylists: () => set({ playlists: [] }),
+      
       updateSettings: (updates) => set((state) => ({
         settings: { ...state.settings, ...updates }
       }))
