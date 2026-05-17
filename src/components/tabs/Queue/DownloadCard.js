@@ -108,7 +108,7 @@ export default function DownloadCard({
               </Tooltip>
             </View>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4, marginBottom: 12, flexWrap: 'wrap' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4, marginBottom: 12, flexWrap: 'wrap', position: 'relative', zIndex: 10 }}>
             {/* Duration Badge */}
             <Tooltip content="Duration" position={index === 0 ? "bottom" : "top"}>
               <View style={styles.metaBadge}>
