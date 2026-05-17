@@ -123,6 +123,14 @@ export default function SettingsAbout() {
               <Text style={styles.aboutLabel}>Framework</Text>
               <Text style={styles.aboutValue}>React Native + Electron</Text>
             </View>
+            <View style={styles.aboutRow}>
+              <Text style={styles.aboutLabel}>Developer</Text>
+              <TouchableOpacity onPress={() => openExternal('https://cloudwerxlab.com')}>
+                <Text style={[styles.aboutValue, { color: theme.colors.primary, textDecorationLine: 'underline', cursor: 'pointer' }]}>
+                  CLOUDWERX LAB
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
