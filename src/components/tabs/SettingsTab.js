@@ -16,7 +16,7 @@ export default function SettingsTab({ onNavigate }) {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <Text style={styles.title}>Settings</Text>
-        <Text style={styles.subtitle}>Customize your experience 🎨</Text>
+        <Text style={styles.subtitle}>Configure download directories, preferred quality, secure vaults, and system parameters ⚙️</Text>
       </View>
 
       <SettingsDownloadLocation />

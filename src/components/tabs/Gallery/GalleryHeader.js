@@ -41,6 +41,7 @@ export default function GalleryHeader({
     <View style={styles.header}>
       <View>
         <Text style={styles.title}>Video Gallery</Text>
+        <Text style={styles.subtitle}>Search, rate, tag, and play your private offline media archive 🎥</Text>
         {historyLength > 0 && (
           <View style={styles.statsContainer}>
             <View style={styles.statBadge}>
@@ -99,6 +100,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: theme.colors.text,
     marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: theme.colors.textSecondary,
+    fontStyle: 'italic',
+    marginBottom: 8,
   },
   statsContainer: {
     flexDirection: 'row',

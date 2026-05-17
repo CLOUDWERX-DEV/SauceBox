@@ -539,6 +539,12 @@ export const styles = StyleSheet.create({
     color: theme.colors.text,
     marginBottom: 4,
   },
+  subtitle: {
+    fontSize: 16,
+    color: theme.colors.textSecondary,
+    fontStyle: 'italic',
+    marginBottom: 8,
+  },
   statsContainer: {
     flexDirection: 'row',
     alignItems: 'center',

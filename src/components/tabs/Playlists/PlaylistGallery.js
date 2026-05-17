@@ -156,6 +156,7 @@ export default function PlaylistGallery({
         <View style={styles.header}>
           <View>
             <Text style={styles.title}>Playlists</Text>
+            <Text style={styles.subtitle}>Build, sequence, and play custom video collections 🗂️</Text>
             {playlists.length > 0 && (
               <View style={styles.statsContainer}>
                 <View style={styles.statBadge}>
