@@ -603,19 +603,23 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 40,
     gap: 12,
+    alignSelf: 'stretch',
   },
   emptyStateIcon: {
-    fontSize: 48,
-    marginBottom: 8,
+    fontSize: 64,
+    marginBottom: 16,
   },
   emptyStateText: {
-    fontSize: 16,
-    color: theme.colors.textSecondary,
+    fontSize: 24,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: 8,
     textAlign: 'center',
   },
   emptyStateSubText: {
-    fontSize: 13,
+    fontSize: 16,
     color: theme.colors.textTertiary,
+    marginBottom: 8,
     textAlign: 'center',
   },
 });

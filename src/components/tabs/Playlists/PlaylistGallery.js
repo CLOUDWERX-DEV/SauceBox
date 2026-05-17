@@ -198,7 +198,8 @@ export default function PlaylistGallery({
           />
         )}
 
-        <View style={styles.galleryGrid}>
+        {playlists.length > 0 && (
+          <View style={styles.galleryGrid}>
 
           {filteredPlaylists.map(playlist => {
             const stats = getPlaylistStats(playlist);
@@ -308,7 +309,8 @@ export default function PlaylistGallery({
               </View>
             );
           })}
-        </View>
+          </View>
+        )}
 
         {playlists.length === 0 && (
           <View style={styles.emptyState}>
