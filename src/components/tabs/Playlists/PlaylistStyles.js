@@ -9,8 +9,8 @@ export const styles = StyleSheet.create({
     gap: 20,
   },
   createCard: {
-    width: 260,
-    height: 200,
+    width: 'calc(33.333% - 14px)',
+    height: 420,
     backgroundColor: theme.colors.surface,
     borderRadius: 16,
     borderWidth: 2,
@@ -31,8 +31,9 @@ export const styles = StyleSheet.create({
     color: theme.colors.primary,
   },
   playlistCard: {
-    width: 260,
-    height: 400,
+    width: 'calc(33.333% - 14px)',
+    height: 420,
+    flexDirection: 'column',
     backgroundColor: theme.colors.surface,
     borderRadius: 16,
     overflow: 'hidden',
@@ -43,7 +44,7 @@ export const styles = StyleSheet.create({
   },
   playlistCardImage: {
     width: '100%',
-    height: 150,
+    height: 200,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
@@ -75,7 +76,9 @@ export const styles = StyleSheet.create({
     marginLeft: 4,
   },
   playlistCardBody: {
+    flex: 1,
     padding: 16,
+    justifyContent: 'space-between',
     gap: 8,
   },
   playlistCardName: {
