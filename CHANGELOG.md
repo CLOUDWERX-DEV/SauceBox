@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.16] - 2026-05-16
+
+### Added
+- **Playlist Builder Sort Bar**: Added a thin, ultra-sleek horizontal sort bar at the top of the "Available Videos" list in the Broadcast Tab's Playlist Builder. Users can now instantly sort the list by Date, Title, Time, or Star Rating. Driven reactively using a high-performance in-memory sort pipeline.
+
 ## [1.3.15] - 2026-05-16
 
 ### Added

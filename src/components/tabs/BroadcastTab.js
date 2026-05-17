@@ -29,6 +29,7 @@ export default function BroadcastTab() {
   const [playlist, setPlaylist] = useState([]);
   const [playlistUrl, setPlaylistUrl] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('date');
   const handlePreviewVideo = async (item) => {
     try {
       let videoPath = item.path;
@@ -387,6 +388,7 @@ export default function BroadcastTab() {
       <BroadcastPlaylistBuilder 
         history={history} playlist={playlist} setPlaylist={setPlaylist} 
         searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+        sortBy={sortBy} setSortBy={setSortBy}
         handleAddToPlaylist={handleAddToPlaylist} handleRemoveFromPlaylist={handleRemoveFromPlaylist} 
         handleMoveUp={handleMoveUp} handleMoveDown={handleMoveDown}
         draggedIndex={draggedIndex} setDraggedIndex={setDraggedIndex} 

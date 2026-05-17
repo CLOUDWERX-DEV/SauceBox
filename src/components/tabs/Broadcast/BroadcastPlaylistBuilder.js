@@ -5,6 +5,7 @@ import VideoThumbnail from '../../VideoThumbnail';
 
 export default function BroadcastPlaylistBuilder({
   history, playlist, setPlaylist, searchQuery, setSearchQuery,
+  sortBy, setSortBy,
   handleAddToPlaylist, handleRemoveFromPlaylist, handleMoveUp, handleMoveDown,
   draggedIndex, setDraggedIndex, dragOverIndex, setDragOverIndex,
   handleDragStart, handleDragOver, handleDragLeave, handleDrop, handleDragEnd,
@@ -29,10 +30,45 @@ export default function BroadcastPlaylistBuilder({
               onChangeText={setSearchQuery}
             />
           </View>
+
+          <View style={styles.sortRow}>
+            <Text style={styles.sortLabel}>Sort:</Text>
+            <View style={styles.sortButtons}>
+              {['date', 'title', 'duration', 'rating'].map(sort => {
+                const labels = { date: '📅 Date', title: '🔤 Title', duration: '⏱️ Time', rating: '★ Rating' };
+                const isActive = sortBy === sort;
+                return (
+                  <TouchableOpacity
+                    key={sort}
+                    style={[styles.sortButton, isActive && styles.sortButtonActive]}
+                    onPress={() => setSortBy(sort)}
+                  >
+                    <Text style={[styles.sortButtonText, isActive && styles.sortButtonTextActive]}>
+                      {labels[sort]}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
           <ScrollView style={styles.videoList}>
             {history
               .filter(h => !playlist.find(p => p.id === h.id))
               .filter(h => !searchQuery || h.title.toLowerCase().includes(searchQuery.toLowerCase()) || (h.tags && h.tags.join(' ').toLowerCase().includes(searchQuery.toLowerCase())))
+              .sort((a, b) => {
+                switch (sortBy) {
+                  case 'title':
+                    return a.title.localeCompare(b.title);
+                  case 'duration':
+                    return (b.duration || 0) - (a.duration || 0);
+                  case 'rating':
+                    return (b.rating || 0) - (a.rating || 0);
+                  case 'date':
+                  default:
+                    return b.timestamp - a.timestamp;
+                }
+              })
               .map(item => (
               <View key={item.id} style={styles.videoRow}>
                 <View style={{ width: 80, height: 45, marginRight: 12, position: 'relative' }}>
@@ -194,6 +230,48 @@ const styles = StyleSheet.create({
   playlistContainer: { flexDirection: 'row', gap: 24, height: 600, marginTop: 16 },
   playlistColumn: { flex: 1, backgroundColor: theme.colors.surface, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.border, padding: 16, display: 'flex', flexDirection: 'column' },
   columnTitle: { fontSize: 16, fontWeight: '700', color: theme.colors.text },
+  sortRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    gap: 8,
+  },
+  sortLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  sortButtons: {
+    flexDirection: 'row',
+    gap: 6,
+    flex: 1,
+  },
+  sortButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: theme.colors.surfaceLight,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    cursor: 'pointer',
+  },
+  sortButtonActive: {
+    backgroundColor: `${theme.colors.primary}20`,
+    borderColor: theme.colors.primary,
+  },
+  sortButtonText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: theme.colors.textTertiary,
+  },
+  sortButtonTextActive: {
+    color: theme.colors.primary,
+  },
   videoList: { flex: 1, backgroundColor: theme.colors.surfaceLight, borderRadius: 8, padding: 8 },
   videoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: theme.colors.surface, padding: 8, borderRadius: 8, marginBottom: 8, borderWidth: 1, borderColor: theme.colors.border },
   videoTitle: { color: theme.colors.text, fontSize: 13, fontWeight: '600', marginBottom: 4 },
