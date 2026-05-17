@@ -7,6 +7,11 @@
 - **Upgraded `electron-builder` from `^24.9.1` to `^26.8.1`**: Resolves 7 transitive CVEs in `app-builder-lib`, `dmg-builder`, `builder-util`, `electron-publish`, `http-proxy-agent`, `@tootallnate/once`, and `tar`. Eliminates all high-severity `tar` path traversal vulnerabilities.
 - **Upgraded `webpack-dev-server` from `^4.15.1` to `^5.2.4`**: Resolves 1 moderate CVE in the development server. No API-breaking changes required due to the clean `devServer` configuration in `webpack.config.js`.
 - Confirmed zero deprecated Electron IPC API usage (`ipcRenderer.sendTo`, `event.senderId`, `event.senderIsMainFrame`) prior to upgrade. No code changes required.
+### Documentation
+- **Updated README Sponsor Buttons**: Replaced mismatched buttons with beautifully styled, uniform centered Shields.io badges for Buy Me a Coffee and GitHub Sponsors.
+- **Created GitHub Funding Configuration**: Added `.github/FUNDING.yml` to enable the official Sponsor button on the repository.
+- **Wrote Custom Sponsors Profile**: Generated a complete, highly-personalized markdown file `docs/SPONSORS.md` and bios for the GitHub Sponsors page.
+- **Expanded Browser Extension Documentation**: Added dedicated steps for pinning the extension to the toolbar and detailed instructions on right-click vs. toolbar icon usage.
 
 ## [1.7.1] - 2026-05-17
 
