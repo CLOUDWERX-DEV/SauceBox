@@ -103,6 +103,20 @@ export const styles = StyleSheet.create({
     gap: 8,
     zIndex: 10,
   },
+  folderButtonHistory: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+  },
+  folderButtonTextHistory: {
+    fontSize: 16,
+  },
   deleteButton: {
     width: 32,
     height: 32,

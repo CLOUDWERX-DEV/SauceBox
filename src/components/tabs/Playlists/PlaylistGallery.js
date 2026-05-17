@@ -4,6 +4,7 @@ import VideoThumbnail from '../../VideoThumbnail';
 import ConfirmModal from '../../ConfirmModal';
 import { theme } from '../../../theme';
 import { styles } from './PlaylistStyles';
+import GalleryFilterBar from '../Gallery/GalleryFilterBar';
 
 export default function PlaylistGallery({
   playlists,
@@ -18,6 +19,14 @@ export default function PlaylistGallery({
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [editingTagId, setEditingTagId] = useState(null);
   const [newTagText, setNewTagText] = useState('');
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('date');
+  const [filterResolution, setFilterResolution] = useState('all'); // unused for playlists but needed by GalleryFilterBar
+  const [filterRating, setFilterRating] = useState(0);
+  const [filterTags, setFilterTags] = useState([]);
+
+  const allTags = Array.from(new Set(playlists.flatMap(p => p.tags || []))).sort();
 
   const handleAddTag = (playlistId, tag) => {
     const playlist = playlists.find(p => p.id === playlistId);
@@ -64,6 +73,29 @@ export default function PlaylistGallery({
     return `${mb.toFixed(0)} MB`;
   };
 
+  const filteredPlaylists = playlists
+    .filter(item => {
+      const matchesSearch = (item.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesRating = filterRating === 0 || (item.rating || 0) >= filterRating;
+      const matchesTag = filterTags.length === 0 || filterTags.every(tag => item.tags && item.tags.includes(tag));
+      return matchesSearch && matchesRating && matchesTag;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'title':
+          return (a.name || 'Untitled').localeCompare(b.name || 'Untitled');
+        case 'rating':
+          return (b.rating || 0) - (a.rating || 0);
+        case 'duration':
+          const durA = (a.items||[]).map(id=>history.find(h=>h.id===id)).filter(Boolean).reduce((sum,v)=>sum+(v.duration||0),0);
+          const durB = (b.items||[]).map(id=>history.find(h=>h.id===id)).filter(Boolean).reduce((sum,v)=>sum+(v.duration||0),0);
+          return durB - durA;
+        case 'date':
+        default:
+          return (b.id || 0) - (a.id || 0);
+      }
+    });
+
   const getCoverImage = (playlist) => {
     if (playlist.coverImage) return playlist.coverImage;
     // Use the first video's thumbnail as fallback
@@ -77,7 +109,7 @@ export default function PlaylistGallery({
 
   return (
     <>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 32, paddingBottom: 60 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 32 }}>
         <View style={{ marginBottom: 32 }}>
           <Text style={{ fontSize: 32, fontWeight: '700', color: theme.colors.text, marginBottom: 8 }}>
             Playlists
@@ -87,13 +119,24 @@ export default function PlaylistGallery({
           </Text>
         </View>
 
+        {playlists.length > 0 && (
+          <GalleryFilterBar 
+            searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+            sortBy={sortBy} setSortBy={setSortBy}
+            filterResolution={filterResolution} setFilterResolution={setFilterResolution}
+            filterRating={filterRating} setFilterRating={setFilterRating}
+            filterTags={filterTags} setFilterTags={setFilterTags}
+            allTags={allTags}
+          />
+        )}
+
         <View style={styles.galleryGrid}>
           <TouchableOpacity style={styles.createCard} onPress={onCreate}>
             <Text style={styles.createCardIcon}>➕</Text>
             <Text style={styles.createCardText}>New Playlist</Text>
           </TouchableOpacity>
 
-          {playlists.map(playlist => {
+          {filteredPlaylists.map(playlist => {
             const stats = getPlaylistStats(playlist);
             const cover = getCoverImage(playlist);
             return (
