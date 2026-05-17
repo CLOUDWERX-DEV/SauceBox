@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import VideoThumbnail from '../../VideoThumbnail';
 import { theme } from '../../../theme';
 import { queueStyles as styles } from './QueueStyles';
+import Tooltip from '../../Tooltip';
 
 export default function DownloadCard({
   download,
@@ -72,19 +73,23 @@ export default function DownloadCard({
             </View>
             <View style={styles.headerButtons}>
               {download.status === 'completed' && (
-                <TouchableOpacity 
-                  style={styles.folderButton}
-                  onPress={() => handleOpenFolder(download)}
-                >
-                  <Text style={styles.folderButtonText}>📁</Text>
-                </TouchableOpacity>
+                <Tooltip content="Open Download Folder">
+                  <TouchableOpacity 
+                    style={styles.folderButton}
+                    onPress={() => handleOpenFolder(download)}
+                  >
+                    <Text style={styles.folderButtonText}>📁</Text>
+                  </TouchableOpacity>
+                </Tooltip>
               )}
-              <TouchableOpacity 
-                style={styles.removeButton}
-                onPress={() => removeDownload(download.id)}
-              >
-                <Text style={styles.removeButtonText}>✕</Text>
-              </TouchableOpacity>
+              <Tooltip content="Remove from Queue">
+                <TouchableOpacity 
+                  style={styles.removeButton}
+                  onPress={() => removeDownload(download.id)}
+                >
+                  <Text style={styles.removeButtonText}>✕</Text>
+                </TouchableOpacity>
+              </Tooltip>
             </View>
           </View>
           <Text style={styles.downloadMeta}>
