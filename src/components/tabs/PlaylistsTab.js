@@ -72,6 +72,7 @@ export default function PlaylistsTab() {
             path: videoPath,
             playlist,
             playlistIndex: playlistIndex !== -1 ? playlistIndex : 0,
+            playlistName: editingPlaylist.name,
           });
         } else {
           useStore.getState().setActiveBuiltinVideo({ ...video, path: videoPath });
@@ -83,8 +84,9 @@ export default function PlaylistsTab() {
     }
   };
 
-  const handlePlayAll = async (items) => {
+  const handlePlayAll = async (items, customPlaylistName = null) => {
     if (items.length === 0) return;
+    const name = customPlaylistName || (editingPlaylist ? editingPlaylist.name : 'Playlist');
 
     if (settings.customPlayerPath && settings.customPlayerPath.trim() !== '') {
       // External player: pass all file paths
@@ -110,6 +112,7 @@ export default function PlaylistsTab() {
         path: videoPath,
         playlist: items,
         playlistIndex: 0,
+        playlistName: name,
       });
     }
   };
@@ -126,7 +129,7 @@ export default function PlaylistsTab() {
         }}
         onCreate={handleCreate}
         onUpdatePlaylist={updatePlaylist}
-        onPlay={(playlist) => handlePlayAll(playlist.items)}
+        onPlay={(playlist) => handlePlayAll(playlist.items, playlist.name)}
         onQuickCast={handleQuickCast}
         onDelete={(id) => {
           deletePlaylist(id);

@@ -297,6 +297,18 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
                         </View>
                       </Tooltip>
                     )}
+
+                    {/* Playlist Name Badge */}
+                    {originalItem?.playlistName && (
+                      <Tooltip content="Active Playlist Context" position="bottom">
+                        <View style={[styles.metaBadge, { borderColor: '#FF8C0080', backgroundColor: '#FF8C0015' }]}>
+                          <Text style={styles.metaBadgeIcon}>🎬</Text>
+                          <Text style={[styles.metaBadgeText, { color: '#FF8C00', fontWeight: '700' }]}>
+                            Playlist: {originalItem.playlistName}
+                          </Text>
+                        </View>
+                      </Tooltip>
+                    )}
                   </View>
                 )}
               </View>
