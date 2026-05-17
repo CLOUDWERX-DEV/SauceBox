@@ -1,6 +1,10 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { helpStyles as styles } from './HelpStyles';
+import { theme } from '../../theme';
+
+const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const openExternal = (url) => ipcRenderer?.invoke('open-external', url);
 
 export default function HelpContent({ activeTab, displayHotkey }) {
   switch (activeTab) {
@@ -535,6 +539,183 @@ export default function HelpContent({ activeTab, displayHotkey }) {
               <Text style={styles.bulletItem}>2. Delete both <Text style={styles.code}>saucebox-settings.json</Text> and <Text style={styles.code}>saucebox-gallery.json</Text> from the application data directory listed above.</Text>
               <Text style={styles.bulletItem}>3. Re-open SauceBox — it will launch instantly in its factory state and generate fresh default databases.</Text>
               <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Note</Text>: Doing this will reset your configurations and empty your in-app lists, but it will NOT delete your downloaded video files from disk.</Text>
+            </View>
+          </View>
+        </View>
+      );
+
+    case 'hub':
+      return (
+        <View>
+          <Text style={styles.contentTitle}>SauceBox Hub & Ecosystem</Text>
+          <Text style={styles.contentSubtitle}>Access official project links, browse our underlying engines, and fuel future development directly! 🌐</Text>
+
+          {/* Premium Donation / Support Section */}
+          <View style={[styles.card, { borderColor: `${theme.colors.primary}40`, borderWidth: 1, backgroundColor: `${theme.colors.primary}05` }]}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardIcon}>💖</Text>
+              <Text style={styles.cardTitle}>Support CLOUDWERX LAB</Text>
+            </View>
+            <Text style={[styles.paragraph, { marginBottom: 16 }]}>
+              SauceBox is hand-crafted with absolute passion by <Text style={{ color: theme.colors.primary, fontWeight: '700' }}>CLOUDWERX LAB</Text>. We believe that high-performance, private media tools should belong to everyone. We will <Text style={styles.highlight}>never</Text> track your data, restrict features behind paywalls, or lock your vault.
+            </Text>
+            <Text style={[styles.paragraph, { marginBottom: 24 }]}>
+              Every speed optimization, visual trimmer enhancement, and cross-platform compile takes considerable late nights and high-octane caffeine. If SauceBox has upgraded your media experience, consider throwing some fuel in our tank!
+            </Text>
+
+            {/* Donation Tiers Row */}
+            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 24 }}>
+              <TouchableOpacity 
+                style={{ flex: 1, backgroundColor: theme.colors.surfaceLight, borderRadius: 12, borderWidth: 1, borderColor: `${theme.colors.primary}20`, padding: 16, alignItems: 'center', cursor: 'pointer' }}
+                onPress={() => openExternal('https://buymeacoffee.com/cloudwerxl3')}
+              >
+                <Text style={{ fontSize: 24, marginBottom: 8 }}>☕</Text>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#fff', marginBottom: 4 }}>Coffee Tier</Text>
+                <Text style={{ fontSize: 16, fontWeight: '800', color: theme.colors.primary, marginBottom: 6 }}>$5</Text>
+                <Text style={{ fontSize: 11, color: theme.colors.textTertiary, textAlign: 'center', lineHeight: 14 }}>Keep us sharp & caffeinated.</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={{ flex: 1, backgroundColor: theme.colors.surfaceLight, borderRadius: 12, borderWidth: 1, borderColor: `${theme.colors.primary}20`, padding: 16, alignItems: 'center', cursor: 'pointer' }}
+                onPress={() => openExternal('https://buymeacoffee.com/cloudwerxl3')}
+              >
+                <Text style={{ fontSize: 24, marginBottom: 8 }}>🍺</Text>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#fff', marginBottom: 4 }}>Beer Tier</Text>
+                <Text style={{ fontSize: 16, fontWeight: '800', color: theme.colors.primary, marginBottom: 6 }}>$10</Text>
+                <Text style={{ fontSize: 11, color: theme.colors.textTertiary, textAlign: 'center', lineHeight: 14 }}>For those late-night bug hunts.</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={{ flex: 1, backgroundColor: theme.colors.surfaceLight, borderRadius: 12, borderWidth: 1, borderColor: `${theme.colors.primary}20`, padding: 16, alignItems: 'center', cursor: 'pointer' }}
+                onPress={() => openExternal('https://buymeacoffee.com/cloudwerxl3')}
+              >
+                <Text style={{ fontSize: 24, marginBottom: 8 }}>🚀</Text>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#fff', marginBottom: 4 }}>Legend Tier</Text>
+                <Text style={{ fontSize: 16, fontWeight: '800', color: theme.colors.primary, marginBottom: 6 }}>$25+</Text>
+                <Text style={{ fontSize: 11, color: theme.colors.textTertiary, textAlign: 'center', lineHeight: 14 }}>Accelerate features & releases.</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Master Appeal Button */}
+            <View style={{ alignItems: 'center', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)', paddingTop: 20 }}>
+              <TouchableOpacity 
+                style={{ width: '100%', maxWidth: 360, height: 46, borderRadius: 8, backgroundColor: theme.colors.primary, justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}
+                onPress={() => openExternal('https://buymeacoffee.com/cloudwerxl3')}
+              >
+                <Text style={{ fontSize: 14, fontWeight: '800', color: '#000000' }}>☕ Buy Me A Coffee (Donate)</Text>
+              </TouchableOpacity>
+              <Text style={{ fontSize: 11, color: theme.colors.textTertiary, marginTop: 12, textAlign: 'center', lineHeight: 15 }}>
+                All support directly enables cross-platform builds, server maintenance, and future features. Thank you! 🙏
+              </Text>
+            </View>
+          </View>
+
+          {/* Official Projects Grid */}
+          <View style={{ flexDirection: 'row', gap: 16, marginBottom: 20 }}>
+            {/* Card 1: Official App Ecosystem */}
+            <View style={[styles.card, { flex: 1, marginBottom: 0 }]}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardIcon}>🌐</Text>
+                <Text style={styles.cardTitle}>Official Hubs</Text>
+              </View>
+              <Text style={[styles.paragraph, { fontSize: 14, lineHeight: 20, marginBottom: 16 }]}>
+                Access our official domains to check for the latest releases, download browser extensions, or learn more about CLOUDWERX LAB.
+              </Text>
+              
+              <View style={{ gap: 10 }}>
+                <TouchableOpacity 
+                  style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.03)', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', cursor: 'pointer' }}
+                  onPress={() => openExternal('https://saucebox.app')}
+                >
+                  <View>
+                    <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>saucebox.app</Text>
+                    <Text style={{ color: '#888', fontSize: 11, marginTop: 2 }}>Official Homepage</Text>
+                  </View>
+                  <Text style={{ color: theme.colors.primary, fontSize: 12 }}>➔</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.03)', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', cursor: 'pointer' }}
+                  onPress={() => openExternal('https://cloudwerxlab.com')}
+                >
+                  <View>
+                    <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>cloudwerxlab.com</Text>
+                    <Text style={{ color: '#888', fontSize: 11, marginTop: 2 }}>CLOUDWERX LAB Homepage</Text>
+                  </View>
+                  <Text style={{ color: theme.colors.primary, fontSize: 12 }}>➔</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Card 2: Developer Ecosystem */}
+            <View style={[styles.card, { flex: 1, marginBottom: 0 }]}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardIcon}>🐙</Text>
+                <Text style={styles.cardTitle}>Source & Community</Text>
+              </View>
+              <Text style={[styles.paragraph, { fontSize: 14, lineHeight: 20, marginBottom: 16 }]}>
+                Browse the source code, check dependencies, report bugs, or star the repository to show your love on GitHub.
+              </Text>
+              
+              <View style={{ gap: 10 }}>
+                <TouchableOpacity 
+                  style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.03)', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', cursor: 'pointer' }}
+                  onPress={() => openExternal('https://github.com/CLOUDWERX-DEV/SauceBox')}
+                >
+                  <View>
+                    <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>GitHub Repository</Text>
+                    <Text style={{ color: '#888', fontSize: 11, marginTop: 2 }}>CLOUDWERX-DEV / SauceBox</Text>
+                  </View>
+                  <Text style={{ color: theme.colors.primary, fontSize: 12 }}>➔</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.03)', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', cursor: 'pointer' }}
+                  onPress={() => openExternal('https://github.com/CLOUDWERX-DEV')}
+                >
+                  <View>
+                    <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>GitHub Profile</Text>
+                    <Text style={{ color: '#888', fontSize: 11, marginTop: 2 }}>http://github.com/CLOUDWERX-DEV</Text>
+                  </View>
+                  <Text style={{ color: theme.colors.primary, fontSize: 12 }}>➔</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+
+          {/* Under the Hood Engines */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardIcon}>⚙️</Text>
+              <Text style={styles.cardTitle}>Under the Hood (Core Engines)</Text>
+            </View>
+            <Text style={[styles.paragraph, { marginBottom: 16 }]}>
+              SauceBox stands on the shoulders of giants. Our core media downloading pipelines, file processing, and playback rely heavily on these outstanding open-source libraries:
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <TouchableOpacity 
+                style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: 'rgba(0,0,0,0.15)', padding: 14, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.02)', cursor: 'pointer' }}
+                onPress={() => openExternal('https://github.com/yt-dlp/yt-dlp')}
+              >
+                <Text style={{ fontSize: 20 }}>📥</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>yt-dlp Engine</Text>
+                  <Text style={{ color: '#666', fontSize: 11, marginTop: 1 }}>Robust adult network extractor</Text>
+                </View>
+                <Text style={{ color: theme.colors.primary, fontSize: 12 }}>➔</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: 'rgba(0,0,0,0.15)', padding: 14, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.02)', cursor: 'pointer' }}
+                onPress={() => openExternal('https://ffmpeg.org')}
+              >
+                <Text style={{ fontSize: 20 }}>🎞️</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>FFmpeg Core</Text>
+                  <Text style={{ color: '#666', fontSize: 11, marginTop: 1 }}>Multimedia frame trimmer & streamer</Text>
+                </View>
+                <Text style={{ color: theme.colors.primary, fontSize: 12 }}>➔</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>

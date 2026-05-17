@@ -56,7 +56,8 @@ export default function HelpModal({ visible, onClose }) {
     { id: 'broadcast', icon: '📡', label: 'VR & Broadcasting' },
     { id: 'advanced', icon: '⚙️', label: 'Advanced Settings' },
     { id: 'sites', icon: '🔞', label: 'Supported Sites' },
-    { id: 'troubleshooting', icon: '🔧', label: 'Troubleshooting' }
+    { id: 'troubleshooting', icon: '🔧', label: 'Troubleshooting' },
+    { id: 'hub', icon: '🌐', label: 'SauceBox Hub' }
   ];
 
   return (
