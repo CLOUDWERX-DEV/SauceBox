@@ -13,6 +13,7 @@
 - **Database Storage Label Refinement**: Changed the system specification label for the database format inside the Settings About tab from "Split Physical JSON" to "JSON" for cleaner and sleeker information display.
 - **Automated Release Script & Comprehensive Documentation**: Developed a highly automated, fully interactive release shell script (`release.sh`) in the project root to handle local compile, cross-compilation (Windows & Linux via Wine), tag validation, changelog parsing, and secure direct publication to GitHub Releases via `gh` CLI. Overhauled `docs/RELEASES.md` into an extensive cross-platform release engineering manual featuring detailed prerequisites, strategic guidance on minor vs major version cycles, and a step-by-step interactive manual.
 - **Development Guidelines & Release Safety Protocol**: Added a new foundational ruleset `## 9. Production Release Protocol` inside `CONTRIBUTING.md` establishing a strict execution guard requiring manual execution of `release.sh` and outlining a chronological release staging process for maintainers to safely execute native builds and tags.
+- **Workspace Ignore Refinement**: Added `dist-bin/` to `.gitignore` to prevent massive compiled binary installers and standalone executables (AppImages, DEBs, and Windows EXEs) from bloating the Git repository and history.
 
 ## [1.6.0] - 2026-05-16
 
