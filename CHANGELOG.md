@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.7.2] - 2026-05-17
+
+### Security
+- **Upgraded `electron` from `^28.1.3` to `^42.1.0`**: Resolves 5 moderate/high CVEs including ASAR integrity bypass (`GHSA-vmqv-hx8q-j7mg`), AppleScript injection on macOS (`GHSA-5rqw-r77c-jp79`), service worker IPC reply spoofing (`GHSA-xj5x-m3f3-5x3h`), incorrect iframe origin in permission handler (`GHSA-r5p7-gp4j-qhrx`), and out-of-bounds read in second-instance IPC on macOS/Linux (`GHSA-3c8v-cfp5-9885`).
+- **Upgraded `electron-builder` from `^24.9.1` to `^26.8.1`**: Resolves 7 transitive CVEs in `app-builder-lib`, `dmg-builder`, `builder-util`, `electron-publish`, `http-proxy-agent`, `@tootallnate/once`, and `tar`. Eliminates all high-severity `tar` path traversal vulnerabilities.
+- **Upgraded `webpack-dev-server` from `^4.15.1` to `^5.2.4`**: Resolves 1 moderate CVE in the development server. No API-breaking changes required due to the clean `devServer` configuration in `webpack.config.js`.
+- Confirmed zero deprecated Electron IPC API usage (`ipcRenderer.sendTo`, `event.senderId`, `event.senderIsMainFrame`) prior to upgrade. No code changes required.
+
 ## [1.7.1] - 2026-05-17
 
 ### Added
