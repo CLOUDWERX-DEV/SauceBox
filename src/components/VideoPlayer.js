@@ -162,7 +162,7 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
       await ipcRenderer?.invoke('trim-video', {
         inputPath: videoPath,
         outputPath: newPath,
-        startTime: formatHHMMSS(startSec),
+        startTime: startSec.toString(),
         duration: durationClipSec.toString(),
       });
 
@@ -184,7 +184,7 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
           timestamp: Date.now(),
           path: newPath,
           title: `${videoTitle || 'Clip'} (clip)`,
-          duration: durationClipSec,
+          duration: Math.round(durationClipSec),
           filesize: null,
           thumbnail: clipThumbnail,
           tags: [...(originalItem?.tags || [])],
