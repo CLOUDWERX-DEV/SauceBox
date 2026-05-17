@@ -56,6 +56,8 @@ SauceBox natively integrates with `yt-dlp` to fetch and extract media from over 
 
 SauceBox supports Windows and Linux natively, with macOS support coming very soon!
 
+🎉 **Zero-Configuration Core Engines:** As of version 1.7.0, SauceBox features a native **Runtime Provisioning Engine**. On first launch, the app will automatically download, extract, and auto-update the required `yt-dlp` and `ffmpeg` binaries for your operating system behind the scenes. You do not need to install anything manually! *(Advanced users can override this behavior in the Settings tab).*
+
 ### 💿 Method A: Installing Pre-Compiled Releases (For General Users)
 
 Download the latest native installers for Windows and Linux from our GitHub **Releases** page:
@@ -70,14 +72,7 @@ Download the latest native installers for Windows and Linux from our GitHub **Re
 
 ### 💻 Method B: Compiling & Running from Source (For Developers & Enthusiasts)
 
-#### 1. Core Engine Dependencies (Automated!)
-SauceBox requires both `yt-dlp` and `ffmpeg` to function. 
-
-🎉 **Zero-Configuration Setup:** As of version 1.7.0, SauceBox features a native **Runtime Provisioning Engine**. On first launch, the app will automatically download, extract, and auto-update the required binaries for your operating system behind the scenes. You do not need to install anything manually!
-
-*(Advanced Users: If you prefer to use your own system-level packages installed via `apt`, `brew`, or `winget`, or if you wish to use custom legacy binaries, you can switch the engine management mode under the **Settings > System Binaries** tab inside SauceBox.)*
-
-#### 2. Get the Source Code
+#### 1. Get the Source Code
 ```bash
 git clone https://github.com/CLOUDWERX-DEV/SauceBox.git
 cd SauceBox
