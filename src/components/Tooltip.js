@@ -7,7 +7,7 @@ export default function Tooltip({ children, content, position = 'top', style }) 
 
   return (
     <View 
-      style={[styles.container, style]}
+      style={[styles.container, style, visible && { zIndex: 9999 }]}
       onMouseEnter={() => setVisible(true)}
       onMouseLeave={() => setVisible(false)}
     >
