@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { useStore } from '../../store';
 import BatchDownloadModal from '../BatchDownloadModal';
 import VideoPreviewModal from '../VideoPreviewModal';
@@ -275,7 +275,7 @@ export default function DownloadTab({ onNavigate }) {
   };
 
   return (
-    <>
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
       <div style={styles.content}>
         <View style={styles.card}>
           <DownloadInputForm 
@@ -315,6 +315,6 @@ export default function DownloadTab({ onNavigate }) {
         onClose={() => setPlaylistModalVisible(false)}
         onDownloadSelected={handleDownloadFromPlaylist}
       />
-    </>
+    </ScrollView>
   );
 }
