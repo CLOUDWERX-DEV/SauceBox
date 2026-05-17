@@ -154,33 +154,35 @@ export default function PlaylistGallery({
         <View style={styles.header}>
           <View>
             <Text style={styles.title}>Playlists</Text>
-            <View style={styles.statsContainer}>
-              <View style={styles.statBadge}>
-                <Text style={styles.statIcon}>🗂️</Text>
-                <Text style={styles.statValue}>
-                  {globalStats.totalPlaylists}
-                </Text>
-                <Text style={styles.statLabel}>
-                  {globalStats.totalPlaylists === 1 ? 'Playlist' : 'Playlists'}
-                </Text>
+            {playlists.length > 0 && (
+              <View style={styles.statsContainer}>
+                <View style={styles.statBadge}>
+                  <Text style={styles.statIcon}>🗂️</Text>
+                  <Text style={styles.statValue}>
+                    {globalStats.totalPlaylists}
+                  </Text>
+                  <Text style={styles.statLabel}>
+                    {globalStats.totalPlaylists === 1 ? 'Playlist' : 'Playlists'}
+                  </Text>
+                </View>
+
+                {globalStats.totalSize > 0 && (
+                  <View style={styles.statBadge}>
+                    <Text style={styles.statIcon}>💾</Text>
+                    <Text style={styles.statValue}>{formatFileSize(globalStats.totalSize)}</Text>
+                    <Text style={styles.statLabel}>Storage</Text>
+                  </View>
+                )}
+
+                {globalStats.totalDuration > 0 && (
+                  <View style={styles.statBadge}>
+                    <Text style={styles.statIcon}>⏱️</Text>
+                    <Text style={styles.statValue}>{formatTotalDuration(globalStats.totalDuration)}</Text>
+                    <Text style={styles.statLabel}>Playtime</Text>
+                  </View>
+                )}
               </View>
-
-              {globalStats.totalSize > 0 && (
-                <View style={styles.statBadge}>
-                  <Text style={styles.statIcon}>💾</Text>
-                  <Text style={styles.statValue}>{formatFileSize(globalStats.totalSize)}</Text>
-                  <Text style={styles.statLabel}>Storage</Text>
-                </View>
-              )}
-
-              {globalStats.totalDuration > 0 && (
-                <View style={styles.statBadge}>
-                  <Text style={styles.statIcon}>⏱️</Text>
-                  <Text style={styles.statValue}>{formatTotalDuration(globalStats.totalDuration)}</Text>
-                  <Text style={styles.statLabel}>Playtime</Text>
-                </View>
-              )}
-            </View>
+            )}
           </View>
           {playlists.length > 0 && (
             <TouchableOpacity style={styles.createPlaylistButton} onPress={onCreate}>

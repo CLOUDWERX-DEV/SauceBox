@@ -41,33 +41,35 @@ export default function GalleryHeader({
     <View style={styles.header}>
       <View>
         <Text style={styles.title}>Video Gallery</Text>
-        <View style={styles.statsContainer}>
-          <View style={styles.statBadge}>
-            <Text style={styles.statIcon}>🎥</Text>
-            <Text style={styles.statValue}>
-              {filteredLength === historyLength ? historyLength : `${filteredLength} / ${historyLength}`}
-            </Text>
-            <Text style={styles.statLabel}>
-              {filteredLength === historyLength ? (historyLength === 1 ? 'Video' : 'Videos') : 'shown'}
-            </Text>
+        {historyLength > 0 && (
+          <View style={styles.statsContainer}>
+            <View style={styles.statBadge}>
+              <Text style={styles.statIcon}>🎥</Text>
+              <Text style={styles.statValue}>
+                {filteredLength === historyLength ? historyLength : `${filteredLength} / ${historyLength}`}
+              </Text>
+              <Text style={styles.statLabel}>
+                {filteredLength === historyLength ? (historyLength === 1 ? 'Video' : 'Videos') : 'shown'}
+              </Text>
+            </View>
+
+            {totalSize && (
+              <View style={styles.statBadge}>
+                <Text style={styles.statIcon}>💾</Text>
+                <Text style={styles.statValue}>{totalSize}</Text>
+                <Text style={styles.statLabel}>Storage</Text>
+              </View>
+            )}
+
+            {formattedDuration && (
+              <View style={styles.statBadge}>
+                <Text style={styles.statIcon}>⏱️</Text>
+                <Text style={styles.statValue}>{formattedDuration}</Text>
+                <Text style={styles.statLabel}>Playtime</Text>
+              </View>
+            )}
           </View>
-
-          {totalSize && historyLength > 0 && (
-            <View style={styles.statBadge}>
-              <Text style={styles.statIcon}>💾</Text>
-              <Text style={styles.statValue}>{totalSize}</Text>
-              <Text style={styles.statLabel}>Storage</Text>
-            </View>
-          )}
-
-          {formattedDuration && historyLength > 0 && (
-            <View style={styles.statBadge}>
-              <Text style={styles.statIcon}>⏱️</Text>
-              <Text style={styles.statValue}>{formattedDuration}</Text>
-              <Text style={styles.statLabel}>Playtime</Text>
-            </View>
-          )}
-        </View>
+        )}
       </View>
       <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center', marginTop: 6 }}>
         {historyLength > 0 && (
