@@ -8,6 +8,7 @@
 - **Three-Way Engine Management System**: Rebuilt the "System Binaries" section inside the Settings tab with a three-way toggle: `SauceBox Managed` (default), `System PATH`, and `Custom Path`. Users can freely override the managed binaries if they have networking limitations, strict enterprise policies, or require specific legacy versions.
 - **Background Auto-Updater**: Integrated an automatic startup background updater that natively spawns `yt-dlp -U` to ensure extraction schemas remain compatible with the latest website layout changes. Includes a toggle to disable this behavior in Settings.
 - **Manual Engine Update & Redownload**: Added dedicated "Update yt-dlp" and "Force Redownload All" action buttons in the Settings tab (visible under the Managed mode). Users can manually trigger an update or completely nuke and redownload the core engines if they become corrupted.
+- **Playlist Editor M3U Support**: Added native `.m3u` Import and Export buttons directly to the Playlist Editor view. Users can now perfectly export their custom local playlists into universal M3U files with absolute paths, enabling immediate playback handoff to VLC, MPV, or other external media players, as well as importing external M3U files to instantly reconstruct saved collections.
 - **Architectural Proposal Documentation**: Authored `docs/BINARIES_BUNDLING_PROPOSAL.md`, detailing the technical, legal (GPL vs Unlicense), and cross-platform limitations of hard-bundling binaries versus the deployed runtime provisioning approach.
 
 ### Changed
