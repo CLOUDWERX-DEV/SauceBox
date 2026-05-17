@@ -149,7 +149,7 @@ export default function BroadcastPlaylistBuilder({
             {totalSize > 0 && <Text style={styles.playlistMetaText}>💾 {formatSize(totalSize)}</Text>}
           </View>
           
-          <ScrollView style={{ flex: 1, marginHorizontal: -16 }} contentContainerStyle={{ flexGrow: 1 }}>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
             {playlist.map((item, index) => (
               <div 
                 key={item.id} 
@@ -164,19 +164,17 @@ export default function BroadcastPlaylistBuilder({
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  backgroundColor: dragOverIndex === index ? theme.colors.surfaceLight : 'transparent',
-                  paddingTop: '8px',
-                  paddingBottom: '8px',
-                  paddingLeft: '16px',
-                  paddingRight: '16px',
-                  borderBottomWidth: '1px',
-                  borderBottomStyle: 'solid',
-                  borderBottomColor: dragOverIndex === index ? theme.colors.primary : theme.colors.border,
-                  borderLeftWidth: draggedIndex === index ? '3px' : '0px',
-                  borderLeftStyle: 'solid',
-                  borderLeftColor: theme.colors.primary,
+                  backgroundColor: dragOverIndex === index ? theme.colors.surfaceLight : theme.colors.surface,
+                  padding: '8px',
+                  borderRadius: '8px',
+                  marginBottom: '8px',
+                  borderWidth: '1px',
+                  borderStyle: draggedIndex === index ? 'dashed' : 'solid',
+                  borderColor: dragOverIndex === index ? theme.colors.primary : theme.colors.border,
                   opacity: draggedIndex === index ? 0.4 : 1,
-                  transition: 'all 0.15s ease',
+                  transform: dragOverIndex === index ? 'scale(1.02)' : 'scale(1)',
+                  transition: 'all 0.2s ease',
+                  boxShadow: dragOverIndex === index ? `0 4px 12px ${theme.colors.primary}40` : 'none',
                   cursor: 'grab'
                 }}
               >

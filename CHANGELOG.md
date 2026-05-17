@@ -13,7 +13,8 @@
 - **Playlist UI Refinements**: Added a large quick-play button on playlist cards, a new "Save & Return" exit pattern in the editor, and a large custom cover art selector. Drag-and-drop was refined to perfectly match the Broadcast tab with manual numbering overrides and up/down quick keys. Left pane now displays video ratings.
 - **Broadcast Tab Playlist Builder UI Overhaul**: Revamped search input, available videos count, sort buttons, and layout to match the PlaylistEditor exactly.
 - **Unified Added State Styling**: Refactored the "Added" status across both PlaylistEditor and Broadcast tab to show clean, bold orange text instead of a grey badge.
-- **Broadcast Playlist Items Refinement**: Removed card styling and converted item rows in the available videos list and current playlist list to flat items with bottom border dividers and full-bleed edge-to-edge layouts.
+- **Broadcast Playlist Items Refinement**: Reverted items in the current playlist list back to the premium card layout with exact borders, margins, padding, and drop shadow styles, mirroring the PlaylistEditor.
+- **Drag-and-Drop Parity**: Fully matched the drag-and-drop scale, opacity, border transitions, and dark-tinted highlight visual effects of the PlaylistEditor.
 - **Full-Bleed Separator Lines**: Integrated edge-to-edge separator lines for metadata and actions inside the Broadcast tab current playlist area using negative margins.
 - **Empty State Alignment**: Aligned the Broadcast current playlist's empty state to use the mailbox emoji (`📬`) and styled placeholder text matching the PlaylistEditor.
 
