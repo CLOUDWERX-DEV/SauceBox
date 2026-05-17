@@ -3,20 +3,20 @@ import { theme } from '../../../theme';
 
 export const downloadStyles = StyleSheet.create({
   content: {
-    padding: 32,
-    paddingBottom: 60,
+    padding: 24,
+    paddingBottom: 24,
   },
   card: {
     backgroundColor: theme.colors.surface,
-    borderRadius: 24,
-    padding: 36,
+    borderRadius: 20,
+    padding: 24,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    marginBottom: 32,
+    marginBottom: 20,
     boxShadow: `0 8px 32px ${theme.colors.border}`,
   },
   inputContainer: {
-    marginBottom: 24,
+    marginBottom: 16,
   },
   inputLabel: {
     fontSize: 15,
@@ -84,11 +84,11 @@ export const downloadStyles = StyleSheet.create({
   batchSection: {
     backgroundColor: `${theme.colors.primary}10`,
     borderRadius: 16,
-    padding: 24,
+    padding: 20,
     borderWidth: 2,
     borderColor: `${theme.colors.primary}30`,
     borderStyle: 'dashed',
-    marginBottom: 32,
+    marginBottom: 0,
   },
   batchInfo: {
     marginBottom: 16,
@@ -137,20 +137,20 @@ export const downloadStyles = StyleSheet.create({
     flex: 1,
     minWidth: 300,
     backgroundColor: theme.colors.surface,
-    borderRadius: 20,
-    padding: 28,
+    borderRadius: 16,
+    padding: 20,
     borderWidth: 1,
     borderColor: theme.colors.borderLight,
     boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
   },
   tipsTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: theme.colors.primary,
-    marginBottom: 20,
+    marginBottom: 12,
   },
   tipsList: {
-    gap: 12,
+    gap: 8,
   },
   tipItem: {
     flexDirection: 'row',

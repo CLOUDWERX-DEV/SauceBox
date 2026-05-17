@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.8] - 2026-05-16
+
+### Fixed
+- **Download Spacing Optimization**: Fine-tuned vertical margins, paddings, and child gaps in `DownloadStyles.js`. By shaving 148px of redundant empty height across main card padding, input margin, batch section margins, and tips layout padding, the downloads tab now comfortably fits all default screen heights perfectly without triggering a tiny 1-10px scrollbar.
+
 ## [1.3.7] - 2026-05-16
 
 ### Fixed
