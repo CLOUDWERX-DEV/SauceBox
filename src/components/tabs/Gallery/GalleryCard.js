@@ -204,7 +204,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: theme.colors.border,
-    cursor: 'pointer',
     transition: 'all 0.2s ease',
     position: 'relative',
   },
