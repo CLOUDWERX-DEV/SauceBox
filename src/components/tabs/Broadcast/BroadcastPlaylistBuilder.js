@@ -39,22 +39,31 @@ export default function BroadcastPlaylistBuilder({
       
       <View style={styles.playlistContainer}>
         <View style={styles.playlistColumnLeft}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <Text style={styles.columnTitle}>Available Videos</Text>
-            <TextInput 
-              style={[styles.textInputFull, { marginTop: 0, width: 150, paddingVertical: 6 }]} 
-              placeholder="Search..." 
-              placeholderTextColor={theme.colors.textTertiary}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
+          {/* Panel header: title + count */}
+          <View style={styles.panelHeader}>
+            <View style={styles.panelHeaderRow}>
+              <Text style={styles.panelTitle}>📚 Available Videos</Text>
+              <Text style={styles.panelSubtitle}>
+                {history.filter(h => !searchQuery || h.title.toLowerCase().includes(searchQuery.toLowerCase()) || (h.tags && h.tags.join(' ').toLowerCase().includes(searchQuery.toLowerCase()))).length} videos
+              </Text>
+            </View>
 
-          <View style={styles.sortRow}>
-            <Text style={styles.sortLabel}>Sort:</Text>
-            <View style={styles.sortButtons}>
+            {/* Styled search bar matching PlaylistEditor */}
+            <View style={styles.editorSearch}>
+              <Text style={styles.editorSearchIcon}>🔍</Text>
+              <TextInput
+                style={styles.editorSearchInput}
+                placeholder="Search videos..."
+                placeholderTextColor="#555"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+            </View>
+
+            {/* Sort buttons — no SORT: label, matching PlaylistEditor */}
+            <View style={styles.sortRow}>
               {['date', 'title', 'duration', 'rating'].map(sort => {
-                const labels = { date: '📅 Date', title: '🔤 Title', duration: '⏱️ Time', rating: '★ Rating' };
+                const labels = { date: '📅 Date', title: '🔤 Title', duration: '⏱️ Duration', rating: '★ Rating' };
                 const isActive = sortBy === sort;
                 return (
                   <TouchableOpacity
@@ -71,7 +80,7 @@ export default function BroadcastPlaylistBuilder({
             </View>
           </View>
 
-          <ScrollView style={styles.videoList}>
+          <ScrollView style={{ flex: 1 }}>
             {history
               .filter(h => !searchQuery || h.title.toLowerCase().includes(searchQuery.toLowerCase()) || (h.tags && h.tags.join(' ').toLowerCase().includes(searchQuery.toLowerCase())))
               .sort((a, b) => {
@@ -203,7 +212,13 @@ export default function BroadcastPlaylistBuilder({
                 </View>
               </div>
             ))}
-            {playlist.length === 0 && <Text style={styles.hintText}>Playlist is empty.</Text>}
+            {playlist.length === 0 && (
+              <View style={styles.emptyPlaylistState}>
+                <Text style={styles.emptyPlaylistIcon}>🎬</Text>
+                <Text style={styles.emptyPlaylistTitle}>Playlist is Empty</Text>
+                <Text style={styles.emptyPlaylistSub}>Add videos from the left panel to build your stream queue.</Text>
+              </View>
+            )}
           </ScrollView>
           
           <View style={styles.playlistActions}>
@@ -258,9 +273,115 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 18, fontWeight: '600', color: theme.colors.primary, marginBottom: 16 },
   subtitle: { fontSize: 16, color: theme.colors.textSecondary, fontStyle: 'italic' },
   playlistContainer: { flexDirection: 'row', gap: 24, height: 600, marginTop: 16 },
-  playlistColumnLeft: { flex: 1, backgroundColor: theme.colors.surface, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.border, padding: 16, display: 'flex', flexDirection: 'column' },
-  playlistColumnRight: { width: 420, backgroundColor: theme.colors.surface, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.border, padding: 16, display: 'flex', flexDirection: 'column' },
+  playlistColumnLeft: {
+    flex: 1,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  playlistColumnRight: {
+    width: 420,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    padding: 16,
+    display: 'flex',
+    flexDirection: 'column',
+  },
   columnTitle: { fontSize: 16, fontWeight: '700', color: theme.colors.text },
+  panelHeader: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    gap: 12,
+    flexShrink: 0,
+  },
+  panelHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  panelTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.primary,
+  },
+  panelSubtitle: {
+    fontSize: 12,
+    color: theme.colors.textTertiary,
+  },
+  editorSearch: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surfaceLight,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  editorSearchIcon: {
+    fontSize: 14,
+    marginRight: 8,
+  },
+  editorSearchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: theme.colors.text,
+    outlineStyle: 'none',
+  },
+  sortRow: {
+    flexDirection: 'row',
+    gap: 6,
+    flexWrap: 'wrap',
+  },
+  sortButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    backgroundColor: theme.colors.surfaceLight,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    cursor: 'pointer',
+  },
+  sortButtonActive: {
+    backgroundColor: `${theme.colors.primary}20`,
+    borderColor: theme.colors.primary,
+  },
+  sortButtonText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
+  sortButtonTextActive: {
+    color: theme.colors.primary,
+  },
+  emptyPlaylistState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+    gap: 12,
+  },
+  emptyPlaylistIcon: {
+    fontSize: 48,
+    marginBottom: 8,
+  },
+  emptyPlaylistTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+  },
+  emptyPlaylistSub: {
+    fontSize: 13,
+    color: theme.colors.textTertiary,
+    textAlign: 'center',
+  },
   playlistMetaRow: {
     flexDirection: 'row',
     gap: 12,
@@ -273,48 +394,6 @@ const styles = StyleSheet.create({
   playlistMetaText: {
     fontSize: 12,
     color: theme.colors.textSecondary,
-  },
-  sortRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-    gap: 8,
-  },
-  sortLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: theme.colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  sortButtons: {
-    flexDirection: 'row',
-    gap: 6,
-    flex: 1,
-  },
-  sortButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    backgroundColor: theme.colors.surfaceLight,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    cursor: 'pointer',
-  },
-  sortButtonActive: {
-    backgroundColor: `${theme.colors.primary}20`,
-    borderColor: theme.colors.primary,
-  },
-  sortButtonText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: theme.colors.textTertiary,
-  },
-  sortButtonTextActive: {
-    color: theme.colors.primary,
   },
   videoList: { flex: 1, backgroundColor: theme.colors.surfaceLight, borderRadius: 8, padding: 8 },
   videoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: theme.colors.surface, padding: 8, borderRadius: 8, marginBottom: 8, borderWidth: 1, borderColor: theme.colors.border },

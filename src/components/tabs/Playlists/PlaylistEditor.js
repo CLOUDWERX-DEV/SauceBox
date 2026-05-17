@@ -376,9 +376,7 @@ export default function PlaylistEditor({
                     </Text>
                   </View>
                   {added ? (
-                    <View style={styles.addedBadge}>
-                      <Text style={styles.addedBadgeText}>✓ Added</Text>
-                    </View>
+                    <Text style={{ fontSize: 12, fontWeight: '700', color: theme.colors.primary, paddingHorizontal: 12, paddingVertical: 6 }}>✓ Added</Text>
                   ) : (
                     <TouchableOpacity
                       style={styles.addButton}
