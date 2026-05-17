@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.15] - 2026-05-16
+
+### Added
+- **Available Videos Star Ratings**: Upgraded the Available Videos list in the Broadcast Tab's Playlist Builder to render solid star ratings (`★`) in brand orange (`theme.colors.primary`) to the right of the resolution quality if a rating is set for the video.
+
 ## [1.3.14] - 2026-05-16
 
 ### Changed

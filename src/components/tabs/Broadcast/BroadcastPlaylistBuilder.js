@@ -44,7 +44,12 @@ export default function BroadcastPlaylistBuilder({
                 <View style={{ flex: 1, marginRight: 12 }}>
                   <Text style={styles.videoTitle} numberOfLines={1}>{item.title}</Text>
                   <Text style={styles.videoMeta} numberOfLines={1}>
-                    {item.duration ? Math.floor(item.duration / 60) + ':' + (item.duration % 60).toString().padStart(2, '0') : '??:??'} • {item.resolution || 'HD'} {item.rating ? `• ${'⭐'.repeat(item.rating)}` : ''}
+                    {item.duration ? Math.floor(item.duration / 60) + ':' + (item.duration % 60).toString().padStart(2, '0') : '??:??'} • {item.resolution || 'HD'}
+                    {item.rating > 0 && (
+                      <Text style={{ color: theme.colors.primary, fontWeight: '700' }}>
+                        {` • ${'★'.repeat(item.rating)}`}
+                      </Text>
+                    )}
                   </Text>
                 </View>
                 <TouchableOpacity style={styles.addButton} onPress={() => handleAddToPlaylist(item)}>
