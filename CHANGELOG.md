@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.13] - 2026-05-16
+
+### Added
+- **Gallery Playtime Stats & Dashboard Cards**: Overhauled the Gallery page header with a horizontal row of high-contrast, premium metrics badges showing the total video count, total storage size, and cumulative video playtime/duration formatted beautifully (e.g., `3h 45m`).
+- **Gallery Playtime Calculation**: Added calculation logic using `reduce` to sum up the playtime of all downloaded media files in `GalleryTab.js` and wired it into `GalleryHeader`.
+
 ## [1.3.12] - 2026-05-16
 
 ### Changed

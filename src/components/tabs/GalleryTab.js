@@ -131,6 +131,7 @@ export default function GalleryTab({ onNavigate }) {
     });
 
   const totalBytes = history.reduce((acc, h) => acc + (Number(h.filesize) || 0), 0);
+  const totalDuration = history.reduce((acc, h) => acc + (Number(h.duration) || 0), 0);
   const totalSizeStr = totalBytes > 0 ? formatFileSize(totalBytes) : null;
   const knownCount = history.filter(h => h.filesize).length;
 
@@ -141,6 +142,7 @@ export default function GalleryTab({ onNavigate }) {
           historyLength={history.length}
           filteredLength={filteredHistory.length}
           totalBytes={totalBytes}
+          totalDuration={totalDuration}
           onImport={() => setImportVisible(true)}
           onClearAll={() => setClearConfirmVisible(true)}
         />

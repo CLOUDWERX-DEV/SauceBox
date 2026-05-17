@@ -11,29 +11,65 @@ const formatFileSize = (bytes) => {
   return `${mb.toFixed(2)} MB`;
 };
 
-export default function GalleryHeader({ historyLength, filteredLength, totalBytes, onImport, onClearAll }) {
+const formatTotalDuration = (seconds) => {
+  const sec = Number(seconds);
+  if (!sec || isNaN(sec)) return null;
+  const days = Math.floor(sec / (24 * 3600));
+  const hours = Math.floor((sec % (24 * 3600)) / 3600);
+  const mins = Math.floor((sec % 3600) / 60);
+  
+  const parts = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0) parts.push(`${hours}h`);
+  if (mins > 0 || parts.length === 0) parts.push(`${mins}m`);
+  
+  return parts.join(' ');
+};
+
+export default function GalleryHeader({ 
+  historyLength, 
+  filteredLength, 
+  totalBytes, 
+  totalDuration, 
+  onImport, 
+  onClearAll 
+}) {
   const totalSize = formatFileSize(totalBytes);
-  const countLabel = historyLength === 0
-    ? 'No downloads yet'
-    : filteredLength === historyLength
-      ? `${historyLength} ${historyLength === 1 ? 'Video' : 'Videos'}`
-      : `${filteredLength} of ${historyLength} shown`;
+  const formattedDuration = formatTotalDuration(totalDuration);
 
   return (
     <View style={styles.header}>
       <View>
         <Text style={styles.title}>Video Gallery</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <Text style={styles.subtitle}>{countLabel}</Text>
+        <View style={styles.statsContainer}>
+          <View style={styles.statBadge}>
+            <Text style={styles.statIcon}>🎥</Text>
+            <Text style={styles.statValue}>
+              {filteredLength === historyLength ? historyLength : `${filteredLength} / ${historyLength}`}
+            </Text>
+            <Text style={styles.statLabel}>
+              {filteredLength === historyLength ? (historyLength === 1 ? 'Video' : 'Videos') : 'shown'}
+            </Text>
+          </View>
+
           {totalSize && historyLength > 0 && (
-            <>
-              <Text style={styles.subtitleDot}>·</Text>
-              <Text style={styles.subtitleSize}>{totalSize}</Text>
-            </>
+            <View style={styles.statBadge}>
+              <Text style={styles.statIcon}>💾</Text>
+              <Text style={styles.statValue}>{totalSize}</Text>
+              <Text style={styles.statLabel}>Storage</Text>
+            </View>
+          )}
+
+          {formattedDuration && historyLength > 0 && (
+            <View style={styles.statBadge}>
+              <Text style={styles.statIcon}>⏱️</Text>
+              <Text style={styles.statValue}>{formattedDuration}</Text>
+              <Text style={styles.statLabel}>Playtime</Text>
+            </View>
           )}
         </View>
       </View>
-      <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+      <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center', marginTop: 6 }}>
         <TouchableOpacity style={styles.importButton} onPress={onImport}>
           <Text style={styles.importButtonText}>📥 IMPORT VIDEOS</Text>
         </TouchableOpacity>
@@ -58,23 +94,40 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '700',
     color: theme.colors.text,
-    marginBottom: 8,
+    marginBottom: 4,
   },
-  subtitle: {
-    fontSize: 16,
-    color: theme.colors.textSecondary,
-    fontStyle: 'italic',
+  statsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
   },
-  subtitleDot: {
-    fontSize: 16,
-    color: theme.colors.textSecondary,
-    opacity: 0.5,
+  statBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: `${theme.colors.primary}15`,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 6,
+    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
   },
-  subtitleSize: {
-    fontSize: 15,
-    color: theme.colors.primary,
+  statIcon: {
+    fontSize: 14,
+  },
+  statValue: {
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 0.3,
+    color: '#ffffff',
+  },
+  statLabel: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   importButton: {
     backgroundColor: theme.colors.primary,
