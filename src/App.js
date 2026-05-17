@@ -4,6 +4,7 @@ import TitleBar from './components/TitleBar';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import AppLock from './components/AppLock';
+import BootScreen from './components/BootScreen';
 import logoSrc from '../public/logo.png';
 
 import { useStore } from './store';
@@ -23,6 +24,43 @@ export default function App() {
   const quickCastVideo = useStore(state => state.quickCastVideo);
   const activeBuiltinVideo = useStore(state => state.activeBuiltinVideo);
   const setActiveBuiltinVideo = useStore(state => state.setActiveBuiltinVideo);
+  
+  const [isBooting, setIsBooting] = useState(true);
+  const [needsProvisioning, setNeedsProvisioning] = useState(false);
+
+  // Engine Provisioning Check
+  useEffect(() => {
+    const checkStartup = async () => {
+      const currentSettings = useStore.getState().settings;
+      const mode = currentSettings.binaryManagementMode || 'managed';
+
+      if (mode === 'managed') {
+        const info = await ipcRenderer?.invoke('check-managed-binaries');
+        if (!info || !info.allPresent) {
+          setNeedsProvisioning(true);
+          return; // Stay in booting state, BootScreen will render
+        } else {
+          // Check for auto update quietly in background
+          if (currentSettings.autoUpdateBinaries !== false) {
+            ipcRenderer?.invoke('update-managed-ytdlp').catch(() => {});
+          }
+          await ipcRenderer?.send('update-binary-paths', {
+            ytdlpPath: info.managedPaths.ytdlpPath,
+            ffmpegPath: info.managedPaths.ffmpegPath
+          });
+        }
+      } else {
+        await ipcRenderer?.send('update-binary-paths', {
+          ytdlpPath: mode === 'system' ? '' : currentSettings.ytdlpPath,
+          ffmpegPath: mode === 'system' ? '' : currentSettings.ffmpegPath
+        });
+      }
+      setIsBooting(false);
+    };
+
+    if (ipcRenderer) checkStartup();
+    else setIsBooting(false);
+  }, []);
   
   useEffect(() => {
     if (quickCastVideo) {
@@ -313,6 +351,25 @@ export default function App() {
       });
     }
   }, [downloads, maxConcurrentDownloads, updateDownload]);
+
+  if (isBooting) {
+    if (needsProvisioning) {
+      return (
+        <BootScreen onComplete={() => {
+          ipcRenderer?.invoke('check-managed-binaries').then(info => {
+            if (info && info.allPresent) {
+               ipcRenderer?.send('update-binary-paths', {
+                 ytdlpPath: info.managedPaths.ytdlpPath,
+                 ffmpegPath: info.managedPaths.ffmpegPath
+               });
+            }
+          });
+          setIsBooting(false);
+        }} />
+      );
+    }
+    return <View style={styles.container}><TitleBar /></View>;
+  }
 
   if (vaultEnabled && !isUnlocked) {
     return (

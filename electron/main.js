@@ -11,6 +11,7 @@ const { setupDownloaderHandlers } = require('./modules/downloader');
 const { setupMetadataHandlers } = require('./modules/metadata');
 const { setupFfmpegHandlers } = require('./modules/ffmpegProcessing');
 const { setupStorageHandlers } = require('./modules/storage');
+const { setupProvisioningHandlers } = require('./modules/provisioning');
 
 function createWindow() {
   const isLinux = process.platform === 'linux';
@@ -104,6 +105,7 @@ if (app) {
     setupMetadataHandlers();
     setupFfmpegHandlers();
     setupStorageHandlers();
+    setupProvisioningHandlers();
   });
 
   app.on('window-all-closed', () => {

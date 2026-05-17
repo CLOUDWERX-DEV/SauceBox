@@ -23,6 +23,8 @@ const DEFAULT_SETTINGS = {
   minFreeSpaceGB: 5,
   ytdlpPath: '',
   ffmpegPath: '',
+  binaryManagementMode: 'managed',
+  autoUpdateBinaries: true,
   customPlayerPath: ''
 };
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.7.0] - 2026-05-17
+
+### Added
+- **Runtime Binary Provisioning Engine**: Completely overhauled core dependency management. SauceBox now automatically downloads, manages, and updates `yt-dlp` and `ffmpeg` engines at runtime, storing them safely in the user's OS application data directory (`~/.config/saucebox/binaries/`, etc.). This eliminates the need for manual system package installations and completely bypasses read-only bundle lockouts on Windows/macOS.
+- **Initial Setup Boot Screen**: Added a full-screen, blocking `BootScreen` component on first launch or when core engines are missing. The interface features real-time progress bars, byte size formatting, and a live console log output, keeping users fully informed during the download and extraction process.
+- **Three-Way Engine Management System**: Rebuilt the "System Binaries" section inside the Settings tab with a three-way toggle: `SauceBox Managed` (default), `System PATH`, and `Custom Path`. Users can freely override the managed binaries if they have networking limitations, strict enterprise policies, or require specific legacy versions.
+- **Background Auto-Updater**: Integrated an automatic startup background updater that natively spawns `yt-dlp -U` to ensure extraction schemas remain compatible with the latest website layout changes. Includes a toggle to disable this behavior in Settings.
+- **Manual Engine Update & Redownload**: Added dedicated "Update yt-dlp" and "Force Redownload All" action buttons in the Settings tab (visible under the Managed mode). Users can manually trigger an update or completely nuke and redownload the core engines if they become corrupted.
+- **Architectural Proposal Documentation**: Authored `docs/BINARIES_BUNDLING_PROPOSAL.md`, detailing the technical, legal (GPL vs Unlicense), and cross-platform limitations of hard-bundling binaries versus the deployed runtime provisioning approach.
+
+### Changed
+- **Removed Legacy Binary Warnings**: Removed the old hardcoded "Core Dependencies Missing" warning box that instructed users to manually run `winget`, `brew`, or `apt install`. The UI now natively handles dependency provisioning, making these instructions obsolete.
+- **System Binary Version Tracking**: The Settings tab now actively probes the exact file path selected by the three-way toggle mode, dynamically updating the displayed binary version in real-time when switching between Managed, System, or Custom modes.
+
 ## [1.6.1] - 2026-05-17
 
 ### Added

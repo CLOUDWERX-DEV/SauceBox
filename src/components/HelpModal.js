@@ -88,7 +88,7 @@ export default function HelpModal({ visible, onClose }) {
 
           <View style={styles.body}>
             {/* Sidebar */}
-            <ScrollView style={styles.sidebar}>
+            <View style={styles.sidebar}>
               {tabs.map((tab) => {
                 const isActive = activeTab === tab.id;
                 return (
@@ -103,7 +103,7 @@ export default function HelpModal({ visible, onClose }) {
                   </TouchableOpacity>
                 );
               })}
-            </ScrollView>
+            </View>
 
             {/* Main Content Area */}
             <ScrollView style={styles.contentArea}>

@@ -1,6 +1,6 @@
 {
   "name": "saucebox",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "Download, organize, and stream adult content — all from one app! SauceBox.",
   "author": {
     "name": "CLOUDWERX LAB",
@@ -32,11 +32,17 @@
     ],
     "mac": {
       "category": "public.app-category.video",
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "icon": "build/icons/512x512.png"
     },
     "win": {
-      "target": ["nsis", "portable"],
+      "target": [
+        "nsis",
+        "portable"
+      ],
       "icon": "build/icon.ico"
     },
     "nsis": {
@@ -49,7 +55,11 @@
       "createDesktopShortcut": true
     },
     "linux": {
-      "target": ["AppImage", "deb", "tar.gz"],
+      "target": [
+        "AppImage",
+        "deb",
+        "tar.gz"
+      ],
       "icon": "build/icons",
       "category": "Video",
       "maintainer": "CLOUDWERX LAB <saucebox@cloudwerxlab.com>"
@@ -58,6 +68,7 @@
   "dependencies": {
     "basic-auth": "^2.0.1",
     "express": "^5.2.1",
+    "extract-zip": "^2.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-native-web": "^0.19.10",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
 import { theme } from '../../../theme';
 import { useStore } from '../../../store';
 
@@ -10,142 +10,207 @@ export default function SettingsSystemBinaries() {
   const updateSettings = useStore(state => state.updateSettings);
   const [ytVersion, setYtVersion] = useState('Detecting...');
   const [ffmpegVersion, setFfmpegVersion] = useState('Detecting...');
+  const [isUpdatingYt, setIsUpdatingYt] = useState(false);
+  const [isRedownloading, setIsRedownloading] = useState(false);
+
+  const mode = settings.binaryManagementMode || 'managed';
+
+  const fetchVersions = async () => {
+    try {
+      setYtVersion('Detecting...');
+      setFfmpegVersion('Detecting...');
+
+      let ytPathToUse = settings.ytdlpPath;
+      let ffPathToUse = settings.ffmpegPath;
+      
+      if (mode === 'managed') {
+         const info = await ipcRenderer?.invoke('check-managed-binaries');
+         ytPathToUse = info?.managedPaths?.ytdlpPath || '';
+         ffPathToUse = info?.managedPaths?.ffmpegPath || '';
+      } else if (mode === 'system') {
+         ytPathToUse = '';
+         ffPathToUse = '';
+      }
+      
+      await ipcRenderer?.send('update-binary-paths', { 
+        ytdlpPath: ytPathToUse, 
+        ffmpegPath: ffPathToUse 
+      });
+      
+      const versions = await ipcRenderer?.invoke('get-binary-versions');
+      if (versions) {
+        setYtVersion(versions.ytDlp);
+        setFfmpegVersion(versions.ffmpeg);
+      }
+    } catch (err) {
+      console.error('Failed to fetch versions:', err);
+    }
+  };
 
   useEffect(() => {
-    const fetchVersions = async () => {
-      try {
-        await ipcRenderer?.send('update-binary-paths', { 
-          ytdlpPath: settings.ytdlpPath, 
-          ffmpegPath: settings.ffmpegPath 
-        });
-        const versions = await ipcRenderer?.invoke('get-binary-versions');
-        if (versions) {
-          setYtVersion(versions.ytDlp);
-          setFfmpegVersion(versions.ffmpeg);
-        }
-      } catch (err) {
-        console.error('Failed to fetch versions:', err);
-      }
-    };
     fetchVersions();
-  }, [settings.ytdlpPath, settings.ffmpegPath]);
+  }, [settings.ytdlpPath, settings.ffmpegPath, mode]);
+
+  const handleUpdateYt = async () => {
+    if (isUpdatingYt) return;
+    setIsUpdatingYt(true);
+    try {
+      const res = await ipcRenderer?.invoke('update-managed-ytdlp');
+      if (res && res.success) {
+        // Success
+        await fetchVersions();
+      } else {
+        console.error("Update failed", res?.error);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setIsUpdatingYt(false);
+  };
+
+  const handleRedownload = async () => {
+    if (isRedownloading) return;
+    setIsRedownloading(true);
+    try {
+      await ipcRenderer?.invoke('download-managed-binaries');
+      await fetchVersions();
+    } catch (e) {
+      console.error(e);
+    }
+    setIsRedownloading(false);
+  };
 
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>🛠️ System Binaries</Text>
       <View style={styles.card}>
-        <View style={{ marginBottom: 24 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
-            <Text style={styles.switchLabel}>yt-dlp Path</Text>
+        
+        <View style={styles.switcherContainer}>
+          <TouchableOpacity 
+            style={[styles.switchButton, mode === 'managed' && styles.switchButtonActive]}
+            onPress={() => updateSettings({ binaryManagementMode: 'managed' })}
+          >
+            <Text style={[styles.switchButtonText, mode === 'managed' && styles.switchButtonTextActive]}>SauceBox Managed</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.switchButton, mode === 'system' && styles.switchButtonActive]}
+            onPress={() => updateSettings({ binaryManagementMode: 'system' })}
+          >
+            <Text style={[styles.switchButtonText, mode === 'system' && styles.switchButtonTextActive]}>System PATH</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.switchButton, mode === 'custom' && styles.switchButtonActive]}
+            onPress={() => updateSettings({ binaryManagementMode: 'custom' })}
+          >
+            <Text style={[styles.switchButtonText, mode === 'custom' && styles.switchButtonTextActive]}>Custom Path</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ marginBottom: 24, paddingBottom: 24, borderBottomWidth: 1, borderBottomColor: theme.colors.border }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
+            <Text style={styles.switchLabel}>yt-dlp Engine</Text>
             <Text style={[styles.aboutValue, { fontSize: 12, color: theme.colors.primary }]}>{ytVersion}</Text>
           </View>
-          <Text style={[styles.switchDesc, { marginBottom: 8 }]}>Custom path to yt-dlp binary (leave empty for system PATH)</Text>
-          <View style={styles.pathContainer}>
-            <TextInput
-              style={[styles.pathInput, { flex: 1, backgroundColor: theme.colors.surfaceLight }]}
-              placeholder="e.g. /usr/local/bin/yt-dlp"
-              placeholderTextColor="#555"
-              value={settings.ytdlpPath}
-              onChangeText={(text) => updateSettings({ ytdlpPath: text })}
-            />
-            <TouchableOpacity 
-              style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16 }]}
-              onPress={async () => {
-                try {
-                  const result = await ipcRenderer?.invoke('select-file', 'Select yt-dlp Executable');
-                  if (result) updateSettings({ ytdlpPath: result });
-                } catch (e) { console.error(e); }
-              }}
-            >
-              <Text style={styles.browseButtonText}>Browse</Text>
-            </TouchableOpacity>
-            {settings.ytdlpPath && settings.ytdlpPath.trim() !== '' && (
-              <TouchableOpacity 
-                style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16, backgroundColor: theme.colors.error }]}
-                onPress={() => updateSettings({ ytdlpPath: '' })}
-              >
-                <Text style={[styles.browseButtonText, { color: '#fff' }]}>Clear</Text>
-              </TouchableOpacity>
-            )}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
+            <Text style={styles.switchLabel}>FFmpeg Processor</Text>
+            <Text style={[styles.aboutValue, { fontSize: 12, color: theme.colors.primary }]}>{ffmpegVersion}</Text>
           </View>
+
+          {mode === 'managed' && (
+            <View style={{ marginTop: 12 }}>
+              <View style={styles.switchRow}>
+                <View style={styles.switchInfo}>
+                  <Text style={styles.switchLabel}>Auto-Update on Startup</Text>
+                  <Text style={styles.switchDesc}>Check for and download yt-dlp/ffmpeg updates automatically</Text>
+                </View>
+                <Switch
+                  value={settings.autoUpdateBinaries !== false}
+                  onValueChange={(value) => updateSettings({ autoUpdateBinaries: value })}
+                  trackColor={{ false: theme.colors.surfaceLight, true: `${theme.colors.primary}50` }}
+                  thumbColor={settings.autoUpdateBinaries !== false ? theme.colors.primary : theme.colors.textTertiary}
+                />
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 12, marginTop: 20 }}>
+                <TouchableOpacity 
+                  style={[styles.actionButton, isUpdatingYt && { opacity: 0.7 }]}
+                  onPress={handleUpdateYt}
+                >
+                  {isUpdatingYt ? <ActivityIndicator size="small" color="#000" /> : <Text style={styles.actionButtonText}>Update yt-dlp</Text>}
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.actionButton, { backgroundColor: theme.colors.surfaceLight, borderWidth: 1, borderColor: theme.colors.border }, isRedownloading && { opacity: 0.7 }]}
+                  onPress={handleRedownload}
+                >
+                  {isRedownloading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={[styles.actionButtonText, { color: theme.colors.text }]}>Force Redownload All</Text>}
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {mode === 'custom' && (
+            <View style={{ marginTop: 16 }}>
+              <Text style={[styles.switchDesc, { marginBottom: 8 }]}>Custom path to yt-dlp binary</Text>
+              <View style={styles.pathContainer}>
+                <TextInput
+                  style={[styles.pathInput, { flex: 1 }]}
+                  placeholder="e.g. /usr/local/bin/yt-dlp"
+                  placeholderTextColor="#555"
+                  value={settings.ytdlpPath}
+                  onChangeText={(text) => updateSettings({ ytdlpPath: text })}
+                />
+                <TouchableOpacity 
+                  style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16 }]}
+                  onPress={async () => {
+                    try {
+                      const result = await ipcRenderer?.invoke('select-file', 'Select yt-dlp Executable');
+                      if (result) updateSettings({ ytdlpPath: result });
+                    } catch (e) { console.error(e); }
+                  }}
+                >
+                  <Text style={styles.browseButtonText}>Browse</Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={[styles.switchDesc, { marginBottom: 8, marginTop: 16 }]}>Custom path to ffmpeg binary</Text>
+              <View style={styles.pathContainer}>
+                <TextInput
+                  style={[styles.pathInput, { flex: 1 }]}
+                  placeholder="e.g. /usr/bin/ffmpeg"
+                  placeholderTextColor="#555"
+                  value={settings.ffmpegPath}
+                  onChangeText={(text) => updateSettings({ ffmpegPath: text })}
+                />
+                <TouchableOpacity 
+                  style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16 }]}
+                  onPress={async () => {
+                    try {
+                      const result = await ipcRenderer?.invoke('select-file', 'Select ffmpeg Executable');
+                      if (result) updateSettings({ ffmpegPath: result });
+                    } catch (e) { console.error(e); }
+                  }}
+                >
+                  <Text style={styles.browseButtonText}>Browse</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {mode === 'system' && (
+            <Text style={[styles.switchDesc, { marginTop: 8 }]}>
+              SauceBox is attempting to use the globally installed binaries from your system PATH environment variable.
+            </Text>
+          )}
         </View>
 
         <View>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
-            <Text style={styles.switchLabel}>ffmpeg Path</Text>
-            <Text style={[styles.aboutValue, { fontSize: 12, color: theme.colors.primary }]}>{ffmpegVersion}</Text>
-          </View>
-          <Text style={[styles.switchDesc, { marginBottom: 8 }]}>Custom path to ffmpeg binary (leave empty for system PATH)</Text>
-          <View style={styles.pathContainer}>
-            <TextInput
-              style={[styles.pathInput, { flex: 1, backgroundColor: theme.colors.surfaceLight }]}
-              placeholder="e.g. /usr/bin/ffmpeg"
-              placeholderTextColor="#555"
-              value={settings.ffmpegPath}
-              onChangeText={(text) => updateSettings({ ffmpegPath: text })}
-            />
-            <TouchableOpacity 
-              style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16 }]}
-              onPress={async () => {
-                try {
-                  const result = await ipcRenderer?.invoke('select-file', 'Select ffmpeg Executable');
-                  if (result) updateSettings({ ffmpegPath: result });
-                } catch (e) { console.error(e); }
-              }}
-            >
-              <Text style={styles.browseButtonText}>Browse</Text>
-            </TouchableOpacity>
-            {settings.ffmpegPath && settings.ffmpegPath.trim() !== '' && (
-              <TouchableOpacity 
-                style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16, backgroundColor: theme.colors.error }]}
-                onPress={() => updateSettings({ ffmpegPath: '' })}
-              >
-                <Text style={[styles.browseButtonText, { color: '#fff' }]}>Clear</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-        {(ytVersion.includes('Not Found') || ffmpegVersion.includes('Not Found')) && (
-          <View style={styles.warningBox}>
-            <Text style={styles.warningTitle}>⚠️ Core Dependencies Missing!</Text>
-            <Text style={styles.warningText}>
-              SauceBox requires both <Text style={{ color: theme.colors.primary, fontWeight: 'bold' }}>yt-dlp</Text> and <Text style={{ color: theme.colors.primary, fontWeight: 'bold' }}>ffmpeg</Text> to download videos, generate thumbnails, and extract clips. They are completely free and open-source tools.
-            </Text>
-
-            <Text style={styles.installHeader}>How to Install on Windows:</Text>
-            <View style={styles.installList}>
-              <Text style={styles.installItem}>• The easiest way is using <Text style={{ color: theme.colors.primary }}>winget</Text> in PowerShell.</Text>
-              <Text style={styles.installItem}>• Open PowerShell and run: <Text style={styles.code}>winget install yt-dlp ffmpeg</Text></Text>
-              <Text style={styles.installItem}>• Alternatively, download the executables manually, put them in a folder, and set their custom paths above.</Text>
-            </View>
-
-            <Text style={styles.installHeader}>How to Install on macOS:</Text>
-            <View style={styles.installList}>
-              <Text style={styles.installItem}>• The easiest way is using <Text style={{ color: theme.colors.primary }}>Homebrew</Text>.</Text>
-              <Text style={styles.installItem}>• Open Terminal and run: <Text style={styles.code}>brew install yt-dlp ffmpeg</Text></Text>
-            </View>
-
-            <Text style={styles.installHeader}>How to Install on Linux:</Text>
-            <View style={styles.installList}>
-              <Text style={[styles.installItem, { marginBottom: 4 }]}>• Ubuntu/Debian: <Text style={styles.code}>sudo apt install ffmpeg yt-dlp</Text></Text>
-              <Text style={styles.installItem}>• Arch: <Text style={styles.code}>sudo pacman -S yt-dlp ffmpeg</Text></Text>
-            </View>
-            
-            <Text style={[styles.installItem, { marginTop: 8, fontStyle: 'italic' }]}>
-              Once installed globally, restart SauceBox or hit "Clear" on empty paths above to auto-detect them.
-            </Text>
-          </View>
-        )}
-
-        <View style={{ marginTop: 24, paddingTop: 24, borderTopWidth: 1, borderTopColor: theme.colors.border }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
             <Text style={styles.switchLabel}>Custom Video Player</Text>
           </View>
           <Text style={[styles.switchDesc, { marginBottom: 8 }]}>Custom path to your preferred external video player (e.g. VLC, MPV). Leave empty to use the built-in app player.</Text>
           <View style={styles.pathContainer}>
             <TextInput
-              style={[styles.pathInput, { flex: 1, backgroundColor: theme.colors.surfaceLight }]}
+              style={[styles.pathInput, { flex: 1 }]}
               placeholder="Select custom player executable..."
               placeholderTextColor="#555"
               value={settings.customPlayerPath || ''}
@@ -181,18 +246,20 @@ const styles = StyleSheet.create({
   section: { marginBottom: 32 },
   sectionTitle: { fontSize: 18, fontWeight: '600', color: theme.colors.primary, marginBottom: 16 },
   card: { backgroundColor: theme.colors.surface, borderRadius: 12, padding: 20, borderWidth: 1, borderColor: theme.colors.border },
+  switcherContainer: { flexDirection: 'row', backgroundColor: theme.colors.surfaceLight, borderRadius: 8, padding: 4, marginBottom: 24, borderWidth: 1, borderColor: theme.colors.border },
+  switchButton: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 6 },
+  switchButtonActive: { backgroundColor: theme.colors.primary },
+  switchButtonText: { color: theme.colors.textSecondary, fontSize: 13, fontWeight: '600' },
+  switchButtonTextActive: { color: '#000' },
+  switchRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  switchInfo: { flex: 1, marginRight: 16 },
   switchLabel: { fontSize: 15, fontWeight: '600', color: theme.colors.text, marginBottom: 4 },
   switchDesc: { fontSize: 13, color: theme.colors.textTertiary },
   aboutValue: { fontSize: 14, fontWeight: '600', color: theme.colors.text },
   pathContainer: { flexDirection: 'row', gap: 12, marginBottom: 8 },
-  pathInput: { flex: 1, backgroundColor: theme.colors.surfaceLight, borderRadius: 8, padding: 12, fontSize: 14, color: theme.colors.text, borderWidth: 1, borderColor: `${theme.colors.primary}30`, outlineStyle: 'none' },
-  browseButton: { backgroundColor: theme.colors.primary, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8, justifyContent: 'center', cursor: 'pointer', minWidth: 120 },
+  pathInput: { backgroundColor: theme.colors.surfaceLight, borderRadius: 8, padding: 12, fontSize: 14, color: theme.colors.text, borderWidth: 1, borderColor: `${theme.colors.primary}30`, outlineStyle: 'none' },
+  browseButton: { backgroundColor: theme.colors.primary, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8, justifyContent: 'center', cursor: 'pointer', minWidth: 120, alignItems: 'center' },
   browseButtonText: { color: '#000', fontSize: 14, fontWeight: '600' },
-  warningBox: { marginTop: 24, padding: 16, backgroundColor: `${theme.colors.error}20`, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.error },
-  warningTitle: { fontSize: 16, fontWeight: '700', color: theme.colors.error, marginBottom: 8 },
-  warningText: { fontSize: 14, color: theme.colors.text, marginBottom: 16, lineHeight: 20 },
-  installHeader: { fontSize: 14, fontWeight: '600', color: theme.colors.primary, marginBottom: 4 },
-  installList: { marginBottom: 12, paddingLeft: 8 },
-  installItem: { fontSize: 13, color: theme.colors.textSecondary },
-  code: { fontFamily: 'monospace', backgroundColor: theme.colors.surfaceLight, padding: 2, borderRadius: 4 }
+  actionButton: { backgroundColor: theme.colors.primary, paddingHorizontal: 20, paddingVertical: 12, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  actionButtonText: { color: '#000', fontSize: 14, fontWeight: '600' }
 });
