@@ -19,13 +19,11 @@ export default function DownloadCard({
   getStatusColor
 }) {
   return (
-    <TouchableOpacity 
+    <View 
       style={[
         styles.downloadCard,
         download.status === 'completed' && styles.downloadCardCompleted
       ]}
-      onPress={() => handlePlayVideo(download)}
-      disabled={download.status !== 'completed'}
     >
       <View style={styles.cardContent}>
         <View style={styles.thumbnailContainer}>
@@ -35,9 +33,12 @@ export default function DownloadCard({
           />
           {download.status === 'completed' && (
             <View style={styles.playOverlay}>
-              <View style={styles.playButton}>
+              <TouchableOpacity 
+                style={styles.playButton}
+                onPress={() => handlePlayVideo(download)}
+              >
                 <Text style={styles.playIcon}>▶</Text>
-              </View>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -145,13 +146,10 @@ export default function DownloadCard({
                   <Text style={styles.retryButtonText}>🔄 Retry</Text>
                 </TouchableOpacity>
               )}
-              {download.status === 'completed' && (
-                <Text style={styles.completedText}>🎉 Click to watch</Text>
-              )}
             </View>
           </View>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }

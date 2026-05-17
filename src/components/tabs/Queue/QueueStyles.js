@@ -95,7 +95,6 @@ export const queueStyles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   downloadCardCompleted: {
-    cursor: 'pointer',
     borderColor: theme.colors.primary,
   },
   cardContent: {
