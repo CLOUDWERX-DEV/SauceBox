@@ -30,9 +30,11 @@ function createWindow() {
     skipTaskbar: false,
     icon: path.join(__dirname, '../build/icons/256x256.png'),
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      webSecurity: false
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+      webSecurity: true
     }
   });
 

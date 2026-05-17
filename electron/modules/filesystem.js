@@ -4,6 +4,10 @@ const os = require('os');
 const fs = require('fs');
 const state = require('../state');
 
+function isVideoFile(filePath) {
+  return typeof filePath === 'string' && /\.(mp4|mkv|webm|avi|mov|m4a)$/i.test(filePath);
+}
+
 function setupFileSystemHandlers() {
   ipcMain.handle('find-duplicates', async (event, downloadPath) => {
     const targetDir = downloadPath || path.join(os.homedir(), 'Downloads', 'SauceBox');
@@ -123,6 +127,9 @@ function setupFileSystemHandlers() {
 
   ipcMain.handle('read-video-file', async (event, filepath) => {
     try {
+      if (!isVideoFile(filepath)) {
+        throw new Error('Only local media files can be read');
+      }
       const data = fs.readFileSync(filepath);
       return data.toString('base64');
     } catch (error) {
@@ -205,6 +212,9 @@ function setupFileSystemHandlers() {
 
   ipcMain.handle('delete-file', async (event, filePath) => {
     try {
+      if (!isVideoFile(filePath)) {
+        return { success: false, error: 'Only local media files can be deleted' };
+      }
       await fs.promises.unlink(filePath);
       return { success: true };
     } catch (err) {
@@ -216,6 +226,10 @@ function setupFileSystemHandlers() {
     const results = [];
     for (const fp of filePaths) {
       try {
+        if (!isVideoFile(fp)) {
+          results.push({ path: fp, success: false, error: 'Only local media files can be deleted' });
+          continue;
+        }
         await fs.promises.unlink(fp);
         results.push({ path: fp, success: true });
       } catch (err) {

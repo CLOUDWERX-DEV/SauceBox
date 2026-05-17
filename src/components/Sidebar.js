@@ -4,8 +4,8 @@ import { useStore } from '../store';
 import { theme } from '../theme';
 import logoSrc from '../../public/logo.png';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
-const openExternal = (url) => ipcRenderer?.invoke('open-external', url);
+const saucebox = window.saucebox;
+const openExternal = (url) => saucebox?.invoke('open-external', url);
 
 const tabs = [
   { id: 'download', icon: '⬇️', label: 'Download', subtitle: 'Download Videos' },
@@ -41,14 +41,14 @@ export default function Sidebar({ activeTab, onTabChange }) {
         const settings = useStore.getState().settings;
         let videoPath = randomVideo.path;
         if (!videoPath) {
-          videoPath = await ipcRenderer?.invoke('get-video-path', {
+          videoPath = await saucebox?.invoke('get-video-path', {
             filename: `${randomVideo.title}.mp4`,
             downloadPath: settings.downloadPath,
           });
         }
         if (videoPath) {
           if (settings.customPlayerPath && settings.customPlayerPath.trim() !== '') {
-            await ipcRenderer?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
+            await saucebox?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
           } else {
             useStore.getState().setActiveBuiltinVideo({ ...randomVideo, path: videoPath });
           }

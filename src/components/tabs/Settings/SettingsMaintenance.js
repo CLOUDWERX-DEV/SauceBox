@@ -4,7 +4,7 @@ import { theme } from '../../../theme';
 import { useStore } from '../../../store';
 import ConfirmModal from '../../ConfirmModal';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 export default function SettingsMaintenance() {
   const settings = useStore(state => state.settings);
@@ -25,7 +25,7 @@ export default function SettingsMaintenance() {
 
   const handleBackup = async () => {
     try {
-      const result = await ipcRenderer?.invoke('backup-state');
+      const result = await saucebox?.invoke('backup-state');
       if (result?.success) {
         alert(`Backup successful!\nFiles saved safely to:\n${result.backupDir}`);
       } else if (!result?.canceled) {
@@ -67,7 +67,7 @@ export default function SettingsMaintenance() {
 
   const handleFindDuplicates = async () => {
     try {
-      const dups = await ipcRenderer?.invoke('find-duplicates', settings.downloadPath);
+      const dups = await saucebox?.invoke('find-duplicates', settings.downloadPath);
       if (dups && dups.length > 0) {
         let msg = `Found ${dups.length} sets of duplicates:\n\n`;
         dups.forEach((d, i) => {
@@ -86,7 +86,7 @@ export default function SettingsMaintenance() {
   const handleFindOrphans = async () => {
     try {
       const dbPaths = history.map(h => h.path).filter(Boolean);
-      const orphans = await ipcRenderer?.invoke('find-orphans', { downloadPath: settings.downloadPath, dbPaths });
+      const orphans = await saucebox?.invoke('find-orphans', { downloadPath: settings.downloadPath, dbPaths });
       if (orphans && orphans.length > 0) {
         alert(`Found ${orphans.length} orphaned files in your directory that are NOT in the Gallery database.\n\nFirst few:\n${orphans.slice(0, 5).join('\n')}`);
       } else {
@@ -100,7 +100,7 @@ export default function SettingsMaintenance() {
   const handleVerifyDatabase = async () => {
     try {
       const dbPaths = history.map(h => h.path).filter(Boolean);
-      const missing = await ipcRenderer?.invoke('verify-database', dbPaths);
+      const missing = await saucebox?.invoke('verify-database', dbPaths);
       if (missing && missing.length > 0) {
         showConfirm({
           title: "Clean Database",

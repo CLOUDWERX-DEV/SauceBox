@@ -3,9 +3,11 @@ import { View, Text, StyleSheet, TextInput, Switch, TouchableOpacity } from 'rea
 import { theme } from '../../../theme';
 import { useStore } from '../../../store';
 
+const saucebox = window.saucebox;
+
 const formatHotkeyDisplay = (hotkey) => {
   if (!hotkey) return 'Ctrl+Shift+H';
-  const isMac = typeof process !== 'undefined' && process.platform === 'darwin';
+  const isMac = saucebox?.platform === 'darwin';
   return hotkey.replace('CommandOrControl', isMac ? 'Cmd' : 'Ctrl');
 };
 
@@ -15,45 +17,11 @@ export default function SettingsSecurityVault() {
   const [isRecording, setIsRecording] = useState(false);
   const [isEditingPin, setIsEditingPin] = useState(false);
   const [tempPin, setTempPin] = useState('');
+  const [pinResetInfo, setPinResetInfo] = useState(null);
 
-  const getPinResetInfo = () => {
-    try {
-      const os = window.require ? window.require('os') : null;
-      const path = window.require ? window.require('path') : null;
-      if (!os || !path) return null;
-
-      const home = os.homedir();
-      const platform = process.platform;
-
-      if (platform === 'win32') {
-        const appData = process.env.APPDATA || path.join(home, 'AppData', 'Roaming');
-        const file = path.join(appData, 'saucebox', 'saucebox-settings.json');
-        return {
-          os: 'Windows',
-          file,
-          shortPath: `%APPDATA%\\saucebox\\saucebox-settings.json`,
-        };
-      } else if (platform === 'darwin') {
-        const file = path.join(home, 'Library', 'Application Support', 'saucebox', 'saucebox-settings.json');
-        return {
-          os: 'macOS',
-          file,
-          shortPath: `~/Library/Application Support/saucebox/saucebox-settings.json`,
-        };
-      } else {
-        const file = path.join(home, '.config', 'saucebox', 'saucebox-settings.json');
-        return {
-          os: 'Linux',
-          file,
-          shortPath: `~/.config/saucebox/saucebox-settings.json`,
-        };
-      }
-    } catch (e) {
-      return null;
-    }
-  };
-
-  const pinResetInfo = getPinResetInfo();
+  useEffect(() => {
+    saucebox?.invoke('get-pin-reset-info').then(setPinResetInfo).catch(() => setPinResetInfo(null));
+  }, []);
 
   useEffect(() => {
     if (!isRecording) return;
@@ -155,13 +123,13 @@ export default function SettingsSecurityVault() {
                 <Text style={[styles.resetInfoText, { color: theme.colors.error, marginTop: 8, fontWeight: '600' }]}>
                   ⚠️ WARNING: Do NOT delete "saucebox-gallery.json" or you will lose your entire video library!
                 </Text>
-                {process.platform === 'win32' && (
+                {saucebox?.platform === 'win32' && (
                   <Text style={styles.resetTip}>💡 Tip: Press Win+R, type %APPDATA%\saucebox and open saucebox-settings.json.</Text>
                 )}
-                {process.platform === 'darwin' && (
+                {saucebox?.platform === 'darwin' && (
                   <Text style={styles.resetTip}>💡 Tip: In Finder press Cmd+Shift+G and paste the path above.</Text>
                 )}
-                {(process.platform !== 'win32' && process.platform !== 'darwin') && (
+                {(saucebox?.platform !== 'win32' && saucebox?.platform !== 'darwin') && (
                   <Text style={styles.resetTip}>
                     {'💡 Tip: Run in terminal — '}
                     <Text style={{ fontFamily: 'monospace', color: theme.colors.primary }}>

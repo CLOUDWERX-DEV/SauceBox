@@ -3,7 +3,7 @@ import { useStore } from '../../store';
 import PlaylistGallery from './Playlists/PlaylistGallery';
 import PlaylistEditor from './Playlists/PlaylistEditor';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 export default function PlaylistsTab() {
   const history = useStore(state => state.history);
@@ -48,13 +48,13 @@ export default function PlaylistsTab() {
     try {
       let videoPath = video.path;
       if (!videoPath) {
-        videoPath = await ipcRenderer?.invoke('get-video-path', {
+        videoPath = await saucebox?.invoke('get-video-path', {
           filename: `${video.title}.mp4`,
           downloadPath: settings.downloadPath,
         });
       }
       if (settings.customPlayerPath && settings.customPlayerPath.trim() !== '') {
-        await ipcRenderer?.invoke('open-video', {
+        await saucebox?.invoke('open-video', {
           filepath: videoPath,
           customPlayerPath: settings.customPlayerPath,
         });
@@ -92,7 +92,7 @@ export default function PlaylistsTab() {
       // External player: pass all file paths
       const paths = items.map(v => v.path).filter(Boolean);
       if (paths.length > 0) {
-        await ipcRenderer?.invoke('open-video', {
+        await saucebox?.invoke('open-video', {
           filepath: paths[0],
           customPlayerPath: settings.customPlayerPath,
         });
@@ -102,7 +102,7 @@ export default function PlaylistsTab() {
       const firstVideo = items[0];
       let videoPath = firstVideo.path;
       if (!videoPath) {
-        videoPath = await ipcRenderer?.invoke('get-video-path', {
+        videoPath = await saucebox?.invoke('get-video-path', {
           filename: `${firstVideo.title}.mp4`,
           downloadPath: settings.downloadPath,
         });

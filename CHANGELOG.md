@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.7.3] - 2026-05-17
+
+### Security
+- **Hardened Electron renderer isolation (`electron/main.js`, `electron/preload.js`)**: Replaced direct renderer Node access with a context-isolated preload bridge, disabled renderer `nodeIntegration`, enabled `contextIsolation`, enabled renderer sandboxing, restored `webSecurity`, and allowlisted IPC invoke/send/listener channels exposed to the frontend.
+- **Moved renderer file-system playlist writes behind IPC (`BroadcastTab.js`, `mediaServer.js`)**: Replaced direct `fs` and `path` usage in the Broadcast tab with a validated `save-stream-playlist` IPC handler that writes `stream.m3u` from the main process.
+- **Restricted high-risk IPC surfaces (`filesystem.js`, `system.js`, `extensionServer.js`)**: Added protocol checks for external links, media-file extension checks for read/delete IPC handlers, custom player path validation, extension-server URL validation, and a request body limit for extension enqueue requests.
+- **Hardened runtime binary downloads (`provisioning.js`)**: Added HTTPS-only binary download validation, HTTP status checks, timeout handling, and temporary-file atomic replacement before managed binaries are promoted into place.
+
+### Changed
+- **Replaced renderer IPC access (`src/`)**: Migrated renderer calls from raw `window.require('electron')` / `ipcRenderer` usage to the `window.saucebox` preload API across app startup, storage persistence, downloads, gallery playback, playlist editing, broadcast controls, settings, and support links.
+- **Replaced native browser confirmations (`App.js`, `DownloadTab.js`, `BroadcastSecurityConfig.js`)**: Removed remaining `window.confirm` usage and routed duplicate-download and internet-exposure confirmations through the modular `ConfirmModal` component.
+- **Moved OS path lookups behind IPC (`SettingsDownloadLocation.js`, `SettingsSecurityVault.js`, `SettingsAbout.js`)**: Removed renderer `os`, `path`, and `process.platform` dependencies by exposing only platform metadata and resolved application paths from the main process.
+
+### Documentation
+- **Updated internal security rules**: Documented the `window.saucebox` preload bridge requirement, renderer Node-access ban, Electron security defaults, confirmation modal requirement, and current Electron source map entries.
+
+### Removed
+- **Removed tracked scratch artifacts (`scratch.js`, `release_notes_1.7.2.tmp`)**: Deleted local one-off release/editing helper files from the tracked project tree.
+
 ## [1.7.2] - 2026-05-17
 
 ### Security
@@ -7,6 +26,7 @@
 - **Upgraded `electron-builder` from `^24.9.1` to `^26.8.1`**: Resolves 7 transitive CVEs in `app-builder-lib`, `dmg-builder`, `builder-util`, `electron-publish`, `http-proxy-agent`, `@tootallnate/once`, and `tar`. Eliminates all high-severity `tar` path traversal vulnerabilities.
 - **Upgraded `webpack-dev-server` from `^4.15.1` to `^5.2.4`**: Resolves 1 moderate CVE in the development server. No API-breaking changes required due to the clean `devServer` configuration in `webpack.config.js`.
 - Confirmed zero deprecated Electron IPC API usage (`ipcRenderer.sendTo`, `event.senderId`, `event.senderIsMainFrame`) prior to upgrade. No code changes required.
+
 ### Documentation
 - **Updated README Sponsor Buttons**: Replaced mismatched buttons with beautifully styled, uniform centered Shields.io badges for Buy Me a Coffee and GitHub Sponsors.
 - **Created GitHub Funding Configuration**: Added `.github/FUNDING.yml` to enable the official Sponsor button on the repository.

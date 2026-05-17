@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Switch, ActivityIn
 import { theme } from '../../../theme';
 import { useStore } from '../../../store';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 export default function SettingsSystemBinaries() {
   const settings = useStore(state => state.settings);
@@ -24,7 +24,7 @@ export default function SettingsSystemBinaries() {
       let ffPathToUse = settings.ffmpegPath;
       
       if (mode === 'managed') {
-         const info = await ipcRenderer?.invoke('check-managed-binaries');
+         const info = await saucebox?.invoke('check-managed-binaries');
          ytPathToUse = info?.managedPaths?.ytdlpPath || '';
          ffPathToUse = info?.managedPaths?.ffmpegPath || '';
       } else if (mode === 'system') {
@@ -32,12 +32,12 @@ export default function SettingsSystemBinaries() {
          ffPathToUse = '';
       }
       
-      await ipcRenderer?.send('update-binary-paths', { 
+      await saucebox?.send('update-binary-paths', {
         ytdlpPath: ytPathToUse, 
         ffmpegPath: ffPathToUse 
       });
       
-      const versions = await ipcRenderer?.invoke('get-binary-versions');
+      const versions = await saucebox?.invoke('get-binary-versions');
       if (versions) {
         setYtVersion(versions.ytDlp);
         setFfmpegVersion(versions.ffmpeg);
@@ -55,7 +55,7 @@ export default function SettingsSystemBinaries() {
     if (isUpdatingYt) return;
     setIsUpdatingYt(true);
     try {
-      const res = await ipcRenderer?.invoke('update-managed-ytdlp');
+      const res = await saucebox?.invoke('update-managed-ytdlp');
       if (res && res.success) {
         // Success
         await fetchVersions();
@@ -72,7 +72,7 @@ export default function SettingsSystemBinaries() {
     if (isRedownloading) return;
     setIsRedownloading(true);
     try {
-      await ipcRenderer?.invoke('download-managed-binaries');
+      await saucebox?.invoke('download-managed-binaries');
       await fetchVersions();
     } catch (e) {
       console.error(e);
@@ -163,7 +163,7 @@ export default function SettingsSystemBinaries() {
                   style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16 }]}
                   onPress={async () => {
                     try {
-                      const result = await ipcRenderer?.invoke('select-file', 'Select yt-dlp Executable');
+                      const result = await saucebox?.invoke('select-file', 'Select yt-dlp Executable');
                       if (result) updateSettings({ ytdlpPath: result });
                     } catch (e) { console.error(e); }
                   }}
@@ -185,7 +185,7 @@ export default function SettingsSystemBinaries() {
                   style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16 }]}
                   onPress={async () => {
                     try {
-                      const result = await ipcRenderer?.invoke('select-file', 'Select ffmpeg Executable');
+                      const result = await saucebox?.invoke('select-file', 'Select ffmpeg Executable');
                       if (result) updateSettings({ ffmpegPath: result });
                     } catch (e) { console.error(e); }
                   }}
@@ -220,7 +220,7 @@ export default function SettingsSystemBinaries() {
               style={[styles.browseButton, { minWidth: 80, paddingHorizontal: 16 }]}
               onPress={async () => {
                 try {
-                  const result = await ipcRenderer?.invoke('select-file', 'Select Video Player Executable');
+                  const result = await saucebox?.invoke('select-file', 'Select Video Player Executable');
                   if (result) updateSettings({ customPlayerPath: result });
                 } catch (e) { console.error(e); }
               }}

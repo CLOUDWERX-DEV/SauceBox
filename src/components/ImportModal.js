@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, TextInput 
 import { theme } from '../theme';
 import { useStore } from '../store';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 // ---------------------------------------------------------------------------
 // Filename parser
@@ -181,12 +181,12 @@ export default function ImportModal({ visible, onClose }) {
   };
 
   const handleSelectFiles = async () => {
-    const result = await ipcRenderer?.invoke('select-import-files');
+    const result = await saucebox?.invoke('select-import-files');
     if (result && result.length > 0) processSelection(result);
   };
 
   const handleSelectFolder = async () => {
-    const result = await ipcRenderer?.invoke('select-import-folder');
+    const result = await saucebox?.invoke('select-import-folder');
     if (result && result.length > 0) {
       processSelection(result);
     } else if (result && result.length === 0) {
@@ -224,8 +224,8 @@ export default function ImportModal({ visible, onClose }) {
       let meta      = { duration: null, resolution: null, filesize: null };
       let thumbnail = null;
       try {
-        meta      = await ipcRenderer?.invoke('get-local-metadata', filePath);
-        thumbnail = await ipcRenderer?.invoke('get-local-thumbnail', filePath);
+        meta      = await saucebox?.invoke('get-local-metadata', filePath);
+        thumbnail = await saucebox?.invoke('get-local-thumbnail', filePath);
       } catch (e) {
         console.error('Failed to get metadata/thumbnail:', e);
       }

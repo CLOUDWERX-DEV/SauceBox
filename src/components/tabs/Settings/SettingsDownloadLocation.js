@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-nativ
 import { theme } from '../../../theme';
 import { useStore } from '../../../store';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 export default function SettingsDownloadLocation() {
   const settings = useStore(state => state.settings);
@@ -14,12 +14,11 @@ export default function SettingsDownloadLocation() {
   useEffect(() => {
     let interval;
     const fetchDiskSpace = async () => {
-      const os = window.require ? window.require('os') : null;
-      const defaultPath = os ? `${os.homedir()}/Downloads/SauceBox` : '';
+      const defaultPath = await saucebox?.invoke('get-default-download-path');
       const checkPath = settings.downloadPath || defaultPath;
-      if (checkPath && ipcRenderer) {
+      if (checkPath && saucebox) {
         try {
-          const res = await ipcRenderer.invoke('get-disk-space', checkPath);
+          const res = await saucebox.invoke('get-disk-space', checkPath);
           if (res && res.success) {
             setDiskSpace(res);
           }
@@ -41,7 +40,7 @@ export default function SettingsDownloadLocation() {
 
   const handleBrowseFolder = async () => {
     try {
-      const result = await ipcRenderer?.invoke('select-folder');
+      const result = await saucebox?.invoke('select-folder');
       if (result) {
         setCustomPath(result);
         updateSettings({ downloadPath: result });

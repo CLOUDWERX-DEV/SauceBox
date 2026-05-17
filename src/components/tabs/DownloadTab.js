@@ -4,13 +4,14 @@ import { useStore } from '../../store';
 import BatchDownloadModal from '../BatchDownloadModal';
 import VideoPreviewModal from '../VideoPreviewModal';
 import PlaylistModal from '../PlaylistModal';
+import ConfirmModal from '../ConfirmModal';
 
 import { downloadStyles as styles } from './Download/DownloadStyles';
 import DownloadInputForm from './Download/DownloadInputForm';
 import BatchSection from './Download/BatchSection';
 import HowToUseCard from './Download/HowToUseCard';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 export default function DownloadTab({ onNavigate }) {
   const [url, setUrl] = useState('');
@@ -21,16 +22,30 @@ export default function DownloadTab({ onNavigate }) {
   const [previewInfo, setPreviewInfo] = useState(null);
   const [playlistModalVisible, setPlaylistModalVisible] = useState(false);
   const [playlistInfo, setPlaylistInfo] = useState(null);
+  const [confirmRequest, setConfirmRequest] = useState(null);
 
   const addDownload = useStore(state => state.addDownload);
   const settings = useStore(state => state.settings);
+
+  const requestDuplicateConfirm = (existingDownload) => new Promise((resolve) => {
+    setConfirmRequest({
+      title: 'Duplicate Download',
+      message: `You already downloaded this video on ${new Date(existingDownload.timestamp).toLocaleDateString()}.\n\nTitle: ${existingDownload.title}\n\nDo you want to download it again?`,
+      resolve,
+    });
+  });
+
+  const closeConfirm = (value) => {
+    if (confirmRequest?.resolve) confirmRequest.resolve(value);
+    setConfirmRequest(null);
+  };
 
   // Unified URL resolver — detects playlist vs single video
   const resolveUrl = async (targetUrl) => {
     setLoading(true);
     setLoadingMsg('🔍 Fetching info...');
     try {
-      const info = await ipcRenderer?.invoke('get-playlist-info', targetUrl);
+      const info = await saucebox?.invoke('get-playlist-info', targetUrl);
       return info;
     } finally {
       setLoadingMsg('');
@@ -43,7 +58,7 @@ export default function DownloadTab({ onNavigate }) {
     setLoading(true);
     setLoadingMsg('🔍 Fetching info...');
     try {
-      const info = await ipcRenderer?.invoke('get-playlist-info', url.trim());
+      const info = await saucebox?.invoke('get-playlist-info', url.trim());
 
       if (info.isPlaylist && info.entries.length > 1) {
         setPlaylistInfo({ ...info, url: url.trim() });
@@ -51,7 +66,7 @@ export default function DownloadTab({ onNavigate }) {
       } else {
         let videoData;
         try {
-          videoData = await ipcRenderer?.invoke('get-video-info', url.trim());
+          videoData = await saucebox?.invoke('get-video-info', url.trim());
         } catch (e) {
           videoData = info.singleVideo;
         }
@@ -100,14 +115,11 @@ export default function DownloadTab({ onNavigate }) {
     try {
       const existingDownload = useStore.getState().history.find(h => h.url === urlToDownload);
       if (existingDownload) {
-        const confirmDownload = window.confirm(
-          `You already downloaded this video on ${new Date(existingDownload.timestamp).toLocaleDateString()}!\n\n` +
-          `Title: ${existingDownload.title}\n\nDo you want to download it again?`
-        );
+        const confirmDownload = await requestDuplicateConfirm(existingDownload);
         if (!confirmDownload) return;
       }
 
-      const info = await ipcRenderer?.invoke('get-video-info', urlToDownload);
+      const info = await saucebox?.invoke('get-video-info', urlToDownload);
 
       const settingsQualityHeight = settings.quality !== 'best'
         ? String(settings.quality).replace(/p$/i, '')
@@ -147,7 +159,7 @@ export default function DownloadTab({ onNavigate }) {
     setLoading(true);
     setLoadingMsg('🔍 Detecting URL type...');
     try {
-      const info = await ipcRenderer?.invoke('get-playlist-info', url.trim());
+      const info = await saucebox?.invoke('get-playlist-info', url.trim());
 
       if (info.isPlaylist && info.entries.length > 1) {
         setPlaylistInfo({ ...info, url: url.trim() });
@@ -159,15 +171,12 @@ export default function DownloadTab({ onNavigate }) {
 
       const existingDownload = useStore.getState().history.find(h => h.url === url.trim());
       if (existingDownload) {
-        const confirmDownload = window.confirm(
-          `You already downloaded this video on ${new Date(existingDownload.timestamp).toLocaleDateString()}!\n\n` +
-          `Title: ${existingDownload.title}\n\nDo you want to download it again?`
-        );
+        const confirmDownload = await requestDuplicateConfirm(existingDownload);
         if (!confirmDownload) return;
       }
 
       setLoadingMsg('📡 Fetching video info...');
-      const videoData = await ipcRenderer?.invoke('get-video-info', url.trim());
+      const videoData = await saucebox?.invoke('get-video-info', url.trim());
 
       const settingsQualityHeight = settings.quality !== 'best'
         ? String(settings.quality).replace(/p$/i, '')
@@ -241,7 +250,7 @@ export default function DownloadTab({ onNavigate }) {
   const handleBatchDownload = async (urls) => {
     for (const batchUrl of urls) {
       try {
-        const info = await ipcRenderer?.invoke('get-video-info', batchUrl);
+        const info = await saucebox?.invoke('get-video-info', batchUrl);
 
         const settingsQualityHeight = settings.quality !== 'best'
           ? String(settings.quality).replace(/p$/i, '')
@@ -314,6 +323,15 @@ export default function DownloadTab({ onNavigate }) {
         playlistInfo={playlistInfo}
         onClose={() => setPlaylistModalVisible(false)}
         onDownloadSelected={handleDownloadFromPlaylist}
+      />
+
+      <ConfirmModal
+        visible={!!confirmRequest}
+        title={confirmRequest?.title}
+        message={confirmRequest?.message}
+        confirmText="Download Again"
+        onConfirm={() => closeConfirm(true)}
+        onCancel={() => closeConfirm(false)}
       />
     </>
   );

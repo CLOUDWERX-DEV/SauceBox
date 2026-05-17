@@ -5,7 +5,7 @@ import { useStore } from '../../../store';
 import packageJson from '../../../../package.json';
 
 const version = packageJson.version;
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 const formatFileSize = (bytes) => {
   const num = Number(bytes);
@@ -33,12 +33,12 @@ const formatTotalDuration = (seconds) => {
 
 export default function SettingsAbout() {
   const history = useStore(state => state.history);
-  const openExternal = (url) => ipcRenderer?.invoke('open-external', url);
+  const openExternal = (url) => saucebox?.invoke('open-external', url);
 
   const totalBytes = history.reduce((acc, h) => acc + (Number(h.filesize) || 0), 0);
   const totalDuration = history.reduce((acc, h) => acc + (Number(h.duration) || 0), 0);
 
-  const osName = process.platform === 'win32' ? 'Windows' : process.platform === 'darwin' ? 'macOS' : 'Linux';
+  const osName = saucebox?.platform === 'win32' ? 'Windows' : saucebox?.platform === 'darwin' ? 'macOS' : 'Linux';
 
   return (
     <View style={styles.section}>

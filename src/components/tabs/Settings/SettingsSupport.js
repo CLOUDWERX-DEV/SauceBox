@@ -2,10 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { theme } from '../../../theme';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 export default function SettingsSupport() {
-  const openExternal = (url) => ipcRenderer?.invoke('open-external', url);
+  const openExternal = (url) => saucebox?.invoke('open-external', url);
 
   return (
     <View style={styles.section}>

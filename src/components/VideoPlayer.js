@@ -5,7 +5,7 @@ import { useStore } from '../store';
 import EditVideoModal from './EditVideoModal';
 import Tooltip from './Tooltip';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 // VideoPlayer now accepts the full `originalItem` object from the gallery
 // so we can pre-fill clip metadata and handle post-clip actions.
@@ -109,7 +109,7 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
 
   const handleOpenFolder = async () => {
     try {
-      await ipcRenderer?.invoke('open-folder', videoPath);
+      await saucebox?.invoke('open-folder', videoPath);
     } catch (error) {
       console.error('Failed to open folder:', error);
       alert('Could not open folder.');
@@ -180,7 +180,7 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
       setTrimming(true);
       const ext = videoPath.split('.').pop();
       const newPath = videoPath.replace(`.${ext}`, `_clip_${Date.now()}.${ext}`);
-      await ipcRenderer?.invoke('trim-video', {
+      await saucebox?.invoke('trim-video', {
         inputPath: videoPath,
         outputPath: newPath,
         startTime: startSec.toString(),
@@ -191,7 +191,7 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
       let clipThumbnail = null;
       try {
         // get-local-thumbnail returns a string URI directly, not an object
-        const thumbResult = await ipcRenderer?.invoke('get-local-thumbnail', newPath);
+        const thumbResult = await saucebox?.invoke('get-local-thumbnail', newPath);
         if (thumbResult && typeof thumbResult === 'string') clipThumbnail = thumbResult;
       } catch (e) {
         console.warn('Could not generate clip thumbnail:', e);
@@ -218,7 +218,7 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
 
       // Handle original deletion
       if (deleteOriginalDisk && videoPath) {
-        await ipcRenderer?.invoke('delete-file', videoPath);
+        await saucebox?.invoke('delete-file', videoPath);
       }
       if (deleteOriginalGallery && originalItem?.id) {
         removeFromHistory(originalItem.id);

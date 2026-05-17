@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-const { ipcRenderer } = window.require('electron');
+const saucebox = window.saucebox;
 
 const DEFAULT_SETTINGS = {
   downloadPath: '',
@@ -128,13 +128,13 @@ export const useStore = create(
       name: 'saucebox-storage',
       storage: createJSONStorage(() => ({
         getItem: async (name) => {
-          return await ipcRenderer.invoke('load-state', name);
+          return await saucebox.invoke('load-state', name);
         },
         setItem: async (name, value) => {
-          await ipcRenderer.invoke('save-state', { name, value });
+          await saucebox.invoke('save-state', { name, value });
         },
         removeItem: async (name) => {
-          await ipcRenderer.invoke('remove-state', name);
+          await saucebox.invoke('remove-state', name);
         }
       }))
     }

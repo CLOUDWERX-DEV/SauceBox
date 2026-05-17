@@ -6,6 +6,7 @@ const extract = require('extract-zip');
 const { spawn } = require('child_process');
 
 const BINARY_DIR = path.join(app.getPath('userData'), 'binaries');
+const DOWNLOAD_TIMEOUT_MS = 120000;
 
 function ensureDir() {
   if (!fs.existsSync(BINARY_DIR)) {
@@ -54,12 +55,32 @@ function getYtdlpUrl(platform) {
 
 function downloadFile(url, dest, onProgress) {
   return new Promise((resolve, reject) => {
+    let parsedUrl;
+    try {
+      parsedUrl = new URL(url);
+      if (parsedUrl.protocol !== 'https:') {
+        reject(new Error('Binary downloads must use HTTPS'));
+        return;
+      }
+    } catch (error) {
+      reject(new Error('Invalid download URL'));
+      return;
+    }
+
+    const tempDest = `${dest}.download`;
     const request = https.get(url, (response) => {
       if (response.statusCode === 301 || response.statusCode === 302) {
+        request.destroy();
         return downloadFile(response.headers.location, dest, onProgress).then(resolve).catch(reject);
       }
+
+      if (response.statusCode !== 200) {
+        reject(new Error(`Download failed with HTTP ${response.statusCode}`));
+        response.resume();
+        return;
+      }
       
-      const file = fs.createWriteStream(dest);
+      const file = fs.createWriteStream(tempDest);
       const len = parseInt(response.headers['content-length'], 10);
       let cur = 0;
 
@@ -72,11 +93,21 @@ function downloadFile(url, dest, onProgress) {
       });
 
       file.on('finish', () => {
-        file.close();
-        resolve(dest);
+        file.close(() => {
+          fs.rename(tempDest, dest, (renameError) => {
+            if (renameError) reject(renameError);
+            else resolve(dest);
+          });
+        });
+      });
+      file.on('error', (err) => {
+        fs.unlink(tempDest, () => reject(err));
       });
     }).on('error', (err) => {
-      fs.unlink(dest, () => reject(err));
+      fs.unlink(tempDest, () => reject(err));
+    });
+    request.setTimeout(DOWNLOAD_TIMEOUT_MS, () => {
+      request.destroy(new Error('Download timed out'));
     });
   });
 }

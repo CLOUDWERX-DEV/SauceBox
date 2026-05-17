@@ -4,7 +4,7 @@ import { theme } from '../theme';
 import logoSrc from '../../public/logo.png';
 import TitleBar from './TitleBar';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 export default function BootScreen({ onComplete }) {
   const [logs, setLogs] = useState([]);
@@ -13,24 +13,24 @@ export default function BootScreen({ onComplete }) {
   const [status, setStatus] = useState('Initializing Runtime Engine...');
 
   useEffect(() => {
-    if (!ipcRenderer) return onComplete();
+    if (!saucebox) return onComplete();
 
-    const handleLog = (event, msg) => {
+    const handleLog = (msg) => {
       setLogs(prev => [...prev, msg]);
       setStatus(msg);
     };
 
-    const handleProgress = (event, data) => {
+    const handleProgress = (data) => {
       const { tool, progress, cur, len } = data;
       if (tool === 'yt-dlp') setYtProgress({ progress, cur, len });
       if (tool === 'ffmpeg') setFfProgress({ progress, cur, len });
     };
 
-    ipcRenderer.on('provision-log', handleLog);
-    ipcRenderer.on('provision-progress', handleProgress);
+    saucebox.on('provision-log', handleLog);
+    saucebox.on('provision-progress', handleProgress);
 
     // Start download
-    ipcRenderer.invoke('download-managed-binaries').then((res) => {
+    saucebox.invoke('download-managed-binaries').then((res) => {
       if (res && res.success) {
         setTimeout(onComplete, 1500); // Give it a second to show completion
       } else {
@@ -41,8 +41,8 @@ export default function BootScreen({ onComplete }) {
     });
 
     return () => {
-      ipcRenderer.removeListener('provision-log', handleLog);
-      ipcRenderer.removeListener('provision-progress', handleProgress);
+      saucebox.removeListener('provision-log', handleLog);
+      saucebox.removeListener('provision-progress', handleProgress);
     };
   }, []);
 

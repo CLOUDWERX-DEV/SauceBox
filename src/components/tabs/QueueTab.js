@@ -8,7 +8,7 @@ import { queueStyles as styles } from './Queue/QueueStyles';
 import EmptyQueueState from './Queue/EmptyQueueState';
 import DownloadCard from './Queue/DownloadCard';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 export default function QueueTab({ onNavigate }) {
   const downloads = useStore(state => state.downloads);
@@ -66,12 +66,12 @@ export default function QueueTab({ onNavigate }) {
   const handlePlayVideo = async (download) => {
     if (download.status !== 'completed') return;
     try {
-      const videoPath = await ipcRenderer?.invoke('get-video-path', {
+      const videoPath = await saucebox?.invoke('get-video-path', {
         filename: `${download.title}.mp4`,
         downloadPath: settings.downloadPath,
       });
       if (settings.customPlayerPath && settings.customPlayerPath.trim() !== '') {
-        await ipcRenderer?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
+        await saucebox?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
       } else {
         useStore.getState().setActiveBuiltinVideo({ path: videoPath, title: download.title });
       }
@@ -89,7 +89,7 @@ export default function QueueTab({ onNavigate }) {
   const handlePauseDownload = async (download) => {
     if (download.status !== 'downloading') return;
     try {
-      await ipcRenderer?.invoke('pause-download', download.id);
+      await saucebox?.invoke('pause-download', download.id);
       updateDownload(download.id, { status: 'paused', speed: null, eta: null });
     } catch (e) {
       console.error('Failed to pause:', e);
@@ -102,11 +102,11 @@ export default function QueueTab({ onNavigate }) {
 
   const handleOpenFolder = async (download) => {
     try {
-      const videoPath = await ipcRenderer?.invoke('get-video-path', {
+      const videoPath = await saucebox?.invoke('get-video-path', {
         filename: `${download.title}.mp4`,
         downloadPath: settings.downloadPath,
       });
-      await ipcRenderer?.invoke('open-folder', videoPath);
+      await saucebox?.invoke('open-folder', videoPath);
     } catch (error) {
       console.error('Failed to open folder:', error);
       alert('Could not open folder. The video file may have been moved or deleted.');
@@ -120,7 +120,7 @@ export default function QueueTab({ onNavigate }) {
     activeDownloads.forEach(async (d) => {
       if (d.status === 'downloading') {
         try {
-          await ipcRenderer?.invoke('pause-download', d.id);
+          await saucebox?.invoke('pause-download', d.id);
         } catch (e) {
           console.error(e);
         }

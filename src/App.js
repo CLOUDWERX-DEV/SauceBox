@@ -5,12 +5,13 @@ import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import AppLock from './components/AppLock';
 import BootScreen from './components/BootScreen';
+import ConfirmModal from './components/ConfirmModal';
 import logoSrc from '../public/logo.png';
 
 import { useStore } from './store';
 import VideoPlayer from './components/VideoPlayer';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('download');
@@ -27,6 +28,16 @@ export default function App() {
   
   const [isBooting, setIsBooting] = useState(true);
   const [needsProvisioning, setNeedsProvisioning] = useState(false);
+  const [confirmRequest, setConfirmRequest] = useState(null);
+
+  const requestConfirm = (title, message, confirmText = 'Download Again') => new Promise((resolve) => {
+    setConfirmRequest({ title, message, confirmText, resolve });
+  });
+
+  const closeConfirm = (value) => {
+    if (confirmRequest?.resolve) confirmRequest.resolve(value);
+    setConfirmRequest(null);
+  };
 
   // Engine Provisioning Check
   useEffect(() => {
@@ -35,22 +46,22 @@ export default function App() {
       const mode = currentSettings.binaryManagementMode || 'managed';
 
       if (mode === 'managed') {
-        const info = await ipcRenderer?.invoke('check-managed-binaries');
+        const info = await saucebox?.invoke('check-managed-binaries');
         if (!info || !info.allPresent) {
           setNeedsProvisioning(true);
           return; // Stay in booting state, BootScreen will render
         } else {
           // Check for auto update quietly in background
           if (currentSettings.autoUpdateBinaries !== false) {
-            ipcRenderer?.invoke('update-managed-ytdlp').catch(() => {});
+            saucebox?.invoke('update-managed-ytdlp').catch(() => {});
           }
-          await ipcRenderer?.send('update-binary-paths', {
+          await saucebox?.send('update-binary-paths', {
             ytdlpPath: info.managedPaths.ytdlpPath,
             ffmpegPath: info.managedPaths.ffmpegPath
           });
         }
       } else {
-        await ipcRenderer?.send('update-binary-paths', {
+        await saucebox?.send('update-binary-paths', {
           ytdlpPath: mode === 'system' ? '' : currentSettings.ytdlpPath,
           ffmpegPath: mode === 'system' ? '' : currentSettings.ffmpegPath
         });
@@ -58,7 +69,7 @@ export default function App() {
       setIsBooting(false);
     };
 
-    if (ipcRenderer) checkStartup();
+    if (saucebox) checkStartup();
     else setIsBooting(false);
   }, []);
   
@@ -69,22 +80,22 @@ export default function App() {
   }, [quickCastVideo]);
 
   useEffect(() => {
-    if (ipcRenderer && stealthHotkey) {
-      ipcRenderer.send('register-stealth-hotkey', stealthHotkey);
+    if (saucebox && stealthHotkey) {
+      saucebox.send('register-stealth-hotkey', stealthHotkey);
     }
   }, [stealthHotkey]);
 
   useEffect(() => {
-    if (ipcRenderer) {
-      const externalAddHandler = async (event, url) => {
+    if (saucebox) {
+      const externalAddHandler = async (url) => {
         const store = useStore.getState();
         
         // Check for duplicates in history
         const existingDownload = store.history.find(h => h.url === url);
         if (existingDownload) {
-          const confirmDownload = window.confirm(
-            `You already downloaded this video on ${new Date(existingDownload.timestamp).toLocaleDateString()}!\n\n` +
-            `Title: ${existingDownload.title}\n\nDo you want to download it again?`
+          const confirmDownload = await requestConfirm(
+            'Duplicate Download',
+            `You already downloaded this video on ${new Date(existingDownload.timestamp).toLocaleDateString()}.\n\nTitle: ${existingDownload.title}\n\nDo you want to download it again?`
           );
           if (!confirmDownload) return;
         }
@@ -93,7 +104,7 @@ export default function App() {
         store.addDownload({ url, title: 'Fetching metadata...' });
         
         try {
-          const info = await ipcRenderer?.invoke('get-video-info', url);
+          const info = await saucebox?.invoke('get-video-info', url);
           const settings = useStore.getState().settings;
           const settingsQualityHeight = settings.quality !== 'best'
             ? String(settings.quality).replace(/p$/i, '')
@@ -141,14 +152,14 @@ export default function App() {
         if (store.settings.stealthPauseDownloads) {
           store.downloads.forEach(d => {
             if (d.status === 'downloading') {
-              ipcRenderer.invoke('pause-download', d.id);
+              saucebox.invoke('pause-download', d.id);
               store.updateDownload(d.id, { status: 'paused', speed: null, eta: null });
             }
           });
         }
       };
 
-      const progressHandler = async (event, data) => {
+      const progressHandler = async (data) => {
         const store = useStore.getState();
         const download = store.downloads.find(d => d.id === data.id);
         if (download) {
@@ -170,12 +181,12 @@ export default function App() {
           if (data.status === 'completed') {
             const currentSettings = store.settings;
             try {
-              const videoPath = await ipcRenderer?.invoke('get-video-path', {
+              const videoPath = await saucebox?.invoke('get-video-path', {
                 filename: `${download.title}.mp4`,
                 downloadPath: currentSettings.downloadPath,
               });
               if (videoPath) {
-                const meta = await ipcRenderer?.invoke('get-local-metadata', videoPath);
+                const meta = await saucebox?.invoke('get-local-metadata', videoPath);
                 // Build the real-metadata update object — override whatever yt-dlp
                 // reported at queue time with what ffmpeg actually sees in the file.
                 const realMeta = { path: videoPath };
@@ -225,20 +236,20 @@ export default function App() {
         }
       };
       
-      const broadcastLogHandler = (event, log) => {
+      const broadcastLogHandler = (log) => {
         useStore.getState().addBroadcastLog(log);
       };
       
-      ipcRenderer.on('external-add-url', externalAddHandler);
-      ipcRenderer.on('panic-stealth', panicStealthHandler);
-      ipcRenderer.on('download-progress', progressHandler);
-      ipcRenderer.on('broadcast-log', broadcastLogHandler);
+      saucebox.on('external-add-url', externalAddHandler);
+      saucebox.on('panic-stealth', panicStealthHandler);
+      saucebox.on('download-progress', progressHandler);
+      saucebox.on('broadcast-log', broadcastLogHandler);
       
       return () => {
-        ipcRenderer.removeListener('external-add-url', externalAddHandler);
-        ipcRenderer.removeListener('panic-stealth', panicStealthHandler);
-        ipcRenderer.removeListener('download-progress', progressHandler);
-        ipcRenderer.removeListener('broadcast-log', broadcastLogHandler);
+        saucebox.removeListener('external-add-url', externalAddHandler);
+        saucebox.removeListener('panic-stealth', panicStealthHandler);
+        saucebox.removeListener('download-progress', progressHandler);
+        saucebox.removeListener('broadcast-log', broadcastLogHandler);
       };
     }
   }, [isUnlocked]);
@@ -265,8 +276,8 @@ export default function App() {
         downloadPath: currentSettings.downloadPath,
         ffmpegPath: currentSettings.ffmpegPath
       };
-      if (ipcRenderer) {
-        ipcRenderer.invoke('start-media-server', config).then(res => {
+      if (saucebox) {
+        saucebox.invoke('start-media-server', config).then(res => {
            if (res && res.success) {
              useStore.getState().setServerStatus({ running: true, url: `http://${res.ip || '127.0.0.1'}:${config.port}` });
            }
@@ -296,7 +307,7 @@ export default function App() {
         try {
           if (!d.resolution || !d.uploader || d.uploader === 'Unknown') {
             try {
-              const info = await ipcRenderer?.invoke('get-video-info', d.url);
+              const info = await saucebox?.invoke('get-video-info', d.url);
               // Only update fields that were missing at queue time.
               // NEVER touch resolution here — it is set correctly at queue time from
               // the selected quality or availableQualities. Overwriting it with
@@ -315,13 +326,12 @@ export default function App() {
           }
           
           const currentSettings = useStore.getState().settings;
-          const os = window.require ? window.require('os') : null;
-          const defaultPath = os ? `${os.homedir()}/Downloads/SauceBox` : '';
+          const defaultPath = await saucebox?.invoke('get-default-download-path');
           const checkPath = currentSettings.downloadPath || defaultPath;
           
           if (currentSettings.minFreeSpaceGB > 0 && checkPath) {
             try {
-              const diskSpace = await ipcRenderer?.invoke('get-disk-space', checkPath);
+              const diskSpace = await saucebox?.invoke('get-disk-space', checkPath);
               if (diskSpace && diskSpace.success && diskSpace.free < currentSettings.minFreeSpaceGB * 1024 * 1024 * 1024) {
                 updateDownload(d.id, { status: 'failed', error: `Disk space low (<${currentSettings.minFreeSpaceGB}GB)` });
                 if (currentSettings.systemNotifications && window.Notification) {
@@ -334,7 +344,7 @@ export default function App() {
             }
           }
 
-          await ipcRenderer?.invoke('download-video', { 
+          await saucebox?.invoke('download-video', {
             id: d.id, 
             url: d.url, 
             resume: d.isRetry,
@@ -356,9 +366,9 @@ export default function App() {
     if (needsProvisioning) {
       return (
         <BootScreen onComplete={() => {
-          ipcRenderer?.invoke('check-managed-binaries').then(info => {
+          saucebox?.invoke('check-managed-binaries').then(info => {
             if (info && info.allPresent) {
-               ipcRenderer?.send('update-binary-paths', {
+               saucebox?.send('update-binary-paths', {
                  ytdlpPath: info.managedPaths.ytdlpPath,
                  ffmpegPath: info.managedPaths.ffmpegPath
                });
@@ -393,6 +403,14 @@ export default function App() {
         videoTitle={activeBuiltinVideo?.title}
         originalItem={activeBuiltinVideo}
         onClose={() => setActiveBuiltinVideo(null)}
+      />
+      <ConfirmModal
+        visible={!!confirmRequest}
+        title={confirmRequest?.title}
+        message={confirmRequest?.message}
+        confirmText={confirmRequest?.confirmText}
+        onConfirm={() => closeConfirm(true)}
+        onCancel={() => closeConfirm(false)}
       />
     </View>
   );

@@ -1,6 +1,15 @@
 const http = require('http');
 const state = require('../state');
 
+function isAllowedUrl(value) {
+  try {
+    const parsed = new URL(value);
+    return ['http:', 'https:'].includes(parsed.protocol);
+  } catch (error) {
+    return false;
+  }
+}
+
 function startExtensionServer() {
   const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,17 +24,25 @@ function startExtensionServer() {
 
     if (req.method === 'POST' && req.url === '/add-download') {
       let body = '';
-      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('data', chunk => {
+        body += chunk.toString();
+        if (body.length > 8192) req.destroy();
+      });
       req.on('end', () => {
         try {
           const { url } = JSON.parse(body);
-          if (url && state.mainWindow) {
+          if (!isAllowedUrl(url)) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Invalid URL' }));
+            return;
+          }
+          if (state.mainWindow) {
             state.mainWindow.webContents.send('external-add-url', url);
           }
-          res.writeHead(200);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ success: true }));
         } catch (e) {
-          res.writeHead(400);
+          res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: e.message }));
         }
       });

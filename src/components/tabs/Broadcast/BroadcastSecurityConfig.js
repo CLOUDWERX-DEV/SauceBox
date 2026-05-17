@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Switch } from 'react-native';
 import { theme } from '../../../theme';
+import ConfirmModal from '../../ConfirmModal';
 
 export default function BroadcastSecurityConfig({
   exposeInternetEnabled, setExposeInternetEnabled,
@@ -9,6 +10,8 @@ export default function BroadcastSecurityConfig({
   password, setPassword,
   serverRunning
 }) {
+  const [showExposureConfirm, setShowExposureConfirm] = useState(false);
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>🔒 Security & Exposure</Text>
@@ -22,8 +25,8 @@ export default function BroadcastSecurityConfig({
             value={exposeInternetEnabled}
             onValueChange={(val) => {
               if (val) {
-                const confirm = window.confirm("WARNING: Exposing your media server to the internet can be dangerous. Anyone with your public IP address and port can access your videos if port forwarding is enabled on your router. We HIGHLY recommend enabling 'Require Authentication' below before doing this.\n\nAre you sure you want to enable this feature?");
-                if (!confirm) return;
+                setShowExposureConfirm(true);
+                return;
               }
               setExposeInternetEnabled(val);
             }}
@@ -73,6 +76,17 @@ export default function BroadcastSecurityConfig({
           </View>
         )}
       </View>
+      <ConfirmModal
+        visible={showExposureConfirm}
+        title="Expose Media Server"
+        message="Exposing your media server to the internet can be dangerous. Anyone with your public IP address and port can access your videos if port forwarding is enabled on your router. Enable authentication before using this."
+        confirmText="Expose Server"
+        onConfirm={() => {
+          setExposeInternetEnabled(true);
+          setShowExposureConfirm(false);
+        }}
+        onCancel={() => setShowExposureConfirm(false)}
+      />
     </View>
   );
 }

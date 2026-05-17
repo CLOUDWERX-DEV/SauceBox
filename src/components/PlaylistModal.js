@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, Image, TextInput } from 'react-native';
 import { theme } from '../theme';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 
 export default function PlaylistModal({ visible, playlistInfo, onClose, onDownloadSelected }) {
@@ -24,13 +24,13 @@ export default function PlaylistModal({ visible, playlistInfo, onClose, onDownlo
 
   // Lazily fetch thumbnails in background when modal opens
   useEffect(() => {
-    if (!visible || entries.length === 0 || !ipcRenderer) return;
+    if (!visible || entries.length === 0 || !saucebox) return;
     if (fetchingRef.current) return;
 
     fetchingRef.current = true;
     setThumbnails({});
 
-    const progressHandler = (_event, batchResults) => {
+    const progressHandler = (batchResults) => {
       setThumbnails(prev => {
         const next = { ...prev };
         batchResults.forEach(({ index, thumbnail }) => {
@@ -40,18 +40,18 @@ export default function PlaylistModal({ visible, playlistInfo, onClose, onDownlo
       });
     };
 
-    ipcRenderer.on('playlist-thumbnails-progress', progressHandler);
+    saucebox.on('playlist-thumbnails-progress', progressHandler);
 
-    ipcRenderer
+    saucebox
       .invoke('get-entry-thumbnails', entries.map(e => ({ index: e.index, url: e.url })))
       .catch(err => console.error('Thumbnail fetch error:', err))
       .finally(() => {
-        ipcRenderer.removeListener('playlist-thumbnails-progress', progressHandler);
+        saucebox.removeListener('playlist-thumbnails-progress', progressHandler);
         fetchingRef.current = false;
       });
 
     return () => {
-      ipcRenderer.removeListener('playlist-thumbnails-progress', progressHandler);
+      saucebox.removeListener('playlist-thumbnails-progress', progressHandler);
     };
   }, [visible, playlistInfo]);
 

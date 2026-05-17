@@ -3,8 +3,8 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { helpStyles as styles } from './HelpStyles';
 import { theme } from '../../theme';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
-const openExternal = (url) => ipcRenderer?.invoke('open-external', url);
+const saucebox = window.saucebox;
+const openExternal = (url) => saucebox?.invoke('open-external', url);
 
 const handleCopyToClipboard = (text, label) => {
   if (navigator.clipboard) {

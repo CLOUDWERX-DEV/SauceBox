@@ -11,9 +11,13 @@ import BroadcastNetworkConfig from './Broadcast/BroadcastNetworkConfig';
 import BroadcastSecurityConfig from './Broadcast/BroadcastSecurityConfig';
 import BroadcastPlaylistBuilder from './Broadcast/BroadcastPlaylistBuilder';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
-const fs = window.require ? window.require('fs') : null;
-const path = window.require ? window.require('path') : null;
+const saucebox = window.saucebox;
+
+const getBasename = (value) => {
+  if (!value) return '';
+  const cleanValue = String(value).split('?')[0];
+  return cleanValue.split(/[\\/]/).filter(Boolean).pop() || '';
+};
 
 export default function BroadcastTab() {
   const settings = useStore(state => state.settings);
@@ -34,13 +38,13 @@ export default function BroadcastTab() {
     try {
       let videoPath = item.path;
       if (!videoPath) {
-        videoPath = await ipcRenderer?.invoke('get-video-path', {
+        videoPath = await saucebox?.invoke('get-video-path', {
           filename: `${item.title}.mp4`,
           downloadPath: settings.downloadPath,
         });
       }
       if (settings.customPlayerPath && settings.customPlayerPath.trim() !== '') {
-        await ipcRenderer?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
+        await saucebox?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
       } else {
         useStore.getState().setActiveBuiltinVideo({ ...item, path: videoPath });
       }
@@ -87,7 +91,7 @@ export default function BroadcastTab() {
   }, [settings.broadcastPlaylist, history]);
 
   useEffect(() => {
-    ipcRenderer?.invoke('get-local-ip').then(ip => setLocalIp(ip));
+    saucebox?.invoke('get-local-ip').then(ip => setLocalIp(ip));
     
     const fetchExternalIp = async () => {
       try {
@@ -111,7 +115,7 @@ export default function BroadcastTab() {
 
   const handleToggleServer = async (forceStart = false) => {
     if (serverRunning && !forceStart) {
-      const res = await ipcRenderer?.invoke('stop-media-server');
+      const res = await saucebox?.invoke('stop-media-server');
       if (res && res.success) {
         setServerRunning(false);
         setServerStatus({ running: false, url: null });
@@ -127,7 +131,7 @@ export default function BroadcastTab() {
         downloadPath: settings.downloadPath,
         ffmpegPath: settings.ffmpegPath
       };
-      const res = await ipcRenderer?.invoke('start-media-server', config);
+      const res = await saucebox?.invoke('start-media-server', config);
       if (res && res.success) {
         setServerRunning(true);
         if (res.ip) {
@@ -154,34 +158,21 @@ export default function BroadcastTab() {
     }
   }, [quickCastVideo]);
 
-  const generateM3U = (currentPlaylist = playlist) => {
-    if (!fs || !path || currentPlaylist.length === 0) return;
-    
-    let m3u = "#EXTM3U\n";
-    m3u += `#PLAYLIST:${serverName}\n`;
-    currentPlaylist.forEach(item => {
-      const tagLine = (item.tags && item.tags.length > 0) ? ` group-title="${item.tags[0]}"` : ` group-title="SauceBox"`;
-      let thumbUrl = '';
-      let extArt = '';
-      if (item.thumbnail) {
-         const thumbName = path.basename(item.thumbnail);
-         const fullThumbUrl = `http://${localIp}:${port}/${encodeURIComponent(thumbName)}`;
-         thumbUrl = ` tvg-logo="${fullThumbUrl}"`;
-         extArt = `#EXTART:${fullThumbUrl}\n`;
-      }
-      m3u += `#EXTINF:${Math.round(item.duration || -1)}${tagLine}${thumbUrl},${item.title}\n`;
-      if (extArt) m3u += extArt;
-      const filename = path.basename(item.path);
-      const urlSuffix = transcodeEnabled ? '?transcode=1' : '';
-      m3u += `http://${localIp}:${port}/${encodeURIComponent(filename)}${urlSuffix}\n`;
+  const generateM3U = async (currentPlaylist = playlist) => {
+    if (currentPlaylist.length === 0) return;
+
+    const result = await saucebox?.invoke('save-stream-playlist', {
+      playlist: currentPlaylist,
+      serverName,
+      localIp,
+      port,
+      downloadPath: settings.downloadPath,
+      transcodeEnabled,
     });
-    
-    const m3uPath = path.join(settings.downloadPath, 'stream.m3u');
-    try {
-      fs.writeFileSync(m3uPath, m3u, 'utf8');
-      setPlaylistUrl(`http://${localIp}:${port}/stream.m3u`);
-    } catch(e) {
-      console.error('Failed to auto-save playlist:', e);
+    if (result?.success) {
+      setPlaylistUrl(result.url);
+    } else if (result?.error) {
+      console.error('Failed to auto-save playlist:', result.error);
     }
   };
 
@@ -256,36 +247,25 @@ export default function BroadcastTab() {
   };
   
   const handleSaveStream = async () => {
-    if (!fs || !path || playlist.length === 0) return;
+    if (playlist.length === 0) return;
     
     if (!serverRunning) {
       await handleToggleServer(true);
     }
-    
-    let m3u = "#EXTM3U\n";
-    m3u += `#PLAYLIST:${serverName}\n`;
-    playlist.forEach(item => {
-      const tagLine = (item.tags && item.tags.length > 0) ? ` group-title="${item.tags[0]}"` : ` group-title="SauceBox"`;
-      let thumbUrl = '';
-      let extArt = '';
-      if (item.thumbnail) {
-         const thumbName = path.basename(item.thumbnail);
-         const fullThumbUrl = `http://${localIp}:${port}/${encodeURIComponent(thumbName)}`;
-         thumbUrl = ` tvg-logo="${fullThumbUrl}"`;
-         extArt = `#EXTART:${fullThumbUrl}\n`;
-      }
-      m3u += `#EXTINF:${Math.round(item.duration || -1)}${tagLine}${thumbUrl},${item.title}\n`;
-      if (extArt) m3u += extArt;
-      const filename = path.basename(item.path);
-      // Append ?transcode=1 if transcoding is enabled so the backend knows
-      const urlSuffix = transcodeEnabled ? '?transcode=1' : '';
-      m3u += `http://${localIp}:${port}/${encodeURIComponent(filename)}${urlSuffix}\n`;
-    });
-    
-    const m3uPath = path.join(settings.downloadPath, 'stream.m3u');
+
     try {
-      fs.writeFileSync(m3uPath, m3u, 'utf8');
-      setPlaylistUrl(`http://${localIp}:${port}/stream.m3u`);
+      const result = await saucebox?.invoke('save-stream-playlist', {
+        playlist,
+        serverName,
+        localIp,
+        port,
+        downloadPath: settings.downloadPath,
+        transcodeEnabled,
+      });
+      if (!result?.success) {
+        throw new Error(result?.error || 'Unknown error');
+      }
+      setPlaylistUrl(result.url);
       alert('Stream Created! You can now stream this via the network URL.');
     } catch(e) {
       alert('Failed to save playlist: ' + e.message);
@@ -301,14 +281,14 @@ export default function BroadcastTab() {
       let thumbUrl = '';
       let extArt = '';
       if (item.thumbnail) {
-         const thumbName = path.basename(item.thumbnail);
+         const thumbName = getBasename(item.thumbnail);
          const fullThumbUrl = `http://${localIp}:${port}/${encodeURIComponent(thumbName)}`;
          thumbUrl = ` tvg-logo="${fullThumbUrl}"`;
          extArt = `#EXTART:${fullThumbUrl}\n`;
       }
       m3u += `#EXTINF:${Math.round(item.duration || -1)}${tagLine}${thumbUrl},${item.title}\n`;
       if (extArt) m3u += extArt;
-      const filename = path.basename(item.path);
+      const filename = getBasename(item.path);
       const urlSuffix = transcodeEnabled ? '?transcode=1' : '';
       m3u += `http://${localIp}:${port}/${encodeURIComponent(filename)}${urlSuffix}\n`;
     });
@@ -337,7 +317,7 @@ export default function BroadcastTab() {
           const encodedFilename = parts[parts.length - 1];
           try {
             const filename = decodeURIComponent(encodedFilename);
-            const foundItem = history.find(h => path.basename(h.path) === filename);
+            const foundItem = history.find(h => getBasename(h.path) === filename);
             if (foundItem && !importedPlaylist.find(i => i.id === foundItem.id)) {
               importedPlaylist.push(foundItem);
             }

@@ -5,7 +5,9 @@ import { theme } from '../../../theme';
 import { styles } from './PlaylistStyles';
 import Tooltip from '../../Tooltip';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
+
+const getBasename = (value) => String(value || '').split('?')[0].split(/[\\/]/).filter(Boolean).pop() || '';
 
 export default function PlaylistEditor({
   playlist,
@@ -34,8 +36,8 @@ export default function PlaylistEditor({
   };
 
   const handleCustomCover = async () => {
-    if (!ipcRenderer) return;
-    const filePath = await ipcRenderer.invoke('select-file', 'Select Custom Cover Image');
+    if (!saucebox) return;
+    const filePath = await saucebox.invoke('select-file', 'Select Custom Cover Image');
     if (filePath) {
       updateDraft({ coverImage: `file://${filePath}` });
     }
@@ -165,23 +167,16 @@ export default function PlaylistEditor({
       const text = event.target.result;
       const lines = text.split('\n');
       const importedItemIds = [];
-      const pathModule = window.require ? window.require('path') : null;
       lines.forEach(line => {
         if (!line.startsWith('#') && line.trim() !== '') {
           const rawPath = line.trim();
-          let filename = rawPath;
-          if (pathModule) {
-             filename = pathModule.basename(rawPath);
-          } else {
-             const parts = rawPath.split(/[\/\\]/);
-             filename = parts[parts.length - 1];
-          }
+          let filename = getBasename(rawPath);
           try {
             filename = decodeURIComponent(filename);
           } catch(err) {}
           
           const foundItem = history.find(h => {
-             const hFilename = pathModule ? pathModule.basename(h.path) : h.path.split(/[\/\\]/).pop();
+             const hFilename = getBasename(h.path);
              return hFilename === filename || h.path === rawPath || decodeURIComponent(hFilename) === filename;
           });
           if (foundItem && !importedItemIds.includes(foundItem.id)) {

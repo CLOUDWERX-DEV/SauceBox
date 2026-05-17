@@ -28,6 +28,42 @@ function getLocalIp() {
 function setupMediaServerHandlers() {
   ipcMain.handle('get-local-ip', () => getLocalIp());
 
+  ipcMain.handle('save-stream-playlist', async (event, { playlist, serverName, localIp, port, downloadPath, transcodeEnabled }) => {
+    if (!Array.isArray(playlist) || playlist.length === 0) {
+      return { success: false, error: 'Playlist is empty' };
+    }
+
+    const servePath = downloadPath || path.join(os.homedir(), 'Downloads', 'SauceBox');
+    let m3u = '#EXTM3U\n';
+    m3u += `#PLAYLIST:${serverName || 'SauceBox Media Server'}\n`;
+
+    for (const item of playlist) {
+      const tagLine = item.tags && item.tags.length > 0 ? ` group-title="${item.tags[0]}"` : ' group-title="SauceBox"';
+      let thumbUrl = '';
+      let extArt = '';
+      if (item.thumbnail) {
+        const thumbName = path.basename(item.thumbnail);
+        const fullThumbUrl = `http://${localIp}:${port}/${encodeURIComponent(thumbName)}`;
+        thumbUrl = ` tvg-logo="${fullThumbUrl}"`;
+        extArt = `#EXTART:${fullThumbUrl}\n`;
+      }
+      m3u += `#EXTINF:${Math.round(item.duration || -1)}${tagLine}${thumbUrl},${item.title}\n`;
+      if (extArt) m3u += extArt;
+      const filename = path.basename(item.path || '');
+      const urlSuffix = transcodeEnabled ? '?transcode=1' : '';
+      m3u += `http://${localIp}:${port}/${encodeURIComponent(filename)}${urlSuffix}\n`;
+    }
+
+    try {
+      fs.mkdirSync(servePath, { recursive: true });
+      const m3uPath = path.join(servePath, 'stream.m3u');
+      fs.writeFileSync(m3uPath, m3u, 'utf8');
+      return { success: true, path: m3uPath, url: `http://${localIp}:${port}/stream.m3u` };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
   ipcMain.handle('start-media-server', async (event, config) => {
     if (mediaServerInstance) {
       mediaServerInstance.close();

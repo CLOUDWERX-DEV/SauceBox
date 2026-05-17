@@ -11,7 +11,7 @@ import GalleryEmptyState from './Gallery/GalleryEmptyState';
 import GalleryFilterBar from './Gallery/GalleryFilterBar';
 import GalleryCard from './Gallery/GalleryCard';
 
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 const formatFileSize = (bytes) => {
   const num = Number(bytes);
@@ -51,13 +51,13 @@ export default function GalleryTab({ onNavigate }) {
     try {
       let videoPath = item.path;
       if (!videoPath) {
-        videoPath = await ipcRenderer?.invoke('get-video-path', {
+        videoPath = await saucebox?.invoke('get-video-path', {
           filename: `${item.title}.mp4`,
           downloadPath: settings.downloadPath,
         });
       }
       if (settings.customPlayerPath && settings.customPlayerPath.trim() !== '') {
-        await ipcRenderer?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
+        await saucebox?.invoke('open-video', { filepath: videoPath, customPlayerPath: settings.customPlayerPath });
       } else {
         // Map the filteredHistory into a playlist context with resolved fallback paths
         const playlist = filteredHistory.map(h => {
@@ -83,12 +83,12 @@ export default function GalleryTab({ onNavigate }) {
     try {
       let videoPath = item.path;
       if (!videoPath) {
-        videoPath = await ipcRenderer?.invoke('get-video-path', {
+        videoPath = await saucebox?.invoke('get-video-path', {
           filename: `${item.title}.mp4`,
           downloadPath: settings.downloadPath,
         });
       }
-      await ipcRenderer?.invoke('open-folder', videoPath);
+      await saucebox?.invoke('open-folder', videoPath);
     } catch (error) {
       console.error('Failed to open folder:', error);
       alert('Could not open folder. The video file may have been moved or deleted.');
@@ -98,7 +98,7 @@ export default function GalleryTab({ onNavigate }) {
   const handleDeleteItem = async () => {
     if (!deleteConfirmItem) return;
     if (deleteFromDisk && deleteConfirmItem.path) {
-      await ipcRenderer?.invoke('delete-file', deleteConfirmItem.path);
+      await saucebox?.invoke('delete-file', deleteConfirmItem.path);
     }
     removeFromHistory(deleteConfirmItem.id);
     setDeleteConfirmItem(null);
@@ -109,7 +109,7 @@ export default function GalleryTab({ onNavigate }) {
     if (clearDiskToo) {
       const paths = history.map(h => h.path).filter(Boolean);
       if (paths.length > 0) {
-        await ipcRenderer?.invoke('delete-files', paths);
+        await saucebox?.invoke('delete-files', paths);
       }
     }
     clearHistory();

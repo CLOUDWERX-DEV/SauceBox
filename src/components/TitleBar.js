@@ -7,15 +7,15 @@ import HelpModal from './HelpModal';
 import packageJson from '../../package.json';
 
 const version = packageJson.version;
-const { ipcRenderer } = window.require ? window.require('electron') : { ipcRenderer: null };
+const saucebox = window.saucebox;
 
 export default function TitleBar({ vaultEnabled, onLock }) {
   const [helpVisible, setHelpVisible] = useState(false);
   const serverStatus = useStore(state => state.serverStatus);
   
-  const handleMinimize = () => ipcRenderer?.invoke('minimize-window');
-  const handleMaximize = () => ipcRenderer?.invoke('maximize-window');
-  const handleClose = () => ipcRenderer?.invoke('close-window');
+  const handleMinimize = () => saucebox?.invoke('minimize-window');
+  const handleMaximize = () => saucebox?.invoke('maximize-window');
+  const handleClose = () => saucebox?.invoke('close-window');
 
   return (
     <>
