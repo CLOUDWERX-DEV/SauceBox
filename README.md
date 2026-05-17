@@ -106,6 +106,21 @@ If you installed SauceBox via an installer (`.exe`, `.deb`, etc.), you will need
 4. Click **Load unpacked** in the top left.
 5. Navigate to and select the `chrome-extension` directory located inside the SauceBox folder you downloaded/cloned.
 
+### Step 3: Pin the Extension to Your Toolbar
+Once loaded, the extension will appear in your browser's Extensions menu (the puzzle piece icon in the top right). Click it, find **Send to SauceBox** in the list, and click the **pin icon** next to it. This will anchor the SauceBox icon directly into your toolbar so it's always one click away.
+
+### How to Use It
+
+There are two ways to send a URL to SauceBox:
+
+**Option A: Right-click any page or link**
+Right-click anywhere on a video page, or right-click a video link directly in the page, and select **"Send to SauceBox"** from the context menu. The URL will be dispatched instantly to your local SauceBox download queue.
+
+**Option B: Click the toolbar icon**
+While viewing any page you want to download, click the SauceBox icon in your browser toolbar. It will automatically grab the current page's URL and send it straight to the queue. No copying and pasting required.
+
+> **Note:** SauceBox must be open and running on your machine for the extension to work. If the app is closed, the extension will log a connection error to the browser console.
+
 ## 🤝 Contributing & Developer Guidelines
 
 We welcome community contributions, bug fixes, and feature requests! To keep the README user-friendly, we have compiled all deep-dive engineering details, structural maps, and code style protocols into a dedicated developer guide. 
