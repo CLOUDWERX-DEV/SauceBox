@@ -17,6 +17,7 @@ export default function PlaylistEditor({
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('date');
+  const isNewPlaylist = typeof playlist.id === 'string' && playlist.id.startsWith('new-');
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
   const [coverModalVisible, setCoverModalVisible] = useState(false);
@@ -229,19 +230,23 @@ export default function PlaylistEditor({
         {/* Right side button group */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           {/* Delete Playlist — danger zone, leftmost */}
-          <TouchableOpacity
-            style={{
-              paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8,
-              backgroundColor: 'transparent', borderWidth: 1,
-              borderColor: theme.colors.error, cursor: 'pointer',
-            }}
-            onPress={() => setConfirmDeleteVisible(true)}
-          >
-            <Text style={{ color: theme.colors.error, fontWeight: '700', fontSize: 13 }}>🗑 Delete Playlist</Text>
-          </TouchableOpacity>
+          {!isNewPlaylist && (
+            <>
+              <TouchableOpacity
+                style={{
+                  paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8,
+                  backgroundColor: 'transparent', borderWidth: 1,
+                  borderColor: theme.colors.error, cursor: 'pointer',
+                }}
+                onPress={() => setConfirmDeleteVisible(true)}
+              >
+                <Text style={{ color: theme.colors.error, fontWeight: '700', fontSize: 13 }}>🗑 Delete Playlist</Text>
+              </TouchableOpacity>
 
-          {/* Separator */}
-          <View style={{ width: 1, height: 28, backgroundColor: theme.colors.border, marginHorizontal: 4 }} />
+              {/* Separator */}
+              <View style={{ width: 1, height: 28, backgroundColor: theme.colors.border, marginHorizontal: 4 }} />
+            </>
+          )}
 
           {/* Discard Changes */}
           <TouchableOpacity
