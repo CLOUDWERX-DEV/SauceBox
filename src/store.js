@@ -31,6 +31,7 @@ export const useStore = create(
     (set) => ({
       downloads: [],
       history: [],
+      playlists: [],
       serverStatus: { running: false, url: null },
       setServerStatus: (status) => set({ serverStatus: status }),
       broadcastLogs: [],
@@ -101,6 +102,19 @@ export const useStore = create(
       })),
       
       clearHistory: () => set({ history: [] }),
+
+      // Playlist Actions
+      addPlaylist: (playlist) => set((state) => ({
+        playlists: [{ ...playlist, id: Date.now(), createdAt: Date.now() }, ...state.playlists]
+      })),
+
+      updatePlaylist: (id, updates) => set((state) => ({
+        playlists: state.playlists.map(p => p.id === id ? { ...p, ...updates } : p)
+      })),
+
+      deletePlaylist: (id) => set((state) => ({
+        playlists: state.playlists.filter(p => p.id !== id)
+      })),
       
       updateSettings: (updates) => set((state) => ({
         settings: { ...state.settings, ...updates }

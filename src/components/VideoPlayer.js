@@ -28,6 +28,13 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
   // Post-clip metadata editing
   const [clipItem, setClipItem] = useState(null);
 
+  // Playlist navigation
+  const playlist = originalItem?.playlist || null;
+  const [playlistIndex, setPlaylistIndex] = useState(originalItem?.playlistIndex || 0);
+  const currentPlaylistItem = playlist ? playlist[playlistIndex] : null;
+  const hasNext = playlist && playlistIndex < playlist.length - 1;
+  const hasPrev = playlist && playlistIndex > 0;
+
   const addToHistory = useStore(state => state.addToHistory);
   const removeFromHistory = useStore(state => state.removeFromHistory);
   const updateHistoryItem = useStore(state => state.updateHistoryItem);
@@ -112,6 +119,26 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
     } catch (error) {
       console.error('Failed to open folder:', error);
       alert('Could not open folder.');
+    }
+  };
+
+  const handlePlaylistNav = (newIndex) => {
+    if (!playlist || newIndex < 0 || newIndex >= playlist.length) return;
+    setPlaylistIndex(newIndex);
+    const nextVideo = playlist[newIndex];
+    if (nextVideo?.path && videoRef.current) {
+      setLoading(true);
+      setError(null);
+      setTrimMode(false);
+      const safePath = nextVideo.path.split('/').map(encodeURIComponent).join('/');
+      videoRef.current.src = `file://${safePath}`;
+      videoRef.current.load();
+    }
+  };
+
+  const handleVideoEnded = () => {
+    if (hasNext) {
+      handlePlaylistNav(playlistIndex + 1);
     }
   };
 
@@ -226,17 +253,37 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
           <View style={styles.playerContainer}>
             <View style={styles.header}>
               <View style={styles.titleSection}>
-                <Text style={styles.title} numberOfLines={1}>{videoTitle || 'Unknown Video'}</Text>
-                {originalItem && (
+                <Text style={styles.title} numberOfLines={1}>
+                  {(currentPlaylistItem?.title || videoTitle || 'Unknown Video')}
+                </Text>
+                {(currentPlaylistItem || originalItem) && (
                   <Text style={styles.subtitle} numberOfLines={1}>
-                    {formatDuration(originalItem.duration)}
-                    {originalItem.resolution && ` • ${originalItem.resolution}`}
-                    {originalItem.filesize && ` • ${formatFileSize(originalItem.filesize)}`}
-                    {originalItem.uploader && originalItem.uploader !== 'Unknown' && ` • 👤 ${originalItem.uploader}`}
+                    {formatDuration((currentPlaylistItem || originalItem).duration)}
+                    {(currentPlaylistItem || originalItem).resolution && ` • ${(currentPlaylistItem || originalItem).resolution}`}
+                    {(currentPlaylistItem || originalItem).filesize && ` • ${formatFileSize((currentPlaylistItem || originalItem).filesize)}`}
+                    {playlist && ` • Track ${playlistIndex + 1} of ${playlist.length}`}
                   </Text>
                 )}
               </View>
               <View style={styles.headerActions}>
+                {playlist && (
+                  <>
+                    <TouchableOpacity
+                      style={[styles.actionButton, !hasPrev && { opacity: 0.3 }]}
+                      onPress={() => handlePlaylistNav(playlistIndex - 1)}
+                      disabled={!hasPrev}
+                    >
+                      <Text style={styles.actionButtonText}>⏮ Prev</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.actionButton, !hasNext && { opacity: 0.3 }]}
+                      onPress={() => handlePlaylistNav(playlistIndex + 1)}
+                      disabled={!hasNext}
+                    >
+                      <Text style={styles.actionButtonText}>Next ⏭</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
                 <TouchableOpacity style={styles.actionButton} onPress={handleOpenExternal}>
                   <Text style={styles.actionButtonText}>🎬 Open Player</Text>
                 </TouchableOpacity>
@@ -377,6 +424,7 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
                     style={styles.video}
                     onLoadedData={handleLoadedData}
                     onError={handleError}
+                    onEnded={handleVideoEnded}
                   >
                     <source src={`file://${safeSrc}`} type="video/mp4" />
                     <source src={`file://${safeSrc}`} type="video/webm" />

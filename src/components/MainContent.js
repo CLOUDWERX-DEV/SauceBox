@@ -2,6 +2,7 @@ import React from 'react';
 import DownloadTab from './tabs/DownloadTab';
 import QueueTab from './tabs/QueueTab';
 import GalleryTab from './tabs/GalleryTab';
+import PlaylistsTab from './tabs/PlaylistsTab';
 import SettingsTab from './tabs/SettingsTab';
 import BroadcastTab from './tabs/BroadcastTab';
 
@@ -14,6 +15,8 @@ export default function MainContent({ activeTab, onNavigate }) {
         return <QueueTab onNavigate={onNavigate} />;
       case 'history':
         return <GalleryTab onNavigate={onNavigate} />;
+      case 'playlists':
+        return <PlaylistsTab />;
       case 'broadcast':
         return <BroadcastTab />;
       case 'settings':

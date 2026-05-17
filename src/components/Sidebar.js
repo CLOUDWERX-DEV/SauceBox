@@ -11,6 +11,7 @@ const tabs = [
   { id: 'download', icon: '⬇️', label: 'Download', subtitle: 'Download Videos' },
   { id: 'queue', icon: '📋', label: 'Queue', subtitle: 'Download Queue' },
   { id: 'history', icon: '🎬', label: 'Gallery', subtitle: 'Video Archive' },
+  { id: 'playlists', icon: '🗂️', label: 'Playlists', subtitle: 'Collections & Mixes' },
   { id: 'broadcast', icon: '📡', label: 'Media Server', subtitle: 'VR & Cast Network' },
   { id: 'settings', icon: '⚙️', label: 'Settings', subtitle: 'Tweaks and Customization' }
 ];
@@ -26,6 +27,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
   const getBadgeCount = (tabId) => {
     if (tabId === 'queue') return activeDownloads.length;
     if (tabId === 'history') return history.length;
+    if (tabId === 'playlists') return useStore.getState().playlists.length;
     return 0;
   };
 
