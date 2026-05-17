@@ -137,6 +137,70 @@ export default function PlaylistEditor({
     updateDraft({ items: [] });
   };
 
+  const handleExportM3u = () => {
+    if (playlistItems.length === 0) return;
+    let m3u = "#EXTM3U\n";
+    const title = draftPlaylist.name || 'SauceBox Playlist';
+    m3u += `#PLAYLIST:${title}\n`;
+    playlistItems.forEach(item => {
+      const tagLine = (item.tags && item.tags.length > 0) ? ` group-title="${item.tags[0]}"` : ` group-title="SauceBox"`;
+      m3u += `#EXTINF:${Math.round(item.duration || -1)}${tagLine},${item.title || 'Untitled'}\n`;
+      m3u += `${item.path}\n`;
+    });
+    
+    const blob = new Blob([m3u], { type: 'audio/x-mpegurl' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'playlist'}.m3u`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportM3u = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const lines = text.split('\n');
+      const importedItemIds = [];
+      const pathModule = window.require ? window.require('path') : null;
+      lines.forEach(line => {
+        if (!line.startsWith('#') && line.trim() !== '') {
+          const rawPath = line.trim();
+          let filename = rawPath;
+          if (pathModule) {
+             filename = pathModule.basename(rawPath);
+          } else {
+             const parts = rawPath.split(/[\/\\]/);
+             filename = parts[parts.length - 1];
+          }
+          try {
+            filename = decodeURIComponent(filename);
+          } catch(err) {}
+          
+          const foundItem = history.find(h => {
+             const hFilename = pathModule ? pathModule.basename(h.path) : h.path.split(/[\/\\]/).pop();
+             return hFilename === filename || h.path === rawPath || decodeURIComponent(hFilename) === filename;
+          });
+          if (foundItem && !importedItemIds.includes(foundItem.id)) {
+            importedItemIds.push(foundItem.id);
+          }
+        }
+      });
+      if (importedItemIds.length > 0) {
+        // Merge with existing or overwrite? Let's overwrite for consistency with Broadcast tab
+        updateDraft({ items: importedItemIds });
+        alert(`Successfully imported ${importedItemIds.length} videos from the M3U playlist!`);
+      } else {
+        alert('Could not match any videos from the M3U file to your current library.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = ''; // reset input
+  };
+
   // Drag and drop reordering
   const handleDragStart = (e, index) => {
     setDraggedIndex(index);
@@ -436,6 +500,16 @@ export default function PlaylistEditor({
                   <Text style={styles.statBadgeText}>💾 {formatSize(totalSize)}</Text>
                 </View>
               )}
+            </View>
+            
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, marginBottom: 8, paddingHorizontal: 4 }}>
+              <TouchableOpacity style={{ backgroundColor: theme.colors.surfaceLight, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: theme.colors.border }} onPress={() => document.getElementById('playlist-m3u-import').click()}>
+                <Text style={{ color: theme.colors.text, fontSize: 11, fontWeight: '600' }}>📂 Import .m3u</Text>
+              </TouchableOpacity>
+              <input type="file" id="playlist-m3u-import" accept=".m3u" style={{ display: 'none' }} onChange={handleImportM3u} />
+              <TouchableOpacity style={{ backgroundColor: theme.colors.surfaceLight, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: theme.colors.border }} onPress={handleExportM3u} disabled={playlistItems.length === 0}>
+                <Text style={{ color: theme.colors.text, fontSize: 11, fontWeight: '600', opacity: playlistItems.length === 0 ? 0.5 : 1 }}>💾 Export .m3u</Text>
+              </TouchableOpacity>
             </View>
           </View>
 
