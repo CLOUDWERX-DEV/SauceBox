@@ -11,6 +11,12 @@
 - **Auto-Advance Playback**: Implemented HTML5 `onEnded` detection in the VideoPlayer. When a clip or video finishes naturally, SauceBox will automatically load and play the next video in the active playlist.
 - **External Player Support**: Fully wired the Playlists ecosystem to the custom external video player handoff. Hitting "Play All" while using an external player (like VLC) passes the file paths correctly.
 - **Playlist UI Refinements**: Added a large quick-play button on playlist cards, a new "Save & Return" exit pattern in the editor, and a large custom cover art selector. Drag-and-drop was refined to perfectly match the Broadcast tab with manual numbering overrides and up/down quick keys. Left pane now displays video ratings.
+- **Broadcast Tab Playlist Builder UI Overhaul**: Revamped search input, available videos count, sort buttons, and layout to match the PlaylistEditor exactly.
+- **Unified Added State Styling**: Refactored the "Added" status across both PlaylistEditor and Broadcast tab to show clean, bold orange text instead of a grey badge.
+- **Broadcast Playlist Items Refinement**: Removed card styling and converted item rows in the available videos list and current playlist list to flat items with bottom border dividers and full-bleed edge-to-edge layouts.
+- **Full-Bleed Separator Lines**: Integrated edge-to-edge separator lines for metadata and actions inside the Broadcast tab current playlist area using negative margins.
+- **Empty State Alignment**: Aligned the Broadcast current playlist's empty state to use the mailbox emoji (`📬`) and styled placeholder text matching the PlaylistEditor.
+
 
 ## [1.5.0] - 2026-05-16
 
