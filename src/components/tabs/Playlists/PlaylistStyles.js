@@ -151,12 +151,10 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // Editor View (View B) - Split pane
   editorContainer: {
     flexDirection: 'row',
     gap: 24,
-    flex: 1,
-    minHeight: 600,
+    height: 650,
   },
   editorLeft: {
     flex: 1,
