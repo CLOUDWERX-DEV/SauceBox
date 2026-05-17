@@ -37,8 +37,18 @@ Already have a massive stash on your hard drive? Use the **Import** feature to i
 ### 🤖 Auto-Tagging & Smart Metadata Extraction
 As videos download, SauceBox intelligently extracts metadata on the fly. The **Auto-Tagging** feature automatically categorizes your new videos based on their source domain/provider (e.g., Pornhub, Spankbang), keeping your Gallery clean and organized without lifting a finger. If you ever need to change things, hit the **Edit** button on any card to update Titles, Creators, and Tags on the fly.
 
-### 🎬 Native Playback & Highlight Clipper ✂️
-No need to hunt down files in your system explorer. SauceBox features a gorgeous, built-in **In-App Video Player** to watch your files instantly. Only care about a 3-minute scene in a 5GB video? Toggle **Clip Mode**, enter a start time, and instantly use the built-in `ffmpeg` integration to slice out and save that highlight clip without re-encoding!
+### 🎬 Native Playback & Visual Video Trimmer ✂️
+No need to hunt down files in your system explorer. SauceBox features a gorgeous, built-in **In-App Video Player** to watch your files instantly. Want to clip a custom highlight without re-encoding or losing video quality? Use our premium **Visual Video Trimmer**:
+*   **Dual-Slider Scrubbing Track**: Grab the two orange trimmer handles and visually drag them frame-by-frame on a scrubbing timeline with real-time video feedback.
+*   **Quick-Cut Snapping**: Instantly snap the start or end handles to the exact millisecond of the player's active position using the `[ Set Start ]` and `[ Set End ]` buttons.
+*   **Lossless Extraction**: SauceBox leverages `ffmpeg` to slice your clips instantly in high speed, preserving 100% video quality. The trim is automatically saved as a fresh, standalone card in your gallery, leaving the original video completely untouched.
+
+### 🗂️ Curated Playlists & Curations Builder
+Curate, edit, and play custom video collections dynamically with our premium **Playlists** engine:
+*   **Isolated Draft States**: Creating or editing a playlist opens a safe, temporary local draft. Edits (adding, removing, reordering, custom cover art, renaming) are held in memory and are only written to the database when you click the orange **Save & Return** button. Discarding exits cleanly without polluting your collection.
+*   **Interactive Dual-Pane curating**: Curate in real time using our dual-pane layout. The left panel shows all available gallery videos with search filtering, sorting keys, resolution, and star-ratings. The right panel displays your active playlist sequence, supporting drag-and-drop manual ordering or instant sequence input numbering.
+*   **Sequenced Playback & Auto-Advance**: Launch a playlist in the built-in player, and SauceBox will automatically advance to the next video when the active one ends. Or, if a custom external player (like VLC or MPV) is enabled in Settings, the app will pass the entire playlist sequence directly to your external player!
+*   **High-Contrast Stats Badges**: The Playlists gallery header displays real-time combined statistics summarizing total playlist count, unique file storage size, and cumulative playtime.
 
 ### ⏸️ Flawless Pause & Resume
 Got to go? Click Pause, or just close the app entirely. SauceBox intelligently saves the exact byte position of your active downloads. When you start the app again, it automatically queues your pending downloads so you can resume them flawlessly.

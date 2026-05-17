@@ -48,6 +48,7 @@ export default function HelpModal({ visible, onClose }) {
   const tabs = [
     { id: 'basics', icon: '🚀', label: 'Getting Started' },
     { id: 'gallery', icon: '🗄️', label: 'Gallery & Import' },
+    { id: 'playlists', icon: '🗂️', label: 'Playlists Collection' },
     { id: 'extension', icon: '🧩', label: 'Web Extension' },
     { id: 'stealth', icon: '🥷', label: 'Stealth & Privacy' },
     { id: 'player', icon: '🎬', label: 'Playback & Clips' },

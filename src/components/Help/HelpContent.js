@@ -119,6 +119,72 @@ export default function HelpContent({ activeTab, displayHotkey }) {
         </View>
       );
 
+    case 'playlists':
+      return (
+        <View>
+          <Text style={styles.contentTitle}>Playlists Collection</Text>
+          <Text style={styles.contentSubtitle}>Create, curate, edit, and play custom video collections dynamically.</Text>
+
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardIcon}>➕</Text>
+              <Text style={styles.cardTitle}>Creating a Playlist Draft</Text>
+            </View>
+            <Text style={styles.paragraph}>
+              Click <Text style={styles.highlight}>➕ NEW PLAYLIST</Text> on the Playlists tab (or the centered button when empty). This opens a secure, local in-memory draft session. Any edits you make here are isolated and will not pollute your permanent database until you explicitly click the orange <Text style={styles.highlight}>💾 Save & Return</Text> button!
+            </Text>
+            <View style={styles.bulletList}>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Rename</Text>: Change the title using the edit input at the top of the editor.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Custom Cover Art</Text>: Hover over the playlist thumbnail and click to select a custom image from your hard drive, or let SauceBox automatically generate a beautiful collage grid from your items!</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Discard</Text>: Clicking <Text style={styles.highlight}>↩ Discard</Text> safely reverts all changes and exits without writing to disk.</Text>
+            </View>
+          </View>
+
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardIcon}>✏️</Text>
+              <Text style={styles.cardTitle}>Curating & Reordering Videos</Text>
+            </View>
+            <Text style={styles.paragraph}>
+              Curating is extremely intuitive with our dual-pane layout:
+            </Text>
+            <View style={styles.bulletList}>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Available Videos (Left Panel)</Text>: Shows all videos in your library with built-in search filtering, sorting, tags, resolution, and rating badges. Click <Text style={styles.highlight}>➕ Add to Playlist</Text> to append it to your playlist.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Active Playlist (Right Panel)</Text>: Shows your current list. Click the trash icon to remove items. Click the up/down arrows or type a number in the sequence index input to instantly move items to a specific position!</Text>
+            </View>
+          </View>
+
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardIcon}>▶️</Text>
+              <Text style={styles.cardTitle}>Playback & Auto-Advance</Text>
+            </View>
+            <Text style={styles.paragraph}>
+              Playlists integrate beautifully with all playback methods:
+            </Text>
+            <View style={styles.bulletList}>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Built-in Video Player</Text>: Hover over any playlist and click the orange Play icon to start playing. Once a video ends, the player will automatically advance to the next item in your playlist! You can also click the Next/Prev buttons on the player overlay to skip.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>External Media Players</Text>: If you have configured a custom player (like VLC or MPV) in Settings, clicking play will feed your entire playlist sequence directly to your external player for native local playback.</Text>
+            </View>
+          </View>
+
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardIcon}>📊</Text>
+              <Text style={styles.cardTitle}>Collection Stats Badges</Text>
+            </View>
+            <Text style={styles.paragraph}>
+              The Playlists gallery header displays real-time combined statistics of your entire collection:
+            </Text>
+            <View style={styles.bulletList}>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Playlists Count</Text>: The total number of curated playlists.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Storage Footprint</Text>: Combined disk storage size of all unique files across your playlists.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Total Playtime</Text>: Cumulative playtime of all unique items across your playlists (duplicates across playlists are only counted once!).</Text>
+            </View>
+          </View>
+        </View>
+      );
+
     case 'extension':
       return (
         <View>
@@ -210,7 +276,7 @@ export default function HelpContent({ activeTab, displayHotkey }) {
       return (
         <View>
           <Text style={styles.contentTitle}>Playback & Clipping</Text>
-          <Text style={styles.contentSubtitle}>Watch and trim your videos without leaving the app.</Text>
+          <Text style={styles.contentSubtitle}>Watch and trim your videos with professional visual tools directly in the player overlay.</Text>
 
           <View style={styles.card}>
             <View style={styles.cardHeader}>
@@ -218,23 +284,23 @@ export default function HelpContent({ activeTab, displayHotkey }) {
               <Text style={styles.cardTitle}>Playing Videos</Text>
             </View>
             <Text style={styles.paragraph}>
-              Click any video thumbnail in the Gallery or a completed item in the Queue to open the built-in player. Use standard controls to play, pause, seek, and adjust volume.
+              Click any video thumbnail in the Gallery, a completed item in the Queue, or launch directly from a Playlist to open the built-in player. Features seamless fullscreen support, keyboard hotkeys (Space to pause, left/right arrows to seek), and automatic transition/advancement to the next video when playing collections.
             </Text>
           </View>
 
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardIcon}>✂️</Text>
-              <Text style={styles.cardTitle}>Clipping a Highlight</Text>
+              <Text style={styles.cardTitle}>Clipping a Highlight (Visual Trimmer)</Text>
             </View>
             <Text style={styles.paragraph}>
-              You can trim any video down to just the part you want without re-encoding or losing quality.
+              SauceBox features a premium, fully interactive visual trimmer that allows you to cut your videos down to custom highlights in seconds with zero re-encoding or quality degradation.
             </Text>
             <View style={styles.bulletList}>
-              <Text style={styles.bulletItem}>• Open a video in the player.</Text>
-              <Text style={styles.bulletItem}>• Click the <Text style={styles.highlight}>Clip</Text> icon.</Text>
-              <Text style={styles.bulletItem}>• Enter a start time and end time (e.g., <Text style={styles.code}>00:02:30</Text> to <Text style={styles.code}>00:05:00</Text>).</Text>
-              <Text style={styles.bulletItem}>• The clip saves as a new file in your gallery. The original is not affected.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Open Trimmer</Text>: Play a video in the built-in player and click the orange scissors <Text style={styles.highlight}>✂️ Clip</Text> icon to open the trimmer panel.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Visual Dual-Slider Scrubbing</Text>: Grab the two orange handles below the timeline to visually adjust the Start and End cut positions. You'll get real-time seek previews as you drag the sliders.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Quick-Cut Snapping</Text>: While watching, click the <Text style={styles.highlight}>[ Set Start</Text> or <Text style={styles.highlight}>Set End ]</Text> buttons to snap the cut boundaries instantly to the player's active timestamp.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Lossless FFmpeg Processing</Text>: Click <Text style={styles.highlight}>💾 Extract Clip</Text>. SauceBox will use ffmpeg to slice the video, automatically creating a standalone video card in your gallery. Your original file remains untouched!</Text>
             </View>
           </View>
         </View>
@@ -427,12 +493,13 @@ export default function HelpContent({ activeTab, displayHotkey }) {
               <Text style={styles.cardTitle}>Forgot Your Vault PIN?</Text>
             </View>
             <Text style={styles.paragraph}>
-              There is no PIN recovery built in. If you're locked out, you'll need to reset it manually by editing the app's config file directly.
+              There is no PIN recovery built into the UI. If you are locked out, you can easily disable or reset it by editing the settings file directly on your hard drive.
             </Text>
             <View style={styles.bulletList}>
-              <Text style={styles.bulletItem}>• All app data is stored in your browser's <Text style={styles.highlight}>localStorage</Text> under the key <Text style={styles.code}>saucebox-storage</Text>.</Text>
-              <Text style={styles.bulletItem}>• Open DevTools in the app (<Text style={styles.code}>Ctrl + Shift + I</Text>), go to <Text style={styles.highlight}>Application → Local Storage</Text>, find the key <Text style={styles.code}>saucebox-storage</Text>, and edit the <Text style={styles.code}>vaultPin</Text> field to a new 4-digit number.</Text>
-              <Text style={styles.bulletItem}>• You can also set <Text style={styles.code}>vaultEnabled</Text> to <Text style={styles.code}>false</Text> to disable the Vault entirely without needing the PIN.</Text>
+              <Text style={styles.bulletItem}>1. Close SauceBox completely.</Text>
+              <Text style={styles.bulletItem}>2. Navigate to your OS application data folder (see paths below) and open <Text style={styles.highlight}>saucebox-settings.json</Text> in any text editor.</Text>
+              <Text style={styles.bulletItem}>3. Find the <Text style={styles.code}>vaultPin</Text> field and change the 4-digit code to a new one, or simply set <Text style={styles.code}>"vaultEnabled": false</Text> to turn the vault off entirely.</Text>
+              <Text style={styles.bulletItem}>4. Save the file and launch SauceBox. You will be able to enter directly or with your newly set PIN!</Text>
             </View>
           </View>
 
@@ -442,13 +509,14 @@ export default function HelpContent({ activeTab, displayHotkey }) {
               <Text style={styles.cardTitle}>Where Config & Data is Stored</Text>
             </View>
             <Text style={styles.paragraph}>
-              SauceBox stores all settings, your gallery, queue, and tags in a single <Text style={styles.highlight}>localStorage</Text> entry inside Electron's renderer process. There is no separate config file on disk.
+              All settings and database records are kept strictly offline on your computer. SauceBox splits your local state into two clean, human-readable JSON files inside the application data directory:
             </Text>
             <View style={styles.bulletList}>
-              <Text style={styles.bulletItem}>• Key name: <Text style={styles.code}>saucebox-storage</Text></Text>
-              <Text style={styles.bulletItem}>• Access it via DevTools → Application → Local Storage → <Text style={styles.code}>http://localhost:8081</Text></Text>
-              <Text style={styles.bulletItem}>• The data is stored as JSON. You can copy it out as a backup or restore it by pasting it back in.</Text>
-              <Text style={styles.bulletItem}>• Your actual video files are stored wherever you set your Download Path in Settings — SauceBox does not move or manage the files themselves.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>saucebox-settings.json</Text> — Stores configuration settings: stealth hotkeys, download speed limits, proxy, vault credentials, and system binary paths.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>saucebox-gallery.json</Text> — Stores your complete video database, custom tags, downloaded history, and playlist definitions.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Windows Path</Text>: <Text style={styles.code}>%APPDATA%\saucebox\</Text></Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Linux Path</Text>: <Text style={styles.code}>~/.config/saucebox/</Text></Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>macOS Path</Text>: <Text style={styles.code}>~/Library/Application Support/saucebox/</Text></Text>
             </View>
           </View>
 
@@ -458,14 +526,13 @@ export default function HelpContent({ activeTab, displayHotkey }) {
               <Text style={styles.cardTitle}>Full Reset</Text>
             </View>
             <Text style={styles.paragraph}>
-              If something is seriously broken and you want to wipe everything and start fresh:
+              If something gets corrupted or you want a fresh start, you can do a complete app reset:
             </Text>
             <View style={styles.bulletList}>
-              <Text style={styles.bulletItem}>• Open DevTools (<Text style={styles.code}>Ctrl + Shift + I</Text>)</Text>
-              <Text style={styles.bulletItem}>• Go to <Text style={styles.highlight}>Application → Local Storage</Text></Text>
-              <Text style={styles.bulletItem}>• Right-click and delete the <Text style={styles.code}>saucebox-storage</Text> key</Text>
-              <Text style={styles.bulletItem}>• Restart the app — it will start with all default settings</Text>
-              <Text style={styles.bulletItem}>• Note: this removes your gallery, queue, and settings but does NOT delete your video files from disk</Text>
+              <Text style={styles.bulletItem}>1. Close the application.</Text>
+              <Text style={styles.bulletItem}>2. Delete both <Text style={styles.code}>saucebox-settings.json</Text> and <Text style={styles.code}>saucebox-gallery.json</Text> from the application data directory listed above.</Text>
+              <Text style={styles.bulletItem}>3. Re-open SauceBox — it will launch instantly in its factory state and generate fresh default databases.</Text>
+              <Text style={styles.bulletItem}>• <Text style={styles.highlight}>Note</Text>: Doing this will reset your configurations and empty your in-app lists, but it will NOT delete your downloaded video files from disk.</Text>
             </View>
           </View>
         </View>
