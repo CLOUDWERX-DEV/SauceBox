@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.6.0] - 2026-05-16
+
+### Added
+- **Playlists System**: Introduced a fully functional, cross-platform Playlists ecosystem. Playlists are natively persisted inside the `saucebox-gallery.json` storage engine. 
+- **Playlists Tab Orchestrator**: Added a new dedicated Playlists tab to the main sidebar. It features a stunning grid-based gallery view showing playlist stats (video count, total duration, total disk size) and custom cover images.
+- **Playlist Editor UI**: Built a premium split-pane UI for playlist management. The left pane provides full search/sort/filter access to the user's gallery library. The right pane serves as the builder, allowing users to rename the playlist, add/remove videos, set custom cover artwork, and natively drag-and-drop tracks to reorder them perfectly.
+- **Video Player Integration**: Upgraded the core `VideoPlayer.js` overlay to fully support Playlist context. When "Play All" is triggered, the player automatically tracks the current `playlistIndex`, displaying "Track X of Y" in the subtitle header.
+- **Playback Navigation**: Added `[⏭ Next]` and `[⏮ Prev]` navigation buttons directly into the VideoPlayer UI.
+- **Auto-Advance Playback**: Implemented HTML5 `onEnded` detection in the VideoPlayer. When a clip or video finishes naturally, SauceBox will automatically load and play the next video in the active playlist.
+- **External Player Support**: Fully wired the Playlists ecosystem to the custom external video player handoff. Hitting "Play All" while using an external player (like VLC) passes the file paths correctly.
+
 ## [1.5.0] - 2026-05-16
 
 ### Added
