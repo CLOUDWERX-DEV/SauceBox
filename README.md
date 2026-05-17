@@ -33,6 +33,7 @@ SauceBox is built from the ground up to handle, archive, and organize adult medi
 *   🔒 **Vault Security & Deep Stealth Mode** — Lock the application interface behind a secure 4-digit PIN screen on startup. Smash the global Stealth Hotkey (`Ctrl + Shift + H`) to instantly hide the app from the taskbar, pause active downloads, and mute audio.
 *   🌐 **"Send to SauceBox" Extension** — Dispatch video URLs directly to your local download queue in one click using the companion Manifest V3 browser extension.
 *   📡 **Media Server & VR Broadcast** — Stream your local gallery to Smart TVs and VR headsets (e.g. Skybox VR) using a built-in Express server, featuring dynamic M3U playlists, cover art injection, and HLS Quick Cast transcoding.
+*   🤖 **Runtime Provisioning Engine** — Zero-configuration setup. SauceBox automatically downloads, manages, and updates the required `yt-dlp` and `ffmpeg` engine binaries for your OS on startup.
 *   ⚙️ **System Configuration & Safeguards** — Limit download speeds to throttle bandwidth usage, configure network proxies to bypass ISP blocks, and prevent storage issues with automated free-space safety monitoring.
 
 ---
@@ -69,26 +70,12 @@ Download the latest native installers for Windows and Linux from our GitHub **Re
 
 ### 💻 Method B: Compiling & Running from Source (For Developers & Enthusiasts)
 
-#### 1. Install System Dependencies
-SauceBox requires both `yt-dlp` and `ffmpeg` to be installed and available in your system's PATH.
+#### 1. Core Engine Dependencies (Automated!)
+SauceBox requires both `yt-dlp` and `ffmpeg` to function. 
 
-*   **Windows:** Run in PowerShell:
-    ```powershell
-    winget install yt-dlp
-    winget install ffmpeg
-    ```
-*   **Linux (Debian/Ubuntu):** Run in terminal:
-    ```bash
-    sudo apt update
-    sudo apt install ffmpeg
-    sudo wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp
-    sudo chmod a+rx /usr/local/bin/yt-dlp
-    ```
-*   **macOS:** Run in terminal (requires Homebrew):
-    ```bash
-    brew install ffmpeg yt-dlp
-    ```
-*(Alternatively, you can place portable binaries in any directory and map their paths under the **Settings > System Binaries** tab inside SauceBox.)*
+🎉 **Zero-Configuration Setup:** As of version 1.7.0, SauceBox features a native **Runtime Provisioning Engine**. On first launch, the app will automatically download, extract, and auto-update the required binaries for your operating system behind the scenes. You do not need to install anything manually!
+
+*(Advanced Users: If you prefer to use your own system-level packages installed via `apt`, `brew`, or `winget`, or if you wish to use custom legacy binaries, you can switch the engine management mode under the **Settings > System Binaries** tab inside SauceBox.)*
 
 #### 2. Get the Source Code
 ```bash
