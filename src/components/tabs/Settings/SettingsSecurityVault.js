@@ -21,28 +21,28 @@ export default function SettingsSecurityVault() {
 
       if (platform === 'win32') {
         const appData = process.env.APPDATA || path.join(home, 'AppData', 'Roaming');
-        const file = path.join(appData, 'SauceBox', 'saucebox-storage.json');
+        const file = path.join(appData, 'saucebox', 'saucebox-storage.json');
         return {
           os: 'Windows',
           file,
           instruction: `Open File Explorer and delete the file:\n${file}`,
-          shortPath: `%APPDATA%\\SauceBox\\saucebox-storage.json`,
+          shortPath: `%APPDATA%\\saucebox\\saucebox-storage.json`,
         };
       } else if (platform === 'darwin') {
-        const file = path.join(home, 'Library', 'Application Support', 'SauceBox', 'saucebox-storage.json');
+        const file = path.join(home, 'Library', 'Application Support', 'saucebox', 'saucebox-storage.json');
         return {
           os: 'macOS',
           file,
           instruction: `Open Finder, press Cmd+Shift+G, paste the path, and delete the file.`,
-          shortPath: `~/Library/Application Support/SauceBox/saucebox-storage.json`,
+          shortPath: `~/Library/Application Support/saucebox/saucebox-storage.json`,
         };
       } else {
-        const file = path.join(home, '.config', 'SauceBox', 'saucebox-storage.json');
+        const file = path.join(home, '.config', 'saucebox', 'saucebox-storage.json');
         return {
           os: 'Linux',
           file,
           instruction: `Open a terminal and run:\nrm "${file}"`,
-          shortPath: `~/.config/SauceBox/saucebox-storage.json`,
+          shortPath: `~/.config/saucebox/saucebox-storage.json`,
         };
       }
     } catch (e) {
@@ -150,7 +150,7 @@ export default function SettingsSecurityVault() {
                   </Text>
                 </View>
                 {process.platform === 'win32' && (
-                  <Text style={styles.resetTip}>💡 Tip: Press Win+R, type %APPDATA%\SauceBox and delete saucebox-storage.json.</Text>
+                  <Text style={styles.resetTip}>💡 Tip: Press Win+R, type %APPDATA%\saucebox and delete saucebox-storage.json.</Text>
                 )}
                 {process.platform === 'darwin' && (
                   <Text style={styles.resetTip}>💡 Tip: In Finder press Cmd+Shift+G and paste the path above.</Text>
