@@ -13,13 +13,32 @@ export default function BroadcastPlaylistBuilder({
   setPreviewVideo, serverRunning, playlistUrl,
   broadcastLogs, clearBroadcastLogs
 }) {
+  const formatDuration = (seconds) => {
+    if (!seconds) return '0m';
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    if (hrs > 0) return `${hrs}h ${mins}m`;
+    return `${mins}m`;
+  };
+
+  const formatSize = (bytes) => {
+    if (!bytes) return '';
+    const gb = bytes / (1024 * 1024 * 1024);
+    const mb = bytes / (1024 * 1024);
+    if (gb >= 1) return `${gb.toFixed(1)} GB`;
+    return `${mb.toFixed(0)} MB`;
+  };
+
+  const totalDuration = playlist.reduce((sum, v) => sum + (v.duration || 0), 0);
+  const totalSize = playlist.reduce((sum, v) => sum + (Number(v.filesize) || 0), 0);
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>▶️ Playlist Builder</Text>
       <Text style={styles.subtitle}>Create a custom .m3u playlist to stream seamlessly</Text>
       
       <View style={styles.playlistContainer}>
-        <View style={styles.playlistColumn}>
+        <View style={styles.playlistColumnLeft}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <Text style={styles.columnTitle}>Available Videos</Text>
             <TextInput 
@@ -54,7 +73,6 @@ export default function BroadcastPlaylistBuilder({
 
           <ScrollView style={styles.videoList}>
             {history
-              .filter(h => !playlist.find(p => p.id === h.id))
               .filter(h => !searchQuery || h.title.toLowerCase().includes(searchQuery.toLowerCase()) || (h.tags && h.tags.join(' ').toLowerCase().includes(searchQuery.toLowerCase())))
               .sort((a, b) => {
                 switch (sortBy) {
@@ -88,17 +106,23 @@ export default function BroadcastPlaylistBuilder({
                     )}
                   </Text>
                 </View>
-                <TouchableOpacity style={styles.addButton} onPress={() => handleAddToPlaylist(item)}>
-                  <Text style={styles.addButtonText}>+ Add</Text>
+                <TouchableOpacity 
+                  style={[styles.addButton, playlist.find(p => p.id === item.id) && styles.addedButton]} 
+                  onPress={() => handleAddToPlaylist(item)}
+                  disabled={playlist.find(p => p.id === item.id)}
+                >
+                  <Text style={[styles.addButtonText, playlist.find(p => p.id === item.id) && styles.addedButtonText]}>
+                    {playlist.find(p => p.id === item.id) ? '✓ Added' : '+ Add'}
+                  </Text>
                 </TouchableOpacity>
               </View>
             ))}
           </ScrollView>
         </View>
         
-        <View style={styles.playlistColumn}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <Text style={styles.columnTitle}>Current Playlist ({playlist.length})</Text>
+        <View style={styles.playlistColumnRight}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={styles.columnTitle}>Current Playlist</Text>
             <View style={{ flexDirection: 'row', gap: 8 }}>
               <TouchableOpacity style={styles.smallButton} onPress={() => document.getElementById('m3u-import').click()}>
                 <Text style={styles.smallButtonText}>📂 Import .m3u</Text>
@@ -109,6 +133,13 @@ export default function BroadcastPlaylistBuilder({
               </TouchableOpacity>
             </View>
           </View>
+          
+          <View style={styles.playlistMetaRow}>
+            <Text style={styles.playlistMetaText}>🎬 {playlist.length} videos</Text>
+            <Text style={styles.playlistMetaText}>⏱️ {formatDuration(totalDuration)}</Text>
+            {totalSize > 0 && <Text style={styles.playlistMetaText}>💾 {formatSize(totalSize)}</Text>}
+          </View>
+          
           <ScrollView style={styles.videoList}>
             {playlist.map((item, index) => (
               <div 
@@ -227,8 +258,22 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 18, fontWeight: '600', color: theme.colors.primary, marginBottom: 16 },
   subtitle: { fontSize: 16, color: theme.colors.textSecondary, fontStyle: 'italic' },
   playlistContainer: { flexDirection: 'row', gap: 24, height: 600, marginTop: 16 },
-  playlistColumn: { flex: 1, backgroundColor: theme.colors.surface, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.border, padding: 16, display: 'flex', flexDirection: 'column' },
+  playlistColumnLeft: { flex: 1, backgroundColor: theme.colors.surface, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.border, padding: 16, display: 'flex', flexDirection: 'column' },
+  playlistColumnRight: { width: 420, backgroundColor: theme.colors.surface, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.border, padding: 16, display: 'flex', flexDirection: 'column' },
   columnTitle: { fontSize: 16, fontWeight: '700', color: theme.colors.text },
+  playlistMetaRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  playlistMetaText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
   sortRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -277,6 +322,8 @@ const styles = StyleSheet.create({
   videoMeta: { color: theme.colors.textSecondary, fontSize: 11 },
   addButton: { backgroundColor: `${theme.colors.primary}20`, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 4, borderWidth: 1, borderColor: theme.colors.primary },
   addButtonText: { color: theme.colors.primary, fontSize: 11, fontWeight: '700' },
+  addedButton: { backgroundColor: 'transparent', borderColor: 'transparent', cursor: 'default' },
+  addedButtonText: { color: theme.colors.primary },
   rowControls: { flexDirection: 'row', gap: 12 },
   controlIcon: { fontSize: 14, cursor: 'pointer' },
   playlistActions: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 16, gap: 12 },
