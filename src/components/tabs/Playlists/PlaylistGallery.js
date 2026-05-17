@@ -201,7 +201,7 @@ export default function PlaylistGallery({ playlists, history, onOpen, onCreate, 
       <ConfirmModal
         visible={!!deleteTarget}
         title="Delete Playlist"
-        message={`Are you sure you want to delete "${deleteTarget?.name || 'Untitled'}"? Your video files will NOT be affected.`}
+        message={`Are you sure you want to delete "${deleteTarget?.name || 'Untitled Playlist'}"? Your video files will NOT be affected.`}
         confirmText="Delete"
         confirmColor={theme.colors.error}
         onConfirm={() => {
