@@ -17,6 +17,7 @@
 - **Drag-and-Drop Parity**: Fully matched the drag-and-drop scale, opacity, border transitions, and dark-tinted highlight visual effects of the PlaylistEditor.
 - **Full-Bleed Spacing Alignment**: Removed the inner padding from the right-hand column container, wrapped the header section in a padded header with a bottom border, and placed bottom buttons inside a toolbar to allow draggable video cards to bleed fully to the edge of the panel container, matching the exact spacing of the PlaylistEditor.
 - **Empty State Alignment**: Aligned the Broadcast current playlist's empty state to use the mailbox emoji (`📬`) and styled placeholder text matching the PlaylistEditor.
+- **Middle Dot Character Alignment**: Replaced all bullet dot characters (`•`) between video duration and resolution/quality in both available and current playlist panels inside the Broadcast tab with the exact thin middle dot character (`·`) used in the PlaylistEditor.
 
 
 ## [1.5.0] - 2026-05-16
