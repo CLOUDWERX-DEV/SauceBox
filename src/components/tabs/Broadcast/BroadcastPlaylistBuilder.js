@@ -226,7 +226,7 @@ export default function BroadcastPlaylistBuilder({
                   <Tooltip content="Move Down">
                     <TouchableOpacity onPress={() => handleMoveDown(index)}><Text style={styles.controlIcon}>⬇️</Text></TouchableOpacity>
                   </Tooltip>
-                  <Tooltip content="Remove from Playlist">
+                  <Tooltip content="Remove">
                     <TouchableOpacity onPress={() => handleRemoveFromPlaylist(item.id)}><Text style={styles.controlIcon}>❌</Text></TouchableOpacity>
                   </Tooltip>
                 </View>
@@ -307,7 +307,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
   },
@@ -317,7 +316,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
   },

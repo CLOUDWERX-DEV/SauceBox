@@ -224,7 +224,7 @@ export default function PlaylistGallery({
               >
                 <View style={{ position: 'relative' }}>
                   <View style={styles.playlistCardActionsTop}>
-                    <Tooltip content="Quick Stream / VR Cast" position="bottom">
+                    <Tooltip content="Quick Cast" position="bottom">
                       <TouchableOpacity 
                         style={styles.folderButtonHistory}
                         onPress={(e) => {
@@ -235,7 +235,7 @@ export default function PlaylistGallery({
                         <Text style={[styles.folderButtonTextHistory, { fontSize: 10, color: theme.colors.primary }]}>📡</Text>
                       </TouchableOpacity>
                     </Tooltip>
-                    <Tooltip content="Delete Playlist" position="bottom">
+                    <Tooltip content="Delete" position="bottom">
                       <TouchableOpacity 
                         style={styles.deleteButton}
                         onPress={(e) => { e.stopPropagation(); setDeleteTarget(playlist); }}

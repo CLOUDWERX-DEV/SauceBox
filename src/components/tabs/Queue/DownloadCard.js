@@ -73,7 +73,7 @@ export default function DownloadCard({
             </View>
             <View style={styles.headerButtons}>
               {download.status === 'completed' && (
-                <Tooltip content="Open Download Folder">
+                <Tooltip content="Open Folder">
                   <TouchableOpacity 
                     style={styles.folderButton}
                     onPress={() => handleOpenFolder(download)}
@@ -82,7 +82,7 @@ export default function DownloadCard({
                   </TouchableOpacity>
                 </Tooltip>
               )}
-              <Tooltip content="Remove from Queue">
+              <Tooltip content="Remove">
                 <TouchableOpacity 
                   style={styles.removeButton}
                   onPress={() => removeDownload(download.id)}

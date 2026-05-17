@@ -502,7 +502,7 @@ export default function PlaylistEditor({
                   <Tooltip content="Move Down">
                     <TouchableOpacity onPress={() => handleMoveDown(index)}><Text style={{ fontSize: 14, cursor: 'pointer' }}>⬇️</Text></TouchableOpacity>
                   </Tooltip>
-                  <Tooltip content="Remove from Playlist">
+                  <Tooltip content="Remove">
                     <TouchableOpacity onPress={() => handleRemoveFromPlaylist(video.id)}><Text style={{ fontSize: 14, cursor: 'pointer' }}>❌</Text></TouchableOpacity>
                   </Tooltip>
                 </View>

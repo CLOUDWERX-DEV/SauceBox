@@ -59,7 +59,7 @@ export default function GalleryCard({
   return (
     <View style={styles.historyCard}>
       <View style={styles.cardActions}>
-        <Tooltip content="Quick Stream / VR Cast" position="bottom">
+        <Tooltip content="Quick Cast" position="bottom">
           <TouchableOpacity 
             style={styles.folderButtonHistory}
             onPress={(e) => {
@@ -70,7 +70,7 @@ export default function GalleryCard({
             <Text style={[styles.folderButtonTextHistory, { fontSize: 10, color: theme.colors.primary }]}>📡</Text>
           </TouchableOpacity>
         </Tooltip>
-        <Tooltip content="Open Download Folder" position="bottom">
+        <Tooltip content="Open Folder" position="bottom">
           <TouchableOpacity 
             style={styles.folderButtonHistory}
             onPress={(e) => {
@@ -81,7 +81,7 @@ export default function GalleryCard({
             <Text style={styles.folderButtonTextHistory}>📁</Text>
           </TouchableOpacity>
         </Tooltip>
-        <Tooltip content="Delete Video" position="bottom">
+        <Tooltip content="Delete" position="bottom">
           <TouchableOpacity 
             style={styles.deleteButton}
             onPress={(e) => {
