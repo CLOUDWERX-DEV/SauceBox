@@ -124,6 +124,10 @@ export default function Sidebar({ activeTab, onTabChange }) {
             <Text style={styles.statLabel}>Total Videos</Text>
             <Text style={styles.statValue}>{history.length}</Text>
           </View>
+          <View style={styles.statRow}>
+            <Text style={styles.statLabel}>Total Playlists</Text>
+            <Text style={styles.statValue}>{useStore.getState().playlists.length}</Text>
+          </View>
         </View>
         <TouchableOpacity 
           style={styles.donateButtonSide}
