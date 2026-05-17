@@ -3,6 +3,29 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 
 const { ipcRenderer } = window.require('electron');
 
+const DEFAULT_SETTINGS = {
+  downloadPath: '',
+  quality: 'best',
+  autoDownload: true,
+  autoStartBroadcast: false,
+  maxConcurrentDownloads: 0,
+  downloadSpeedLimit: 0,
+  autoClearCompleted: false,
+  systemNotifications: true,
+  preferredContainer: 'mp4',
+  proxyString: '',
+  vaultEnabled: false,
+  vaultPin: '0000',
+  stealthHotkey: 'CommandOrControl+Shift+H',
+  stealthPauseDownloads: false,
+  stealthMuteNotifications: true,
+  autoTagDomainUploader: true,
+  minFreeSpaceGB: 5,
+  ytdlpPath: '',
+  ffmpegPath: '',
+  customPlayerPath: ''
+};
+
 export const useStore = create(
   persist(
     (set) => ({
@@ -19,28 +42,9 @@ export const useStore = create(
       setQuickCastVideo: (video) => set({ quickCastVideo: video }),
       activeBuiltinVideo: null,
       setActiveBuiltinVideo: (video) => set({ activeBuiltinVideo: video }),
-      settings: {
-        downloadPath: '',
-        quality: 'best',
-        autoDownload: true,
-        autoStartBroadcast: false,
-        maxConcurrentDownloads: 0,
-        downloadSpeedLimit: 0,
-        autoClearCompleted: false,
-        systemNotifications: true,
-        preferredContainer: 'mp4',
-        proxyString: '',
-        vaultEnabled: false,
-        vaultPin: '0000',
-        stealthHotkey: 'CommandOrControl+Shift+H',
-        stealthPauseDownloads: false,
-        stealthMuteNotifications: true,
-        autoTagDomainUploader: true,
-        minFreeSpaceGB: 5,
-        ytdlpPath: '',
-        ffmpegPath: '',
-        customPlayerPath: ''
-      },
+      settings: DEFAULT_SETTINGS,
+      
+      resetSettings: () => set({ settings: DEFAULT_SETTINGS }),
       
       addDownload: (download) => set((state) => {
         const status = state.settings.autoDownload ? 'queued' : 'pending';

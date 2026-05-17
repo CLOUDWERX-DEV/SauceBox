@@ -9,6 +9,37 @@ export default function SettingsMaintenance() {
   const settings = useStore(state => state.settings);
   const history = useStore(state => state.history);
   const removeFromHistory = useStore(state => state.removeFromHistory);
+  const clearHistory = useStore(state => state.clearHistory);
+  const resetSettings = useStore(state => state.resetSettings);
+
+  const handleBackup = async () => {
+    try {
+      const result = await ipcRenderer?.invoke('backup-state');
+      if (result?.success) {
+        alert(`Backup successful!\nFiles saved safely to:\n${result.backupDir}`);
+      } else if (!result?.canceled) {
+        alert('Backup failed: ' + (result?.error || 'Unknown error'));
+      }
+    } catch (e) {
+      alert('Error during backup: ' + e.message);
+    }
+  };
+
+  const handleClearDatabase = () => {
+    const answer = window.prompt("🚨 DANGER ZONE 🚨\n\nThis will permanently wipe your entire SauceBox Gallery database (history, ratings, tags). Your physical video files on your hard drive will NOT be deleted, but SauceBox will forget everything about them.\n\nTo confirm, type 'NUKE' below:");
+    if (answer === 'NUKE') {
+      clearHistory();
+      alert("Database completely wiped.");
+    }
+  };
+
+  const handleResetSettings = () => {
+    const confirm = window.confirm("Are you sure you want to reset ALL SauceBox settings back to their default values? Your Gallery and video files will NOT be affected.");
+    if (confirm) {
+      resetSettings();
+      alert("All settings have been reset to factory defaults.");
+    }
+  };
 
   const handleFindDuplicates = async () => {
     try {
@@ -104,6 +135,45 @@ export default function SettingsMaintenance() {
             onPress={handleVerifyDatabase}
           >
             <Text style={[styles.saveButtonText, { color: theme.colors.error }]}>Clean Database</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={[styles.switchRow, { marginTop: 24, borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 24 }]}>
+          <View style={styles.switchInfo}>
+            <Text style={styles.switchLabel}>Backup Database & Settings</Text>
+            <Text style={styles.switchDesc}>Create a secure copy of your entire JSON database to an external folder</Text>
+          </View>
+          <TouchableOpacity 
+            style={[styles.saveButton, { backgroundColor: theme.colors.primary }]}
+            onPress={handleBackup}
+          >
+            <Text style={[styles.saveButtonText, { color: '#000' }]}>Backup Data</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={[styles.switchRow, { marginTop: 24, borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 24 }]}>
+          <View style={styles.switchInfo}>
+            <Text style={styles.switchLabel}>Reset Application Settings</Text>
+            <Text style={styles.switchDesc}>Reset all preferences, download paths, and configs back to factory defaults</Text>
+          </View>
+          <TouchableOpacity 
+            style={[styles.saveButton, { backgroundColor: theme.colors.surfaceLight, borderWidth: 1, borderColor: theme.colors.primary }]}
+            onPress={handleResetSettings}
+          >
+            <Text style={[styles.saveButtonText, { color: theme.colors.primary }]}>Reset Settings</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={[styles.switchRow, { marginTop: 24, borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 24 }]}>
+          <View style={styles.switchInfo}>
+            <Text style={styles.switchLabel}>Nuke Gallery Database</Text>
+            <Text style={styles.switchDesc}>Wipe your entire gallery, ratings, and history (keeps physical video files)</Text>
+          </View>
+          <TouchableOpacity 
+            style={[styles.saveButton, { backgroundColor: theme.colors.error }]}
+            onPress={handleClearDatabase}
+          >
+            <Text style={[styles.saveButtonText, { color: '#fff' }]}>Wipe Gallery</Text>
           </TouchableOpacity>
         </View>
       </View>

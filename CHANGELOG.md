@@ -1,8 +1,10 @@
 # Changelog
 
-## [1.3.18] - 2026-05-16
+## [1.4.0] - 2026-05-16
 
 ### Added
+- **Database Backup System**: Added a one-click native "Backup Database & Settings" button in the Settings Maintenance tab. This instantly exports a clean, secure copy of your `saucebox-gallery.json` and `saucebox-settings.json` files to any directory of your choosing using a native system file dialog.
+- **Wipe Database & Reset Options**: Added extreme cleanup options with strict multi-step safeguards ("ARE YOU SURE?" text confirmation prompts). Users can now natively "Nuke Gallery Database" to completely empty their history and ratings without losing the physical media files, or "Reset Application Settings" to completely restore the app to factory defaults.
 - **Split Native File System Storage**: Completely replaced browser `localStorage` with a robust, cross-platform physical file system storage engine. All application state is now natively parsed and split into two beautifully formatted, human-readable JSON files (`saucebox-settings.json` and `saucebox-gallery.json`). They are written directly to the OS application data directory (`~/.config/saucebox/` on Linux, `%APPDATA%\saucebox\` on Windows, `~/Library/Application Support/saucebox/` on Mac). This guarantees data survival across app updates, prevents loss when browser caches are cleared, ensures identical state between development and production (`.deb` / `.AppImage`) builds, and enables easy manual backups or direct setting modifications via a text editor.
 - **Automatic State Migration**: When launching SauceBox after this update, the app will automatically migrate your legacy `saucebox-storage.json` file into the new split files cleanly.
 - **Atomic State Writes**: Implemented atomic write operations for the new filesystem state. Data is first written to a temporary file (`.tmp.json`) and then rapidly renamed to prevent any corruption of the user's gallery or settings in the event of a sudden power loss or app crash during a save operation.

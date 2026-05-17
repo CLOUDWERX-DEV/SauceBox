@@ -1,4 +1,4 @@
-const { ipcMain, app } = require('electron');
+const { ipcMain, app, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -94,6 +94,37 @@ function setupStorageHandlers() {
       return { success: true };
     } catch (e) {
       console.error(`Failed to remove split state:`, e);
+      return { success: false, error: e.message };
+    }
+  });
+
+  ipcMain.handle('backup-state', async (event) => {
+    try {
+      const result = await dialog.showOpenDialog({
+        title: 'Select Backup Folder',
+        properties: ['openDirectory', 'createDirectory']
+      });
+
+      if (result.canceled || result.filePaths.length === 0) {
+        return { success: false, canceled: true };
+      }
+
+      const backupDir = path.join(result.filePaths[0], `SauceBox_Backup_${Date.now()}`);
+      fs.mkdirSync(backupDir, { recursive: true });
+
+      const settingsPath = path.join(userDataPath, 'saucebox-settings.json');
+      const galleryPath = path.join(userDataPath, 'saucebox-gallery.json');
+
+      if (fs.existsSync(settingsPath)) {
+        fs.copyFileSync(settingsPath, path.join(backupDir, 'saucebox-settings.json'));
+      }
+      if (fs.existsSync(galleryPath)) {
+        fs.copyFileSync(galleryPath, path.join(backupDir, 'saucebox-gallery.json'));
+      }
+
+      return { success: true, backupDir };
+    } catch (e) {
+      console.error('Failed to backup state:', e);
       return { success: false, error: e.message };
     }
   });
