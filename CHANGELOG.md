@@ -3,11 +3,13 @@
 ## [1.3.18] - 2026-05-16
 
 ### Added
-- **Native File System Storage**: Completely replaced browser `localStorage` with a robust, cross-platform physical file system storage engine. All application state (Settings, Gallery History, Queues, Tags, Ratings) is now natively written directly to the OS application data directory (`~/.config/SauceBox/` on Linux, `%APPDATA%\SauceBox\` on Windows, `~/Library/Application Support/SauceBox/` on Mac). This guarantees data survival across app updates, prevents loss when browser caches are cleared, ensures identical state between development and production (`.deb` / `.AppImage`) builds, and enables easy manual backups by simply copying the `saucebox-storage.json` file.
+- **Split Native File System Storage**: Completely replaced browser `localStorage` with a robust, cross-platform physical file system storage engine. All application state is now natively parsed and split into two beautifully formatted, human-readable JSON files (`saucebox-settings.json` and `saucebox-gallery.json`). They are written directly to the OS application data directory (`~/.config/saucebox/` on Linux, `%APPDATA%\saucebox\` on Windows, `~/Library/Application Support/saucebox/` on Mac). This guarantees data survival across app updates, prevents loss when browser caches are cleared, ensures identical state between development and production (`.deb` / `.AppImage`) builds, and enables easy manual backups or direct setting modifications via a text editor.
+- **Automatic State Migration**: When launching SauceBox after this update, the app will automatically migrate your legacy `saucebox-storage.json` file into the new split files cleanly.
 - **Atomic State Writes**: Implemented atomic write operations for the new filesystem state. Data is first written to a temporary file (`.tmp.json`) and then rapidly renamed to prevent any corruption of the user's gallery or settings in the event of a sudden power loss or app crash during a save operation.
 
 ### Changed
 - **Zustand Storage Adapter**: Refactored `src/store.js` to utilize a custom asynchronous `createJSONStorage` adapter that natively invokes the newly built `load-state`, `save-state`, and `remove-state` IPC handlers in `electron/modules/storage.js`.
+- **Vault PIN Reset Instructions**: Updated the PIN reset guide in the Settings tab to point directly to `saucebox-settings.json`, explicitly warning the user NOT to delete `saucebox-gallery.json` to prevent catastrophic data loss.
 ## [1.3.17] - 2026-05-16
 
 ### Changed

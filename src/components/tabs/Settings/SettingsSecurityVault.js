@@ -21,28 +21,25 @@ export default function SettingsSecurityVault() {
 
       if (platform === 'win32') {
         const appData = process.env.APPDATA || path.join(home, 'AppData', 'Roaming');
-        const file = path.join(appData, 'saucebox', 'saucebox-storage.json');
+        const file = path.join(appData, 'saucebox', 'saucebox-settings.json');
         return {
           os: 'Windows',
           file,
-          instruction: `Open File Explorer and delete the file:\n${file}`,
-          shortPath: `%APPDATA%\\saucebox\\saucebox-storage.json`,
+          shortPath: `%APPDATA%\\saucebox\\saucebox-settings.json`,
         };
       } else if (platform === 'darwin') {
-        const file = path.join(home, 'Library', 'Application Support', 'saucebox', 'saucebox-storage.json');
+        const file = path.join(home, 'Library', 'Application Support', 'saucebox', 'saucebox-settings.json');
         return {
           os: 'macOS',
           file,
-          instruction: `Open Finder, press Cmd+Shift+G, paste the path, and delete the file.`,
-          shortPath: `~/Library/Application Support/saucebox/saucebox-storage.json`,
+          shortPath: `~/Library/Application Support/saucebox/saucebox-settings.json`,
         };
       } else {
-        const file = path.join(home, '.config', 'saucebox', 'saucebox-storage.json');
+        const file = path.join(home, '.config', 'saucebox', 'saucebox-settings.json');
         return {
           os: 'Linux',
           file,
-          instruction: `Open a terminal and run:\nrm "${file}"`,
-          shortPath: `~/.config/saucebox/saucebox-storage.json`,
+          shortPath: `~/.config/saucebox/saucebox-settings.json`,
         };
       }
     } catch (e) {
@@ -142,15 +139,18 @@ export default function SettingsSecurityVault() {
               <View style={styles.resetInfoBox}>
                 <Text style={styles.resetInfoTitle}>🔑 Forgot your PIN?</Text>
                 <Text style={styles.resetInfoText}>
-                  Close SauceBox, then delete the state file below. This resets ALL app data (gallery, settings, PIN).
+                  Close SauceBox, then open the settings file below in any text editor to change your PIN manually, or delete the file entirely to reset all settings.
                 </Text>
                 <View style={styles.resetPathBox}>
                   <Text style={styles.resetPathText}>
                     {pinResetInfo.shortPath}
                   </Text>
                 </View>
+                <Text style={[styles.resetInfoText, { color: theme.colors.error, marginTop: 8, fontWeight: '600' }]}>
+                  ⚠️ WARNING: Do NOT delete "saucebox-gallery.json" or you will lose your entire video library!
+                </Text>
                 {process.platform === 'win32' && (
-                  <Text style={styles.resetTip}>💡 Tip: Press Win+R, type %APPDATA%\saucebox and delete saucebox-storage.json.</Text>
+                  <Text style={styles.resetTip}>💡 Tip: Press Win+R, type %APPDATA%\saucebox and open saucebox-settings.json.</Text>
                 )}
                 {process.platform === 'darwin' && (
                   <Text style={styles.resetTip}>💡 Tip: In Finder press Cmd+Shift+G and paste the path above.</Text>
@@ -159,7 +159,7 @@ export default function SettingsSecurityVault() {
                   <Text style={styles.resetTip}>
                     {'💡 Tip: Run in terminal — '}
                     <Text style={{ fontFamily: 'monospace', color: theme.colors.primary }}>
-                      {`rm "${pinResetInfo.file}"`}
+                      {`nano "${pinResetInfo.file}"`}
                     </Text>
                   </Text>
                 )}
