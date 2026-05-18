@@ -32,6 +32,7 @@ export default function VideoThumbnail({ uri, style }) {
         </View>
       ) : (
         <Image
+          key={uri}
           source={{ uri }}
           style={[styles.fill, style]}
           resizeMode="cover"

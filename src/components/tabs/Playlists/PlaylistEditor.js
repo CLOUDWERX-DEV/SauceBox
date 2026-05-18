@@ -466,7 +466,11 @@ export default function PlaylistEditor({
         <View style={styles.editorRight}>
           <View style={styles.panelHeader}>
             <TouchableOpacity onPress={() => setCoverModalVisible(true)} style={{ width: '100%', height: 140, backgroundColor: theme.colors.surfaceLight, borderRadius: 8, overflow: 'hidden', marginBottom: 12, position: 'relative' }}>
-              <VideoThumbnail uri={draftPlaylist.coverImage || (playlistItems[0] && playlistItems[0].thumbnail) || null} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
+              <VideoThumbnail 
+                key={`cover-${draftPlaylist.coverImage || (playlistItems[0] && playlistItems[0].thumbnail) || 'empty'}`}
+                uri={draftPlaylist.coverImage || (playlistItems[0] && playlistItems[0].thumbnail) || null} 
+                style={{ width: '100%', height: '100%', resizeMode: 'cover' }} 
+              />
               <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.6)', padding: 6 }}>
                 <Text style={{ color: '#fff', fontSize: 11, textAlign: 'center', fontWeight: 'bold' }}>🖼️ Click to Change Cover Art</Text>
               </View>
