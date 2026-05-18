@@ -16,6 +16,10 @@ const FALLBACK_URI = logoSrc;
 export default function VideoThumbnail({ uri, style }) {
   const [useFallback, setUseFallback] = useState(!uri);
 
+  React.useEffect(() => {
+    setUseFallback(!uri);
+  }, [uri]);
+
   return (
     <View style={[styles.wrapper, style]}>
       {useFallback ? (

@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.7.4] - 2026-05-18
+
+### Fixed
+- **Resolved Playlist Cover Art Preview Bug (`VideoThumbnail.js`)**: Fixed a lifecycle bug where the cover art preview image failed to live-update when selecting a new custom cover while drafting a new, unsaved playlist. The `VideoThumbnail` component now dynamically tracks changes to the `uri` prop and correctly resets its fallback state, ensuring real-time UI updates during the playlist creation flow.
+
 ## [1.7.3] - 2026-05-17
 
 ### Security
