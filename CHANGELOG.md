@@ -385,3 +385,4 @@
 ## [1.0.0] - 2026-05-12
 ### Initial Release
 - Initial stable release of SauceBox Media Manager.
+
