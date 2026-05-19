@@ -2,6 +2,9 @@
 
 ## [1.7.5] - 2026-05-18
 
+### Documentation
+- **Overhauled Development Guidelines (`CONTRIBUTING.md`)**: Completely restructured the developer contributing guide to feature a highly detailed system architecture blueprint, IPC bridge explanations, atomic storage documentation, and strict modularity constraints. Enforced the absolute ban on subjective adjectives to ensure a professional, open-source-ready engineering manual.
+
 ### Fixed
 - **Resolved Playlist Cover Art Bug on Unsaved Playlists (`PlaylistEditor.js`, `VideoThumbnail.js`)**: Fixed a visual bug where selecting a new custom cover or video thumbnail during the creation of a new, unsaved playlist failed to instantly update the main cover art preview. Added explicit React `key` props tied to the `uri` to force the `<Image>` component inside `<VideoThumbnail>` to reliably unmount and remount when source strings change.
 
