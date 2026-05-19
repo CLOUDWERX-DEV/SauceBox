@@ -1,7 +1,6 @@
 node_modules/
 dist/
 dist-bin/
-CONTRIBUTING.md
 release.sh
 docs/
 build/
