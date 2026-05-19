@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.7.5] - 2026-05-19
+## [1.7.6] - 2026-05-19
 
 ### Fixed
 - **Resolved Local Media Block Issue (`electron/main.js`, `VideoPlayer.js`)**: Addressed a critical bug where Chromium's strict Cross-Origin Read Blocking (CORB) prevented the internal video player and playlist cover art from rendering local video files when `webSecurity` was enabled. Registered a privileged, custom `sauce-media://` protocol in the main Electron process to safely pipe native disk resources to the isolated renderer. Refactored `VideoPlayer.js` and `PlaylistEditor.js` to utilize URL encoded paths wrapped in this custom scheme, eliminating the "Unable to load video file" error for all downloaded and imported media.
@@ -8,6 +8,11 @@
 
 ### Documentation
 - **Overhauled Development Guidelines (`CONTRIBUTING.md`)**: Completely restructured the developer contributing guide to feature a highly detailed system architecture blueprint, IPC bridge explanations, atomic storage documentation, and strict modularity constraints. Enforced the absolute ban on subjective adjectives to ensure a professional, open-source-ready engineering manual.
+
+## [1.7.5] - 2026-05-19
+
+### Core
+- Pre-release GitHub API caching conflict and artifact synchronization iteration.
 
 ## [1.7.4] - 2026-05-18
 
