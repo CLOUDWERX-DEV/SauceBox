@@ -39,7 +39,7 @@ export default function PlaylistEditor({
     if (!saucebox) return;
     const filePath = await saucebox.invoke('select-file', 'Select Custom Cover Image');
     if (filePath) {
-      updateDraft({ coverImage: `file://${filePath}` });
+      updateDraft({ coverImage: `sauce-media://media/?path=${encodeURIComponent(filePath)}` });
     }
   };
 

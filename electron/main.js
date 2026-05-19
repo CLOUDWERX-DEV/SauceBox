@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut, session, nativeImage } = require('electron');
+const { app, BrowserWindow, globalShortcut, session, nativeImage, protocol } = require('electron');
 const path = require('path');
 const state = require('./state');
 
@@ -12,6 +12,10 @@ const { setupMetadataHandlers } = require('./modules/metadata');
 const { setupFfmpegHandlers } = require('./modules/ffmpegProcessing');
 const { setupStorageHandlers } = require('./modules/storage');
 const { setupProvisioningHandlers } = require('./modules/provisioning');
+
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'sauce-media', privileges: { secure: true, standard: true, supportFetchAPI: true, bypassCSP: true, stream: true } }
+]);
 
 function createWindow() {
   const isLinux = process.platform === 'linux';
@@ -52,6 +56,20 @@ function createWindow() {
 
 if (app) {
   app.whenReady().then(() => {
+    protocol.registerFileProtocol('sauce-media', (request, callback) => {
+      try {
+        const urlObj = new URL(request.url);
+        const filePath = urlObj.searchParams.get('path');
+        if (filePath) {
+          callback({ path: filePath });
+        } else {
+          callback({ error: -6 });
+        }
+      } catch (e) {
+        console.error('sauce-media protocol error:', e);
+      }
+    });
+
     createWindow();
 
     // On Linux, app.setIcon() is required to show the icon in the taskbar.

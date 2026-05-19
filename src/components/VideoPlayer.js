@@ -69,8 +69,8 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
       setLoading(true);
       setError(null);
       if (videoRef.current) {
-        const safePath = videoPath.split('/').map(encodeURIComponent).join('/');
-        videoRef.current.src = `file://${safePath}`;
+        const safePath = encodeURIComponent(videoPath);
+        videoRef.current.src = `sauce-media://media/?path=${safePath}`;
         videoRef.current.load();
       }
     }
@@ -124,8 +124,8 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
       setLoading(true);
       setError(null);
       setTrimMode(false);
-      const safePath = nextVideo.path.split('/').map(encodeURIComponent).join('/');
-      videoRef.current.src = `file://${safePath}`;
+      const safePath = encodeURIComponent(nextVideo.path);
+      videoRef.current.src = `sauce-media://media/?path=${safePath}`;
       videoRef.current.load();
     }
   };
@@ -458,7 +458,7 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
                 </View>
               ) : (() => {
                 const safeSrc = videoPath
-                  ? videoPath.split('/').map(encodeURIComponent).join('/')
+                  ? encodeURIComponent(videoPath)
                   : '';
                 return (
                   <video
@@ -469,9 +469,9 @@ export default function VideoPlayer({ visible, videoPath, videoTitle, originalIt
                     onError={handleError}
                     onEnded={handleVideoEnded}
                   >
-                    <source src={`file://${safeSrc}`} type="video/mp4" />
-                    <source src={`file://${safeSrc}`} type="video/webm" />
-                    <source src={`file://${safeSrc}`} type="video/ogg" />
+                    <source src={`sauce-media://media/?path=${safeSrc}`} type="video/mp4" />
+                    <source src={`sauce-media://media/?path=${safeSrc}`} type="video/webm" />
+                    <source src={`sauce-media://media/?path=${safeSrc}`} type="video/ogg" />
                     Your browser does not support the video tag.
                   </video>
                 );
