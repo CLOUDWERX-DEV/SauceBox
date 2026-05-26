@@ -57,9 +57,20 @@ function setupFfmpegHandlers() {
         outputPath
       ]);
 
+      let completed = false;
+
+      ffmpeg.on('error', (err) => {
+        console.error('ffmpeg thumbnail spawn error:', err);
+        if (completed) return;
+        completed = true;
+        resolve(null);
+      });
+
       ffmpeg.on('close', (code) => {
+        if (completed) return;
         if (code === 0 && fs.existsSync(outputPath)) {
-          resolve(`file://${outputPath}`);
+          completed = true;
+          resolve(`sauce-media://media/?path=${encodeURIComponent(outputPath)}`);
         } else {
           const ffmpegFallback = spawn(state.ffmpegPath, [
             '-ss', '00:00:01',
@@ -69,11 +80,21 @@ function setupFfmpegHandlers() {
             '-y',
             outputPath
           ]);
+
+          ffmpegFallback.on('error', (fallbackErr) => {
+            console.error('ffmpeg fallback thumbnail spawn error:', fallbackErr);
+            if (completed) return;
+            completed = true;
+            resolve(null);
+          });
+
           ffmpegFallback.on('close', (codeFallback) => {
+            if (completed) return;
+            completed = true;
             if (codeFallback === 0 && fs.existsSync(outputPath)) {
-               resolve(`file://${outputPath}`);
+              resolve(`sauce-media://media/?path=${encodeURIComponent(outputPath)}`);
             } else {
-               resolve(null);
+              resolve(null);
             }
           });
         }

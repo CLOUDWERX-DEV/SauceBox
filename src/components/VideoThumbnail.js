@@ -13,12 +13,27 @@ const FALLBACK_URI = logoSrc;
  * Falls back to the SauceBox logo (centered, padded) if no thumbnail URI
  * is provided or if the image fails to load, so cards never break.
  */
+export function resolveMediaUri(uri) {
+  if (!uri || typeof uri !== 'string') return uri;
+  if (uri.startsWith('sauce-media://')) return uri;
+  if (uri.startsWith('http://') || uri.startsWith('https://') || uri.startsWith('data:')) {
+    return uri;
+  }
+  let localPath = uri;
+  if (uri.startsWith('file://')) {
+    localPath = uri.substring(7);
+  }
+  return `sauce-media://media/?path=${encodeURIComponent(localPath)}`;
+}
+
 export default function VideoThumbnail({ uri, style }) {
   const [useFallback, setUseFallback] = useState(!uri);
 
   React.useEffect(() => {
     setUseFallback(!uri);
   }, [uri]);
+
+  const resolvedUri = React.useMemo(() => resolveMediaUri(uri), [uri]);
 
   return (
     <View style={[styles.wrapper, style]}>
@@ -32,8 +47,8 @@ export default function VideoThumbnail({ uri, style }) {
         </View>
       ) : (
         <Image
-          key={uri}
-          source={{ uri }}
+          key={resolvedUri}
+          source={{ uri: resolvedUri }}
           style={[styles.fill, style]}
           resizeMode="cover"
           onError={() => setUseFallback(true)}

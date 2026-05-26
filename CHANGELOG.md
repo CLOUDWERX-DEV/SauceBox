@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.7.7] - 2026-05-26
+
+### Fixed
+- **Resolved Local Folder Import Thumbnail Block (`VideoThumbnail.js`, `ffmpegProcessing.js`)**: Addressed a critical bug where imported local video files failed to show cover art or screenshots in the gallery. Spawning thumbnail extraction now resolves paths wrapped in the privileged `sauce-media://` protocol instead of `file://`, bypassing Chromium's strict local resource load blocking. Configured comprehensive exception-safe error handlers for child process spawns to prevent promise failures during thumbnail processing.
+
 ## [1.7.6] - 2026-05-19
 
 ### Fixed
