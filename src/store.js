@@ -175,6 +175,15 @@ export const useStore = create(
     }),
     {
       name: 'saucebox-storage',
+      // Only persist data that should survive app restarts.
+      // downloads is intentionally excluded — it is session-only.
+      // Persisting queued/paused downloads caused them to be re-downloaded on
+      // every app restart, resulting in duplicate gallery entries.
+      partialize: (state) => ({
+        history:   state.history,
+        playlists: state.playlists,
+        settings:  state.settings,
+      }),
       storage: createJSONStorage(() => ({
         getItem: async (name) => {
           return await getSaucebox().invoke('load-state', name);
