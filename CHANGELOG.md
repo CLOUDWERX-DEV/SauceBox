@@ -12,6 +12,7 @@
 ### Fixed
 - **Resolved Download Regression (`src/store.js`)**: Eliminated a module-load timing race introduced by the Docker web shim. The previous implementation captured `window.saucebox` at module initialization time, before the Electron `contextBridge` had injected it into the renderer. Replaced with a `getSaucebox()` lazy accessor that reads `window.saucebox` at call-time, guaranteeing the IPC bridge is always used in Electron while the HTTP shim remains functional for headless Docker deployments.
 - **Download Failure Reason Visibility (`DownloadCard.js`, `App.js`)**: Failed downloads with a specific error cause (e.g., disk space guard) now display the exact reason beneath the failed status indicator in the queue card. The OS system notification for failed downloads also includes the reason string when one is available.
+- **Duplicate Gallery Entries on Download (`App.js`, `DownloadTab.js`)**: Resolved a bug where completing a download could create two gallery entries. Three-layer fix: (1) added a `processingIdsRef` Set to the queue manager so the same download ID is never started by concurrent effect firings; (2) added in-queue URL deduplication to `handleDownload`, `queueDownload`, `handleBatchDownload`, and the external Chrome extension handler so the same URL cannot be queued more than once while active; (3) added a 10-second URL guard before `addToHistory` so a double-completion event cannot create two history entries.
 
 ## [1.7.7] - 2026-05-26
 

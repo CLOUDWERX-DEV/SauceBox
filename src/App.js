@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import TitleBar from './components/TitleBar';
 import Sidebar from './components/Sidebar';
@@ -89,6 +89,12 @@ export default function App() {
     if (saucebox) {
       const externalAddHandler = async (url) => {
         const store = useStore.getState();
+
+        // Prevent queueing a URL that is already active in the queue
+        const alreadyQueued = store.downloads.find(
+          d => d.url === url && !['completed', 'failed'].includes(d.status)
+        );
+        if (alreadyQueued) return;
         
         // Check for duplicates in history
         const existingDownload = store.history.find(h => h.url === url);
@@ -179,6 +185,13 @@ export default function App() {
           };
 
           if (data.status === 'completed') {
+            // Guard against double-completion events (HMR reloads, effect re-registration)
+            const tenSecondsAgo = Date.now() - 10000;
+            const alreadyInHistory = store.history.find(
+              h => h.url === download.url && h.timestamp > tenSecondsAgo
+            );
+            if (alreadyInHistory) return;
+
             const currentSettings = store.settings;
             try {
               const videoPath = await saucebox?.invoke('get-video-path', {
@@ -291,10 +304,16 @@ export default function App() {
     }
   }, []);
 
+  // Tracks download IDs actively being processed to prevent double-starts when the
+  // effect fires multiple times before the async download-video call completes.
+  const processingIdsRef = useRef(new Set());
+
   // Queue Manager
   useEffect(() => {
     const activeDownloads = downloads.filter(d => d.status === 'downloading').length;
-    const queuedDownloads = downloads.filter(d => d.status === 'queued');
+    const queuedDownloads = downloads.filter(
+      d => d.status === 'queued' && !processingIdsRef.current.has(d.id)
+    );
     
     const max = maxConcurrentDownloads || 0;
     
@@ -303,7 +322,8 @@ export default function App() {
     if (availableSlots > 0 && queuedDownloads.length > 0) {
       const toStart = queuedDownloads.slice(0, availableSlots);
       toStart.forEach(async d => {
-        // Set to starting/downloading immediately to prevent double-starts
+        // Mark as in-flight immediately so concurrent effect runs skip this ID
+        processingIdsRef.current.add(d.id);
         updateDownload(d.id, { status: 'downloading', isRetry: false });
         
         try {
@@ -339,7 +359,7 @@ export default function App() {
                 if (currentSettings.systemNotifications && window.Notification) {
                   new Notification('Download Stopped', { body: `Disk space is critically low. (${currentSettings.minFreeSpaceGB}GB minimum)` });
                 }
-                return; // Stop here, don't download
+                return;
               }
             } catch (e) {
               console.warn('Could not check disk space', e);
@@ -359,6 +379,8 @@ export default function App() {
         } catch (err) {
           console.error(err);
           updateDownload(d.id, { status: 'failed' });
+        } finally {
+          processingIdsRef.current.delete(d.id);
         }
       });
     }

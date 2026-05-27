@@ -113,6 +113,15 @@ export default function DownloadTab({ onNavigate }) {
   const queueDownload = async (urlToDownload) => {
     setLoading(true);
     try {
+      // Check if URL is already actively queued
+      const alreadyQueued = useStore.getState().downloads.find(
+        d => d.url === urlToDownload && !['completed', 'failed'].includes(d.status)
+      );
+      if (alreadyQueued) {
+        alert('This video is already in the download queue.');
+        return;
+      }
+
       const existingDownload = useStore.getState().history.find(h => h.url === urlToDownload);
       if (existingDownload) {
         const confirmDownload = await requestDuplicateConfirm(existingDownload);
@@ -166,6 +175,15 @@ export default function DownloadTab({ onNavigate }) {
         setPlaylistModalVisible(true);
         setLoading(false);
         setLoadingMsg('');
+        return;
+      }
+
+      // Check if URL is already actively queued
+      const alreadyQueued = useStore.getState().downloads.find(
+        d => d.url === url.trim() && !['completed', 'failed'].includes(d.status)
+      );
+      if (alreadyQueued) {
+        alert('This video is already in the download queue.');
         return;
       }
 
@@ -250,6 +268,11 @@ export default function DownloadTab({ onNavigate }) {
   const handleBatchDownload = async (urls) => {
     for (const batchUrl of urls) {
       try {
+        // Skip URLs already actively queued
+        const alreadyQueued = useStore.getState().downloads.find(
+          d => d.url === batchUrl && !['completed', 'failed'].includes(d.status)
+        );
+        if (alreadyQueued) continue;
         const info = await saucebox?.invoke('get-video-info', batchUrl);
 
         const settingsQualityHeight = settings.quality !== 'best'
