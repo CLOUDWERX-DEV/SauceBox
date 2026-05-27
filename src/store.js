@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-let saucebox = window.saucebox;
-
-if (!saucebox) {
+// Lazy accessor — always reads window.saucebox at call-time so the Electron
+// contextBridge is never missed due to module-load timing.
+// Falls back to an HTTP shim only when running headless (Docker/web mode).
+const webShim = (() => {
   const listenerMap = new Map();
   let eventSource = null;
-
-  saucebox = {
+  return {
     platform: 'web',
     invoke: async (channel, ...args) => {
       const res = await fetch('/api/invoke', {
@@ -48,8 +48,9 @@ if (!saucebox) {
       }
     }
   };
-  window.saucebox = saucebox;
-}
+})();
+
+const getSaucebox = () => window.saucebox || webShim;
 
 const DEFAULT_SETTINGS = {
   downloadPath: '',
@@ -176,13 +177,13 @@ export const useStore = create(
       name: 'saucebox-storage',
       storage: createJSONStorage(() => ({
         getItem: async (name) => {
-          return await saucebox.invoke('load-state', name);
+          return await getSaucebox().invoke('load-state', name);
         },
         setItem: async (name, value) => {
-          await saucebox.invoke('save-state', { name, value });
+          await getSaucebox().invoke('save-state', { name, value });
         },
         removeItem: async (name) => {
-          await saucebox.invoke('remove-state', name);
+          await getSaucebox().invoke('remove-state', name);
         }
       }))
     }

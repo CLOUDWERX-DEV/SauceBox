@@ -227,8 +227,10 @@ export default function App() {
             }
           } else if (data.status === 'failed') {
             if (canNotify() && window.Notification) {
+              const currentDownload = store.downloads.find(d => d.id === data.id);
+              const reason = currentDownload?.error ? ` — ${currentDownload.error}` : '';
               new Notification('Download Failed', {
-                body: `${download.title} failed to download.`,
+                body: `${download.title} failed to download${reason}.`,
                 icon: logoSrc
               });
             }

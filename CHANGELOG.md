@@ -9,6 +9,10 @@
 - **Automated Docker Release Orchestrator**: Developed `docker_release.sh`, a cross-compilation pipeline utilizing Docker Buildx to generate, tag, and publish multi-architecture release images straight to Docker Hub.
 - **Debian Native Auto-Provisioning**: Swapped the core image from Alpine to Debian Slim (`node:20-slim`) and injected `python3`. This ensures the exact same zero-configuration runtime provisioning engine used by the desktop app operates identically within the container, preserving the native "Update yt-dlp" UI action and keeping updates crash-immune.
 
+### Fixed
+- **Resolved Download Regression (`src/store.js`)**: Eliminated a module-load timing race introduced by the Docker web shim. The previous implementation captured `window.saucebox` at module initialization time, before the Electron `contextBridge` had injected it into the renderer. Replaced with a `getSaucebox()` lazy accessor that reads `window.saucebox` at call-time, guaranteeing the IPC bridge is always used in Electron while the HTTP shim remains functional for headless Docker deployments.
+- **Download Failure Reason Visibility (`DownloadCard.js`, `App.js`)**: Failed downloads with a specific error cause (e.g., disk space guard) now display the exact reason beneath the failed status indicator in the queue card. The OS system notification for failed downloads also includes the reason string when one is available.
+
 ## [1.7.7] - 2026-05-26
 
 ### Fixed

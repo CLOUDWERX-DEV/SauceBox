@@ -174,6 +174,11 @@ export default function DownloadCard({
               <Text style={[styles.statusText, { color: getStatusColor(download.status) }]}>
                 {getStatusIcon(download.status)} {download.status}
               </Text>
+              {download.status === 'failed' && download.error && (
+                <Text style={{ fontSize: 11, color: theme.colors.error, opacity: 0.8, marginTop: 3, fontStyle: 'italic' }}>
+                  {download.error}
+                </Text>
+              )}
               {download.status === 'downloading' && download.speed && (
                 <View style={styles.statsContainer}>
                   <Text style={styles.speedText}>⚡ {download.speed}</Text>
