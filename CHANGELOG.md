@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.7.8] - 2026-05-27
+
+### Added
+- **Headless Docker Architecture**: Fully integrated native headless Docker support. SauceBox can now be deployed as a headless web application on NAS devices, Raspberry Pis, and home servers (`linux/amd64` and `linux/arm64`). Created a robust `server.js` Express backend that effortlessly overrides and mocks Electron native APIs to provide identical functionality directly through standard web browsers via a custom HTTP/SSE polyfill.
+- **Chrome Extension Options Page**: Added a native options page to the SauceBox Companion extension. Users can now securely override the default `127.0.0.1` target and map the extension to send payload directly to a networked Docker instance.
+- **Dynamic M3U Broadcasting Integration**: Rewrote the `mediaServer` M3U generator to natively respect `SAUCEBOX_HOST_IP` and `SAUCEBOX_HOST_PORT` environment variables. This correctly bridges internal Docker ports with external host mappings, ensuring Smart TVs and VR headsets seamlessly decode the stream.
+- **Automated Docker Release Orchestrator**: Developed `docker_release.sh`, a cross-compilation pipeline utilizing Docker Buildx to generate, tag, and publish multi-architecture release images straight to Docker Hub.
+- **Debian Native Auto-Provisioning**: Swapped the core image from Alpine to Debian Slim (`node:20-slim`) and injected `python3`. This ensures the exact same zero-configuration runtime provisioning engine used by the desktop app operates identically within the container, preserving the native "Update yt-dlp" UI action and keeping updates crash-immune.
+
 ## [1.7.7] - 2026-05-26
 
 ### Fixed

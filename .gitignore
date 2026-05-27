@@ -2,7 +2,8 @@ node_modules/
 dist/
 dist-bin/
 release.sh
-docs/
+docs/*
+!docs/DOCKER_DEPLOYMENT.md
 build/
 !build/icons/
 !build/icon.ico

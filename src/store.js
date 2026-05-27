@@ -1,7 +1,55 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-const saucebox = window.saucebox;
+let saucebox = window.saucebox;
+
+if (!saucebox) {
+  const listenerMap = new Map();
+  let eventSource = null;
+
+  saucebox = {
+    platform: 'web',
+    invoke: async (channel, ...args) => {
+      const res = await fetch('/api/invoke', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ channel, args })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'API Error');
+      return data.result;
+    },
+    send: (channel, ...args) => {
+      fetch('/api/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ channel, args })
+      }).catch(console.error);
+    },
+    on: (channel, listener) => {
+      if (!eventSource) {
+        eventSource = new EventSource('/api/events');
+        eventSource.onmessage = (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            const listeners = listenerMap.get(data.channel) || [];
+            listeners.forEach(fn => fn({}, ...(data.args || [])));
+          } catch (err) {
+            console.error('Failed to parse SSE data', err);
+          }
+        };
+      }
+      if (!listenerMap.has(channel)) listenerMap.set(channel, []);
+      listenerMap.get(channel).push(listener);
+    },
+    removeListener: (channel, listener) => {
+      if (listenerMap.has(channel)) {
+        listenerMap.set(channel, listenerMap.get(channel).filter(fn => fn !== listener));
+      }
+    }
+  };
+  window.saucebox = saucebox;
+}
 
 const DEFAULT_SETTINGS = {
   downloadPath: '',

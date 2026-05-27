@@ -85,6 +85,27 @@ npm install
 npm run dev
 ```
 
+### 🐳 Method C: Deploy via Docker (For Servers & NAS)
+
+SauceBox can be run headlessly via Docker, providing a full Web UI perfect for home servers and Raspberry Pis (`linux/amd64` and `linux/arm64` supported).
+
+The Docker image uses a Debian base, meaning the **Zero-Configuration Runtime Provisioning Engine** and the **in-app yt-dlp Updater** work exactly the same as the desktop version!
+
+Run with Docker Compose:
+```yaml
+services:
+  saucebox:
+    image: cloudwerxlabs/saucebox:latest
+    container_name: saucebox
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./saucebox_data:/data
+```
+
+For full details on configuring the headless Web UI and persistent storage, see the [Docker Deployment Guide](docs/DOCKER_DEPLOYMENT.md).
+
 ---
 
 ## 🧩 Installing the Browser Companion Extension
@@ -119,7 +140,13 @@ Right-click anywhere on a video page, or right-click a video link directly in th
 **Option B: Click the toolbar icon**
 While viewing any page you want to download, click the SauceBox icon in your browser toolbar. It will automatically grab the current page's URL and send it straight to the queue. No copying and pasting required.
 
-> **Note:** SauceBox must be open and running on your machine for the extension to work. If the app is closed, the extension will log a connection error to the browser console.
+### Step 4: Configure for Docker (Optional)
+If you are running SauceBox headlessly in a Docker container (like on a NAS or Raspberry Pi), you need to tell the extension where to find it.
+1. Right-click the SauceBox icon in your browser toolbar and click **Options**.
+2. Change the Server URL from the default `http://127.0.0.1:13337` to your Docker server's IP (e.g., `http://192.168.1.100:8080`).
+3. Click Save.
+
+> **Note:** SauceBox must be running (either the desktop app or the Docker container) for the extension to work. If the app is closed, the extension will log a connection error to the browser console.
 
 ## 🤝 Contributing & Developer Guidelines
 

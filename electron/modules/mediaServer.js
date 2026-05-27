@@ -12,6 +12,9 @@ let mediaServerApp = null;
 let mediaServerInstance = null;
 
 function getLocalIp() {
+  if (process.env.SAUCEBOX_HOST_IP) {
+    return process.env.SAUCEBOX_HOST_IP;
+  }
   const interfaces = os.networkInterfaces();
   for (const devName in interfaces) {
     const iface = interfaces[devName];
@@ -37,13 +40,16 @@ function setupMediaServerHandlers() {
     let m3u = '#EXTM3U\n';
     m3u += `#PLAYLIST:${serverName || 'SauceBox Media Server'}\n`;
 
+    const externalIp = process.env.SAUCEBOX_HOST_IP || localIp;
+    const externalPort = process.env.SAUCEBOX_HOST_PORT || port;
+
     for (const item of playlist) {
       const tagLine = item.tags && item.tags.length > 0 ? ` group-title="${item.tags[0]}"` : ' group-title="SauceBox"';
       let thumbUrl = '';
       let extArt = '';
       if (item.thumbnail) {
         const thumbName = path.basename(item.thumbnail);
-        const fullThumbUrl = `http://${localIp}:${port}/${encodeURIComponent(thumbName)}`;
+        const fullThumbUrl = `http://${externalIp}:${externalPort}/${encodeURIComponent(thumbName)}`;
         thumbUrl = ` tvg-logo="${fullThumbUrl}"`;
         extArt = `#EXTART:${fullThumbUrl}\n`;
       }
@@ -51,14 +57,14 @@ function setupMediaServerHandlers() {
       if (extArt) m3u += extArt;
       const filename = path.basename(item.path || '');
       const urlSuffix = transcodeEnabled ? '?transcode=1' : '';
-      m3u += `http://${localIp}:${port}/${encodeURIComponent(filename)}${urlSuffix}\n`;
+      m3u += `http://${externalIp}:${externalPort}/${encodeURIComponent(filename)}${urlSuffix}\n`;
     }
 
     try {
       fs.mkdirSync(servePath, { recursive: true });
       const m3uPath = path.join(servePath, 'stream.m3u');
       fs.writeFileSync(m3uPath, m3u, 'utf8');
-      return { success: true, path: m3uPath, url: `http://${localIp}:${port}/stream.m3u` };
+      return { success: true, path: m3uPath, url: `http://${externalIp}:${externalPort}/stream.m3u` };
     } catch (error) {
       return { success: false, error: error.message };
     }

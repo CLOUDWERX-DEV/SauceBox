@@ -1,0 +1,16 @@
+services:
+  saucebox:
+    image: cloudwerxlabs/saucebox:latest
+    container_name: saucebox
+    restart: unless-stopped
+    ports:
+      # Format is "HostPort:ContainerPort"
+      # You can change the FIRST number to map to a different port on your host.
+      - "8080:8080"     # Main Web UI and API Port
+      - "8081:8081"     # Media Streaming Port (If Broadcast is enabled)
+    volumes:
+      - ./saucebox_data:/data   # Persists configuration and gallery library
+    environment:
+      - TZ=America/New_York     # Optional: Set your local timezone
+      # - SAUCEBOX_HOST_IP=192.168.1.100    # Set this if your Broadcast M3U needs a specific LAN IP
+      # - SAUCEBOX_HOST_PORT=8081           # Set this if you changed the Broadcast port above (e.g. 9091)
